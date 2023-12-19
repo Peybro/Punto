@@ -370,7 +370,8 @@
 
 		<button
 			on:click={startRound}
-			disabled={$players.length !== 1 || $playerName !== $host || $roundHasStarted}>Start</button
+			disabled={$players.length !== (dev ? 1 : 4) || $playerName !== $host || $roundHasStarted}
+			>Start</button
 		>
 		<button on:click={resetLobby} disabled={!$roundHasStarted}>Runde beenden</button>
 
