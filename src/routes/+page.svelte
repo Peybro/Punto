@@ -14,8 +14,9 @@
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import { browser } from '$app/environment';
-	import type { Player } from '$lib/types';
+	import type { Color, Player } from '$lib/types';
 	import { dev } from '$app/environment';
+	import { getBeautifulColors } from '$lib/utils';
 
 	async function resetLobby() {
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
@@ -241,14 +242,19 @@
 		listenToLobby(newLobbyCode);
 	}
 
+	// TODO: fix joining with same name possible
 	async function joinLobby() {
+		let legitToJoin = true;
+
 		if ($playerName === '') {
 			toast.push('Bitte gib einen Namen ein!');
+			legitToJoin = false;
 			return;
 		}
 
 		if ($lobbyCode.length !== 6) {
 			toast.push('Bitte gib einen gültigen Raumcode ein!');
+			legitToJoin = false;
 			return;
 		}
 
@@ -260,26 +266,37 @@
 			playersOnline = snap.val();
 		});
 
-		await update(ref(db, `${$lobbyCode}/`), {
-			players: [
-				...playersOnline,
-				{
-					name: $playerName,
-					connections: -1,
-					color: ['red', 'blue', 'green', 'yellow'][playersOnline.length],
-					deck: duplicate(
-						shuffle(
-							Array(9)
-								.fill(0)
-								.map((_, i) => i + 1)
-						).map((v) => ({
-							value: v,
-							color: ['red', 'blue', 'green', 'yellow'][playersOnline.length]
-						}))
-					)
-				}
-			]
-		});
+		if (playersOnline.some((p) => p.name === $playerName)) {
+			toast.push('Es gibt bereits einen Spieler mit diesem Namen!');
+			legitToJoin = false;
+			return;
+		}
+
+		if (legitToJoin) {
+			await update(ref(db, `${$lobbyCode}/`), {
+				players: [
+					...playersOnline,
+					{
+						name: $playerName,
+						connections: -1,
+						color: ['red', 'blue', 'green', 'yellow'][playersOnline.length],
+						deck: duplicate(
+							shuffle(
+								Array(9)
+									.fill(0)
+									.map((_, i) => i + 1)
+							).map((v) => ({
+								value: v,
+								color: ['red', 'blue', 'green', 'yellow'][playersOnline.length]
+							}))
+						)
+					}
+				]
+			});
+		} else {
+			stopListeningToLobby();
+			$lobbyConnected = false;
+		}
 	}
 
 	function closeLobby() {
@@ -348,12 +365,11 @@
 	{/if}
 
 	{#if $lobbyConnected}
-		<h2>Players:</h2>
-		<ul>
+		<div style="display: flex; justify-content: space-around;">
 			{#each $players as player}
-				<li style="background-color: {player.color}">
+				<div style="background-color: {getBeautifulColors(player.color)}">
 					{player.name}
-					{#each player.deck as card}{card.value}{/each}
+					<!-- {#each player.deck as card}{card.value}{/each} -->
 					{#if player.name === $host}
 						(Host)
 					{/if}
@@ -364,22 +380,29 @@
 					{#if $playerName === $host && player.name !== $host}
 						<button on:click={() => kickPlayer(player.name)}>Kick</button>
 					{/if}
-				</li>
+				</div>
 			{/each}
-		</ul>
+		</div>
 
 		<button
 			on:click={startRound}
-			disabled={$players.length !== (dev ? 1 : 4) || $playerName !== $host || $roundHasStarted}
+			disabled={(dev ? false : $players.length !== 4) || $playerName !== $host || $roundHasStarted}
 			>Start</button
 		>
-		<button on:click={resetLobby} disabled={!$roundHasStarted}>Runde beenden</button>
+		<button on:click={resetLobby} disabled={$playerName !== $host || !$roundHasStarted}
+			>Runde beenden</button
+		>
 
 		{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
 			<h3>
 				Zug #{$gameState.turn + 1}:
-				<span style="background-color: {$players[$gameState.currentPlayerIndex].color}"
-					>{$players[$gameState.currentPlayerIndex].name}</span
+				<span
+					class={$players[$gameState.currentPlayerIndex]?.color}
+					style="background-color: {getBeautifulColors(
+						$players[$gameState.currentPlayerIndex]?.color
+					)}"
+					>{$players[$gameState.currentPlayerIndex].name}:
+					{$players[$gameState.currentPlayerIndex].deck[0].value}</span
 				>
 			</h3>
 		{/if}

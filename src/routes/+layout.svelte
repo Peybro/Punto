@@ -15,5 +15,16 @@
 	};
 </script>
 
-<slot />
-<SvelteToast {options} />
+<body>
+	<slot />
+	<SvelteToast {options} />
+</body>
+
+<style scoped>
+	body {
+		margin: 0;
+		padding: 0;
+		font-family: sans-serif;
+		background-color: #161616;
+	}
+</style>

@@ -3,6 +3,7 @@
 	import { db } from '$lib/firebase';
 	import { ref, update } from 'firebase/database';
 	import Face from './dice/Face.svelte';
+	import { getBeautifulColors } from '$lib/utils';
 
 	/**
 	 * Plays a card on the board.
@@ -22,17 +23,18 @@
 					return card;
 				})
 			),
-			turn: $gameState.turn + 1,
-			currentPlayerIndex: ($gameState.currentPlayerIndex + 1) % $players.length
+			turn: $gameState.turn + 1
 		});
 
 		await update(ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}`), {
-			deck: $players[
-				$gameState.currentPlayerIndex < $players.length - 1 ? $gameState.currentPlayerIndex - 1 : 0
-			].deck.slice(1)
+			deck: $players[$gameState.currentPlayerIndex].deck.slice(1)
 		});
 
-		console.log(getMinAndMaxIndices(), getPlayedBoardDimensions());
+		await update(ref(db, `${$lobbyCode}/gameState`), {
+			currentPlayerIndex: ($gameState.currentPlayerIndex + 1) % $players.length
+		});
+
+		// console.log(getMinAndMaxIndices(), getPlayedBoardDimensions());
 	}
 
 	/**
@@ -177,23 +179,25 @@
 			{#if $gameState.turn === 0}
 				{#if rowIndex === 5 && cardIndex === 5}
 					<button
-						style="background-color: lightgrey"
+						class="cell"
+						style="border: none; background-color: lightgrey"
 						on:click={() => playCard(rowIndex, cardIndex)}
 						disabled={($players.length > 0
 							? $players[$gameState.currentPlayerIndex].name !== $playerName
 							: true) || !$roundHasStarted}
-						>{card.value}
+						>{' '}
 					</button>
 				{:else}
-					<button style="background-color: white" disabled>{card.value}</button>
+					<button class="cell" style="border:none; background-color: white" disabled>{' '}</button>
 				{/if}
 			{:else}
 				<button
-					style="background-color: {card.value > 0
+					class="cell"
+					style="border: none; background-color: {card.value > 0
 						? 'black'
 						: isAllowedField(rowIndex, cardIndex)
 							? 'lightgrey'
-							: 'white'}; color: {card.color};"
+							: 'white'}; color: {getBeautifulColors(card.color)};"
 					on:click={() => playCard(rowIndex, cardIndex)}
 					disabled={$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
 						$players[$gameState.currentPlayerIndex].name !== $playerName ||
@@ -201,7 +205,7 @@
 						!$roundHasStarted}
 				>
 					<!-- <Face value={card.value} color={card.color} /> -->
-					{card.value}
+					{card.value > 0 ? card.value : ' '}
 				</button>
 			{/if}
 		{/each}
@@ -209,4 +213,9 @@
 {/each}
 
 <style>
+	.cell {
+		width: 30px;
+		height: 30px;
+		font-size: 20px;
+	}
 </style>
