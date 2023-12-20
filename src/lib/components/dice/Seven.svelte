@@ -1,18 +1,18 @@
 <script lang="ts">
-	import './dice.css';
 	import type { Color } from '$lib/types';
+	import { getBeautifulColors } from '$lib/utils';
 
 	export let color: Color;
 </script>
 
 <div class="grid-container seven">
-	<div style="background-color: {color}" class="item1"></div>
-	<div style="background-color: {color}" class="item2"></div>
-	<div style="background-color: {color}" class="item3"></div>
-	<div style="background-color: {color}" class="item4"></div>
-	<div style="background-color: {color}" class="item5"></div>
-	<div style="background-color: {color}" class="item6"></div>
-	<div style="background-color: {color}" class="item7"></div>
+	<div class={`item1 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item2 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item3 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item4 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item5 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item6 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item7 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
 </div>
 
 <style>

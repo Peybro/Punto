@@ -1,13 +1,14 @@
 <script lang="ts">
-	import './dice.css';
 	import type { Color } from "$lib/types";
+	import { getBeautifulColors } from "$lib/utils";
 
 	export let color: Color;
 </script>
 
 <div class="grid-container two">
-	<div style="background-color: {color}" class="item1"></div>
-	<div style="background-color: {color}" class="item2"></div>
+	<div class={`item1 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item2 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`filler bg-dark`}></div>
 </div>
 
 <style scoped>
@@ -16,5 +17,8 @@
 	}
 	.two > .item2 {
 		grid-area: i;
+	}
+	.two > .filler {
+		grid-area: e;
 	}
 </style>

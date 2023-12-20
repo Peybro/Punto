@@ -2,9 +2,6 @@
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import toast, { Toaster } from 'svelte-french-toast';
 
-	// Import our custom CSS
-	import './../scss/styles.scss';
-
 	import { browser } from '$app/environment';
 
 	// Default options
@@ -20,7 +17,10 @@
 		classes: [] // user-defined classes
 	};
 
-	import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+	// Import our custom CSS
+	import './../scss/styles.scss';
+	browser && import('bootstrap');
+	// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 </script>
 
 <body class="bg-dark text-light">

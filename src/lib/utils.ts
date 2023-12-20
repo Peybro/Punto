@@ -2,7 +2,7 @@ import type { Color } from '$lib/types';
 import { set } from '@firebase/database';
 import { codeCopied } from './store';
 
-function getBeautifulColors(color: Color) {
+function getBeautifulColors(color: Color | string) {
 	return [
 		{ color: 'red', hex: '#dc3522', bootstrap: 'danger' },
 		{ color: 'blue', hex: '#02ace7', bootstrap: 'info' },

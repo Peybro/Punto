@@ -4,5 +4,26 @@ $success: #78b728;
 $warning: #f1b300;
 $dark: #161616;
 
-@import 'bootstrap/scss/bootstrap';
+.grid-container {
+	display: grid;
+	grid-template:
+		'a b c'
+		'd e f'
+		'g h i';
+	grid-gap: 3px;
+	aspect-ratio: 1 / 1;
+	justify-content: space-between;
+	align-items: center;
+    padding: 2px;
+}
+
+.grid-container > div {
+	text-align: center;
+	width: calc(100vw / 50);
+    max-width: 10px;
+	aspect-ratio: 1 / 1;
+	border-radius: 50%;
+}
+
+@import 'bootstrap/scss/bootstrap.scss';
 @import 'bootstrap-icons/font/bootstrap-icons.css';

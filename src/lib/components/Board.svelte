@@ -84,6 +84,8 @@
 	 */
 	function isAllowedField(rowIndex: number, cardIndex: number) {
 		return (
+			// first round
+			($gameState.turn === 0 && rowIndex === 5 && cardIndex === 5) ||
 			// upper left corner
 			(rowIndex === 0 &&
 				rowIndex < $gameState.board.length - 1 &&
@@ -173,44 +175,27 @@
 	}
 </script>
 
-<div class="container">
+<div class="">
 	{#each $gameState.board as row, rowIndex}
-		<div class="row g-0 mb-1">
+		<div class="w-100 d-flex justify-content-center">
 			{#each row as card, cardIndex}
-				<div class="col mx-1">
-					{#if $gameState.turn === 0}
-						{#if rowIndex === 5 && cardIndex === 5}
-							<button
-								class="cell bg-secondary w-100 border-0 rounded"
-								on:click={() => playCard(rowIndex, cardIndex)}
-								disabled={($players.length > 0
-									? $players[$gameState.currentPlayerIndex].name !== $playerName
-									: true) || !$roundHasStarted}
-							>
-							</button>
-						{:else}
-							<button class="cell invisible w-100 border-0 rounded" disabled></button>
-						{/if}
-					{:else}
-						<button
-							class={`cell w-100 rounded ${
-								card.value > 0
-									? 'bg-dark border-1'
-									: isAllowedField(rowIndex, cardIndex)
-										? 'bg-secondary border-0'
-										: 'invisible'
-							} text-${getBeautifulColors(card.color)?.bootstrap}`}
-							on:click={() => playCard(rowIndex, cardIndex)}
-							disabled={$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
-								$players[$gameState.currentPlayerIndex].name !== $playerName ||
-								(card.value === 0 && !isAllowedField(rowIndex, cardIndex)) ||
-								!$roundHasStarted}
-						>
-							<!-- <Face value={card.value} color={card.color} /> -->
-							{card.value > 0 ? card.value : ''}
-						</button>
-					{/if}
-				</div>
+					<button
+						class={`p-0 cell rounded ${
+							card.value > 0
+								? 'bg-dark border-1'
+								: isAllowedField(rowIndex, cardIndex)
+									? 'bg-secondary border-1 border-secondary'
+									: 'invisible border-1'
+						} text-${getBeautifulColors(card.color)?.bootstrap}`}
+						on:click={() => playCard(rowIndex, cardIndex)}
+						disabled={$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
+							$players[$gameState.currentPlayerIndex].name !== $playerName ||
+							(card.value === 0 && !isAllowedField(rowIndex, cardIndex)) ||
+							!$roundHasStarted}
+					>
+						<Face value={card.value} color={card.color} />
+						<!-- {card.value > 0 ? card.value : ''} -->
+					</button>
 			{/each}
 		</div>
 	{/each}
@@ -219,5 +204,7 @@
 <style scoped>
 	.cell {
 		aspect-ratio: 1/1;
+		width: calc(100% / 10.5);
+		max-width: 50px;
 	}
 </style>

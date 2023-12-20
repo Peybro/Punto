@@ -1,11 +1,22 @@
 <script lang="ts">
-	import './dice.css';
 </script>
 
-<div class="grid-container"></div>
+<div class="grid-container empty">
+	<div class={`filler1`}></div>
+	<div class={`filler2`}></div>
+	<div class={`filler3`}></div>
+</div>
 
 <style scoped>
-	.grid-container {
-		background-color: white;
+	.empty > .filler1 {
+		grid-area: d;
+	}
+
+	.empty > .filler2 {
+		grid-area: e;
+	}
+
+	.empty > .filler3 {
+		grid-area: f;
 	}
 </style>

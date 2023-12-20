@@ -20,6 +20,8 @@
 	import { dev } from '$app/environment';
 	import { copyTextToClipboard, getBeautifulColors } from '$lib/utils';
 
+	let infoVisible = true;
+
 	async function resetLobby() {
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
 
@@ -42,6 +44,8 @@
 			turn: 0,
 			currentPlayerIndex: 0
 		};
+
+		infoVisible = true;
 	}
 
 	function resetApp() {
@@ -56,6 +60,7 @@
 			currentPlayerIndex: 0
 		};
 		$roundHasStarted = false;
+		infoVisible = true;
 	}
 
 	function listenToLobby(code: string) {
@@ -76,11 +81,6 @@
 				return;
 			}
 
-			$host = data.host;
-			$players = data.players;
-			$gameState = data.gameState;
-			$roundHasStarted = data.roundHasStartet;
-
 			if (isInARowOfSameColor(4)) {
 				// TODO: fix double win message
 				toast(
@@ -93,6 +93,13 @@
 				);
 				$roundHasStarted = false;
 			}
+
+			$host = data.host;
+			$players = data.players;
+			$gameState = data.gameState;
+			$roundHasStarted = data.roundHasStartet;
+
+			infoVisible = !data.roundHasStartet;
 		});
 	}
 
@@ -154,48 +161,10 @@
 		}
 
 		// check diagonal (top left to bottom right)
-		for (let i = 0; i < height; i++) {
-			let count = 0;
-			let lastColor = null;
-			for (let j = 0; j < width; j++) {
-				if ($gameState.board[i][j].value > 0) {
-					if ($gameState.board[i][j].color === lastColor) {
-						count++;
-					} else {
-						count = 1;
-						lastColor = $gameState.board[i][j].color;
-					}
-				} else {
-					count = 0;
-					lastColor = null;
-				}
-				if (count >= nr) {
-					return true;
-				}
-			}
-		}
+		
 
 		// check diagonal (top right to bottom left)
-		for (let i = 0; i < height; i++) {
-			let count = 0;
-			let lastColor = null;
-			for (let j = width - 1; j >= 0; j--) {
-				if ($gameState.board[i][j].value > 0) {
-					if ($gameState.board[i][j].color === lastColor) {
-						count++;
-					} else {
-						count = 1;
-						lastColor = $gameState.board[i][j].color;
-					}
-				} else {
-					count = 0;
-					lastColor = null;
-				}
-				if (count >= nr) {
-					return true;
-				}
-			}
-		}
+		
 
 		return false;
 	}
@@ -261,10 +230,7 @@
 			return;
 		}
 
-		$lobbyConnected = true;
-		listenToLobby($lobbyCode);
-
-		let playersOnline: any[] = [];
+		let playersOnline: Player[] | [] = [];
 		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
 			playersOnline = snap.val();
 		});
@@ -282,7 +248,9 @@
 					{
 						name: $playerName,
 						connections: -1,
-						color: ['red', 'blue', 'green', 'yellow'][playersOnline.length],
+						color: ['red', 'blue', 'green', 'yellow'].filter(
+							(color) => !playersOnline.some((p) => p.color === color)
+						)[0],
 						deck: duplicate(
 							shuffle(
 								Array(9)
@@ -290,12 +258,17 @@
 									.map((_, i) => i + 1)
 							).map((v) => ({
 								value: v,
-								color: ['red', 'blue', 'green', 'yellow'][playersOnline.length]
+								color: ['red', 'blue', 'green', 'yellow'].filter(
+									(color) => !playersOnline.some((p) => p.color === color)
+								)[0]
 							}))
 						)
 					}
 				]
 			});
+
+			$lobbyConnected = true;
+			listenToLobby($lobbyCode);
 		} else {
 			stopListeningToLobby();
 			$lobbyConnected = false;
@@ -308,21 +281,21 @@
 		resetApp();
 	}
 
-	function leaveLobby() {
+	async function leaveLobby() {
 		if ($players.length === 1) {
 			closeLobby();
 			return;
 		}
+		await set(
+			ref(db, `${$lobbyCode}/players/`),
+			$players.filter((p) => p.name !== $playerName)
+		);
 		if ($host === $playerName) {
-			update(ref(db, `${$lobbyCode}/`), {
+			await update(ref(db, `${$lobbyCode}/`), {
 				host: $players.filter((p) => p.name !== $playerName)[0].name
 			});
 		}
 		stopListeningToLobby();
-		set(
-			ref(db, `${$lobbyCode}/players/${$players.find((p) => p.name !== $playerName)?.name}`),
-			null
-		);
 		resetApp();
 	}
 
@@ -348,7 +321,7 @@
 </script>
 
 <main class="container">
-	<h1>
+	<h1 class="mt-2 mb-4">
 		<span class="text-danger">p</span>
 		<span class="text-info">u</span>
 		<span class="text-warning">n</span>
@@ -356,96 +329,131 @@
 		<span class="text-danger">o</span>
 	</h1>
 
-	<input
-		type="text"
-		class="form-control"
-		bind:value={$playerName}
-		placeholder="Name"
-		disabled={$lobbyConnected}
-	/>
-	{#if $lobbyConnected && $host === $playerName}
-		<button class="btn btn-danger" on:click={closeLobby}>Raum schließen</button>
-	{:else}
-		<button class="btn btn-primary" on:click={createLobby} disabled={$playerName.length === 0}
-			>Raum erstellen</button
-		>
+	{#if infoVisible}
+		<div class="row g-1">
+			<div class="col-xs-12 col-md-6 col-xl-3">
+				<input
+					type="text"
+					class="form-control"
+					bind:value={$playerName}
+					placeholder="Name"
+					disabled={$lobbyConnected}
+				/>
+			</div>
+
+			<div class="col-xs-12 col-md-6 col-xl-3">
+				<div class="input-group">
+					<input
+						type="text"
+						class="form-control"
+						value={$lobbyCode}
+						on:input={(e) => ($lobbyCode = e.currentTarget.value.toUpperCase())}
+						placeholder="Lobby Code"
+						disabled={$lobbyConnected}
+					/>
+					{#if navigator.clipboard && $lobbyConnected}
+						<button class="btn btn-outline-primary" on:click={() => copyTextToClipboard($lobbyCode)}
+							>{#if $codeCopied}
+								<i class="bi bi-clipboard-check"></i>
+							{:else}<i class="bi bi-clipboard-plus"></i>
+							{/if}</button
+						>
+					{/if}
+				</div>
+			</div>
+
+			<div class="col-xs-2 col-md-6 col-xl-3">
+				{#if $lobbyConnected && $host === $playerName}
+					<button class="btn btn-danger w-100" on:click={closeLobby}>Raum schließen</button>
+				{:else}
+					<button
+						class="btn btn-primary w-100"
+						on:click={createLobby}
+						disabled={$playerName.length === 0}>Raum erstellen</button
+					>
+				{/if}
+			</div>
+
+			<div class="col-xs-6 col-md-6 col-xl-3">
+				{#if $lobbyConnected}
+					<button class="btn btn-warning w-100" on:click={leaveLobby}>Raum verlassen</button>
+				{:else}
+					<button
+						class="btn btn-primary w-100"
+						on:click={joinLobby}
+						disabled={$lobbyCode.length !== 6}>Raum betreten</button
+					>
+				{/if}
+			</div>
+		</div>
 	{/if}
 
-	<div class="input-group">
-		<input
-			type="text"
-			class="form-control"
-			value={$lobbyCode}
-			on:input={(e) => ($lobbyCode = e.currentTarget.value.toUpperCase())}
-			placeholder="Lobby Code"
-			disabled={$lobbyConnected}
-		/>
-		{#if navigator.clipboard && $lobbyConnected}
-			<button class="btn btn-outline-primary" on:click={() => copyTextToClipboard($lobbyCode)}
-				>{#if $codeCopied}
-					<i class="bi bi-clipboard-check"></i>
-				{:else}<i class="bi bi-clipboard-plus"></i>
-				{/if}</button
-			>
-		{/if}
-	</div>
-
 	{#if $lobbyConnected}
-		<button class="btn btn-warning" on:click={leaveLobby}>Raum verlassen</button>
-	{:else}
-		<button class="btn btn-primary" on:click={joinLobby} disabled={$lobbyCode.length !== 6}
-			>Raum betreten</button
-		>
-	{/if}
-
-	{#if $lobbyConnected}
-		<div class="container">
-			<div class="my-4 row">
-				{#each $players as player}
-					<div class="btn-group col">
-						<button type="button" class={`bg-${getBeautifulColors(player.color)?.bootstrap}`}
+		{#if infoVisible}
+			<div class="row my-4 text-center g-1">
+				<h4 class="text-start">Spieler</h4>
+				{#each $players as player, i}
+					<div class="btn-group col-xs-6 col-sm-3">
+						<button type="button" class={`btn bg-${getBeautifulColors(player.color)?.bootstrap}`}
 							>{player.name}
 							{#if player.name === $host}
 								(Host)
 							{/if}</button
 						>
-						<button
-							type="button"
-							class="btn btn-danger dropdown-toggle dropdown-toggle-split"
-							data-bs-toggle="dropdown"
-						>
-							<span class="visually-hidden">Toggle Dropdown</span>
-						</button>
-						<ul class="dropdown-menu">
-							<li>
-								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>rot</a>
-							</li>
-							<li>
-								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>blau</a>
-							</li>
-							<li>
-								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>gelb</a>
-							</li>
-							<li>
-								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>grün</a>
-							</li>
-							{#if $playerName === $host && player.name !== $host}
-								<li><hr class="dropdown-divider" /></li>
-								<li>
-									<a class="dropdown-item" role="button" on:click={() => kickPlayer(player.name)}
-										>Kick</a
-									>
-								</li>
-							{/if}
-						</ul>
+						{#if player.name === $playerName || $playerName === $host}
+							<button
+								type="button"
+								class={`btn btn-${
+									getBeautifulColors(player.color)?.bootstrap
+								} dropdown-toggle dropdown-toggle-split`}
+								data-bs-toggle="dropdown"
+							>
+								<span class="visually-hidden">Toggle Dropdown</span>
+							</button>
+
+							<ul class="dropdown-menu bg-dark">
+								{#each ['red', 'blue', 'green', 'yellow'] as color}
+									<li>
+										<button
+											class={`dropdown-item bg-${getBeautifulColors(color)?.bootstrap}`}
+											on:click={() =>
+												update(ref(db, `${$lobbyCode}/players/${i}`), {
+													color: color
+												})}
+											disabled={$players.some((p) => p.color === color) || $roundHasStarted}
+										>
+											{['Rot', 'Blau', 'Grün', 'Gelb'][
+												['red', 'blue', 'green', 'yellow'].indexOf(color)
+											]}
+										</button>
+									</li>
+								{/each}
+								{#if $playerName === $host && player.name !== $host}
+									<li><hr class="dropdown-divider" /></li>
+									<li>
+										<button class="dropdown-item" on:click={() => kickPlayer(player.name)}
+											>Kick</button
+										>
+									</li>
+								{/if}
+							</ul>
+						{/if}
 					</div>
 				{/each}
 				{#each Array(4 - $players.length) as _}
-					<div class="col bg-secondary p-2 border">[unbesetzt]</div>
+					<div class={`col-xs-6 col-sm-3 bg-secondary p-2 rounded`}>[unbesetzt]</div>
 				{/each}
 			</div>
-		</div>
+		{/if}
 
+		{#if $roundHasStarted}
+			<button
+				class="btn btn-outline-secondary"
+				on:click={() => {
+					infoVisible = !infoVisible;
+				}}>Info</button
+			>
+		{/if}
 		<button
 			class="btn btn-primary"
 			on:click={startRound}
@@ -459,24 +467,39 @@
 		>
 
 		{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
-			<h3>
-				Zug #{$gameState.turn + 1}:
-				<span
-					class={`bg-${
+			<div class="d-flex my-4">
+				<h4 class="">
+					Zug #{$gameState.turn + 1}:
+					<span
+						class={`p-1 rounded bg-${
+							getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
+						}`}
+						>{$players[$gameState.currentPlayerIndex].name}
+					</span>
+				</h4>
+
+				<div style="width: 3rem; aspect-ratio: 1/1" class="ms-2 p-1 border rounded">
+					<Face
+						value={$players[$gameState.currentPlayerIndex].deck[0].value}
+						color={$players[$gameState.currentPlayerIndex].deck[0].color}
+					/>
+				</div>
+
+				<!-- <button
+					class={`col btn btn-dark border-light text-${
 						getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
 					}`}
-					>{$players[$gameState.currentPlayerIndex].name}:
-					{$players[$gameState.currentPlayerIndex].deck[0].value}</span
-				>
-			</h3>
-		{/if}
+					style="aspect-ratio: 1/1">{$players[$gameState.currentPlayerIndex].deck[0].value}</button
+				> -->
+			</div>
 
-		<Board />
+			<Board />
+		{/if}
 	{:else}
-		<h1>Kein Raum verbunden</h1>
+		<h1 class="mt-5">Kein Raum verbunden</h1>
 	{/if}
 </main>
 
 {#if dev}
-	<button on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
+	<button class="m-2" on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
 {/if}
