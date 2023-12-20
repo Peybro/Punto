@@ -76,7 +76,7 @@
 	function getPlayedBoardDimensions() {
 		const { minX, maxX, minY, maxY } = getMinAndMaxIndices();
 
-		return { width: maxY - minY + 1, height: maxX - minX + 1 };
+		return { height: maxY - minY + 1, width: maxX - minX + 1 };
 	}
 
 	/**
@@ -86,32 +86,34 @@
 	 */
 	function isAllowedField(rowIndex: number, cardIndex: number) {
 		// check if the field is in the allowed area
-		let minI = -1;
-		let maxI = -1;
-		let minJ = -1;
-		let maxJ = -1;
-
-		if (getPlayedBoardDimensions().width === 6) {
-			minI = getMinAndMaxIndices().maxY - 5;
-			maxI = getMinAndMaxIndices().minY + 5;
-		}
+		let minY = -1;
+		let maxY = -1;
+		let minX = -1;
+		let maxX = -1;
 
 		if (getPlayedBoardDimensions().height === 6) {
-			minJ = getMinAndMaxIndices().maxX - 5;
-			maxJ = getMinAndMaxIndices().minX + 5;
+			minY = getMinAndMaxIndices().maxY - 5;
+			maxY = getMinAndMaxIndices().minY + 5;
 		}
 
-		// console.log(minI, maxI, minJ, maxJ);
+		if (getPlayedBoardDimensions().width === 6) {
+			minX = getMinAndMaxIndices().maxX - 5;
+			maxX = getMinAndMaxIndices().minX + 5;
+		}
 
+		console.log(minY, maxY, minX, maxX);
+
+		// TODO: better structuring
 		return (
-			// (minJ >= 0 &&
-			// 	cardIndex >= minJ &&
-			// 	maxJ >= 0 &&
-			// 	cardIndex <= maxJ &&
-			// 	minI >= 0 &&
-			// 	rowIndex >= minI &&
-			// 	maxI >= 0 &&
-			// 	rowIndex <= maxI) ||
+			// TODO: merge these conditions correctly
+			// ((minX >= 0 &&
+			// 	cardIndex >= minX &&
+			// 	maxX >= 0 &&
+			// 	cardIndex <= maxX) ||
+			// 	(minY >= 0 &&
+			// 	rowIndex >= minY &&
+			// 	maxY >= 0 &&
+			// 	rowIndex <= maxY)) &&
 
 			// first round
 			($gameState.turn === 0 && rowIndex === 5 && cardIndex === 5) ||
