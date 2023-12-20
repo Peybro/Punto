@@ -462,8 +462,10 @@
 		<button
 			class="btn btn-primary"
 			on:click={startRound}
-			disabled={(dev ? false : $players.length !== 4) || $playerName !== $host || $roundHasStarted}
-			>Start</button
+			disabled={(dev ? false : $players.length !== 4) ||
+				$playerName === 'Lonewolf' ||
+				$playerName !== $host ||
+				$roundHasStarted}>Start</button
 		>
 		<button
 			class="btn btn-warning"
