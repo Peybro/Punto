@@ -81,7 +81,7 @@
 				return;
 			}
 
-			if (isInARowOfSameColor(4)) {
+			if (fourInARow()) {
 				// TODO: after win it's needed to press Start twice for new round
 				toast(
 					`${
@@ -109,62 +109,69 @@
 		off(ref(db, `${$lobbyCode}/`));
 	}
 
-	// TODO: fix diagonal checks
 	/**
 	 * Returns true if there are at least nr cards of the same color (red, blue, green or yellow) in a row.
 	 * @param nr The number of cards in a row.
 	 */
-	function isInARowOfSameColor(nr: number) {
+	function fourInARow() {
 		const width = $gameState.board[0].length;
 		const height = $gameState.board.length;
 
 		// check horizontal
 		for (let i = 0; i < height; i++) {
-			let count = 0;
-			let lastColor = null;
-			for (let j = 0; j < width; j++) {
-				if ($gameState.board[i][j].value > 0) {
-					if ($gameState.board[i][j].color === lastColor) {
-						count++;
-					} else {
-						count = 1;
-						lastColor = $gameState.board[i][j].color;
-					}
-				} else {
-					count = 0;
-					lastColor = null;
-				}
-				if (count >= nr) {
+			for (let j = 0; j < width - 3; j++) {
+				if (
+					$gameState.board[i][j].value > 0 &&
+					$gameState.board[i][j].color === $gameState.board[i][j + 1].color &&
+					$gameState.board[i][j].color === $gameState.board[i][j + 2].color &&
+					$gameState.board[i][j].color === $gameState.board[i][j + 3].color
+				) {
 					return true;
 				}
 			}
 		}
 
 		// check vertical
-		for (let j = 0; j < width; j++) {
-			let count = 0;
-			let lastColor = null;
-			for (let i = 0; i < height; i++) {
-				if ($gameState.board[i][j].value > 0) {
-					if ($gameState.board[i][j].color === lastColor) {
-						count++;
-					} else {
-						count = 1;
-						lastColor = $gameState.board[i][j].color;
-					}
-				} else {
-					count = 0;
-					lastColor = null;
-				}
-				if (count >= nr) {
+		for (let i = 0; i < height - 3; i++) {
+			for (let j = 0; j < width; j++) {
+				if (
+					$gameState.board[i][j].value > 0 &&
+					$gameState.board[i][j].color === $gameState.board[i + 1][j].color &&
+					$gameState.board[i][j].color === $gameState.board[i + 2][j].color &&
+					$gameState.board[i][j].color === $gameState.board[i + 3][j].color
+				) {
 					return true;
 				}
 			}
 		}
 
 		// check diagonal (top left to bottom right)
+		for (let i = 3; i < height; i++) {
+			for (let j = 3; j < width; j++) {
+				if (
+					$gameState.board[i][j].value > 0 &&
+					$gameState.board[i][j].color === $gameState.board[i - 1][j - 1].color &&
+					$gameState.board[i][j].color === $gameState.board[i - 2][j - 2].color &&
+					$gameState.board[i][j].color === $gameState.board[i - 3][j - 3].color
+				) {
+					return true;
+				}
+			}
+		}
 
-		// check diagonal (top right to bottom left)
+		// check diagonal (bottom left to top right)
+		for (let i = 3; i < height; i++) {
+			for (let j = 0; j < width - 3; j++) {
+				if (
+					$gameState.board[i][j].value > 0 &&
+					$gameState.board[i][j].color === $gameState.board[i - 1][j + 1].color &&
+					$gameState.board[i][j].color === $gameState.board[i - 2][j + 2].color &&
+					$gameState.board[i][j].color === $gameState.board[i - 3][j + 3].color
+				) {
+					return true;
+				}
+			}
+		}
 
 		return false;
 	}
