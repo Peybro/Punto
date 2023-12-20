@@ -1,5 +1,10 @@
-<script>
+<script lang="ts">
 	import { SvelteToast } from '@zerodevx/svelte-toast';
+
+	// Import our custom CSS
+	import './../scss/styles.scss';
+
+	import { browser } from '$app/environment';
 
 	// Default options
 	const options = {
@@ -15,16 +20,7 @@
 	};
 </script>
 
-<body>
+<body class="bg-dark text-light">
 	<slot />
 	<SvelteToast {options} />
 </body>
-
-<style scoped>
-	body {
-		margin: 0;
-		padding: 0;
-		font-family: sans-serif;
-		background-color: #161616;
-	}
-</style>

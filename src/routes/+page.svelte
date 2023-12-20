@@ -344,24 +344,41 @@
 	}
 </script>
 
-<main>
-	<input type="text" bind:value={$playerName} placeholder="Name" disabled={$lobbyConnected} />
+<main class="container">
+	<h1>
+		<span class="text-danger">p</span>
+		<span class="text-info">u</span>
+		<span class="text-warning">n</span>
+		<span class="text-success">t</span>
+		<span class="text-danger">o</span>
+	</h1>
+
+	<input
+		type="text"
+		class="form-control"
+		bind:value={$playerName}
+		placeholder="Name"
+		disabled={$lobbyConnected}
+	/>
 	{#if $lobbyConnected && $host === $playerName}
-		<button on:click={closeLobby}>Raum schließen</button>
+		<button class="btn btn-primary" on:click={closeLobby}>Raum schließen</button>
 	{:else}
-		<button on:click={createLobby} disabled={$playerName.length === 0}>Raum erstellen</button>
+		<button class="btn btn-primary" on:click={createLobby} disabled={$playerName.length === 0}
+			>Raum erstellen</button
+		>
 	{/if}
 	<input
 		type="text"
+		class="form-control"
 		value={$lobbyCode}
 		on:input={(e) => ($lobbyCode = e.currentTarget.value.toUpperCase())}
 		placeholder="Lobby Code"
 		disabled={$lobbyConnected}
 	/>
 	{#if $lobbyConnected}
-		<button on:click={leaveLobby}>Raum verlassen</button>
+		<button class="btn btn-primary" on:click={leaveLobby}>Raum verlassen</button>
 	{:else}
-		<button on:click={joinLobby} disabled={$lobbyCode.length !== 6}>Raum betreten</button>
+		<button class="btn btn-primary" on:click={joinLobby} disabled={$lobbyCode.length !== 6}>Raum betreten</button>
 	{/if}
 
 	{#if $lobbyConnected}
