@@ -491,7 +491,7 @@
 					</span>
 				</h4>
 
-				<div style="width: 3rem; aspect-ratio: 1/1" class="ms-2 p-1 border rounded">
+				<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden">
 					<Face
 						value={$players[$gameState.currentPlayerIndex].deck[0].value}
 						color={$players[$gameState.currentPlayerIndex].deck[0].color}

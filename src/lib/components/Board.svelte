@@ -181,7 +181,7 @@
 		<div class="w-100 d-flex justify-content-center">
 			{#each row as card, cardIndex}
 				<button
-					class={`p-0 cell rounded ${
+					class={`p-0 cell rounded overflow-hidden ${
 						card.value > 0
 							? 'bg-dark border-1'
 							: isAllowedField(rowIndex, cardIndex)
@@ -204,7 +204,6 @@
 
 <style scoped>
 	.cell {
-		aspect-ratio: 1/1;
 		width: calc(100% / 10.5);
 		max-width: 50px;
 	}
