@@ -83,6 +83,7 @@
 	 * @param cardIndex
 	 */
 	function isAllowedField(rowIndex: number, cardIndex: number) {
+		// TODO: block fields that are beyond 6x6 or cannot be reached anymore
 		return (
 			// first round
 			($gameState.turn === 0 && rowIndex === 5 && cardIndex === 5) ||
@@ -179,23 +180,23 @@
 	{#each $gameState.board as row, rowIndex}
 		<div class="w-100 d-flex justify-content-center">
 			{#each row as card, cardIndex}
-					<button
-						class={`p-0 cell rounded ${
-							card.value > 0
-								? 'bg-dark border-1'
-								: isAllowedField(rowIndex, cardIndex)
-									? 'bg-secondary border-1 border-secondary'
-									: 'invisible border-1'
-						} text-${getBeautifulColors(card.color)?.bootstrap}`}
-						on:click={() => playCard(rowIndex, cardIndex)}
-						disabled={$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
-							$players[$gameState.currentPlayerIndex].name !== $playerName ||
-							(card.value === 0 && !isAllowedField(rowIndex, cardIndex)) ||
-							!$roundHasStarted}
-					>
-						<Face value={card.value} color={card.color} />
-						<!-- {card.value > 0 ? card.value : ''} -->
-					</button>
+				<button
+					class={`p-0 cell rounded ${
+						card.value > 0
+							? 'bg-dark border-1'
+							: isAllowedField(rowIndex, cardIndex)
+								? 'bg-secondary border-1 border-secondary'
+								: 'invisible border-1'
+					} text-${getBeautifulColors(card.color)?.bootstrap}`}
+					on:click={() => playCard(rowIndex, cardIndex)}
+					disabled={$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
+						$players[$gameState.currentPlayerIndex].name !== $playerName ||
+						(card.value === 0 && !isAllowedField(rowIndex, cardIndex)) ||
+						!$roundHasStarted}
+				>
+					<Face value={card.value} color={card.color} />
+					<!-- {card.value > 0 ? card.value : ''} -->
+				</button>
 			{/each}
 		</div>
 	{/each}

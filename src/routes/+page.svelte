@@ -73,7 +73,7 @@
 			}
 
 			if (
-				$players.some((p) => p.name === $playerName) &&
+				$players.some((p: Player) => p.name === $playerName) &&
 				!data.players.some((p: Player) => p.name === $playerName)
 			) {
 				toast.error('Du wurdest gekickt!');
@@ -82,7 +82,7 @@
 			}
 
 			if (isInARowOfSameColor(4)) {
-				// TODO: fix double win message
+				// TODO: after win it's needed to press Start twice for new round
 				toast(
 					`${
 						$gameState.currentPlayerIndex < $players.length - 1
@@ -92,6 +92,8 @@
 					{ icon: '🎉' }
 				);
 				$roundHasStarted = false;
+				infoVisible = true;
+				return;
 			}
 
 			$host = data.host;
@@ -161,19 +163,17 @@
 		}
 
 		// check diagonal (top left to bottom right)
-		
 
 		// check diagonal (top right to bottom left)
-		
 
 		return false;
 	}
 
-	function duplicate(arr: any[]) {
+	function duplicate(arr: any[]): any[] {
 		return [...arr, ...arr];
 	}
 
-	function shuffle(arr: any[]) {
+	function shuffle(arr: any[]): any[] {
 		return arr.sort(() => Math.random() - 0.5);
 	}
 
@@ -214,65 +214,69 @@
 		listenToLobby(newLobbyCode);
 	}
 
-	// TODO: fix joining with same name possible
 	async function joinLobby() {
-		let legitToJoin = true;
-
 		if ($playerName === '') {
 			toast.error('Bitte gib einen Namen ein!');
-			legitToJoin = false;
+			stopListeningToLobby();
+			$lobbyConnected = false;
 			return;
 		}
 
 		if ($lobbyCode.length !== 6) {
 			toast.error('Bitte gib einen gültigen Raumcode ein!');
-			legitToJoin = false;
+			stopListeningToLobby();
+			$lobbyConnected = false;
 			return;
 		}
+
+		await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
+			if (snap.val() === null) {
+				toast.error('Es gibt keinen Raum mit diesem Code!');
+				stopListeningToLobby();
+				$lobbyConnected = false;
+				return;
+			}
+		});
 
 		let playersOnline: Player[] | [] = [];
 		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
 			playersOnline = snap.val();
 		});
 
-		if (playersOnline.some((p) => p.name === $playerName)) {
+		if (playersOnline.some((p: Player) => p.name === $playerName)) {
 			toast.error('Es gibt bereits einen Spieler mit diesem Namen!');
-			legitToJoin = false;
+			stopListeningToLobby();
+			$lobbyConnected = false;
 			return;
 		}
 
-		if (legitToJoin) {
-			await update(ref(db, `${$lobbyCode}/`), {
-				players: [
-					...playersOnline,
-					{
-						name: $playerName,
-						connections: -1,
-						color: ['red', 'blue', 'green', 'yellow'].filter(
-							(color) => !playersOnline.some((p) => p.color === color)
-						)[0],
-						deck: duplicate(
-							shuffle(
-								Array(9)
-									.fill(0)
-									.map((_, i) => i + 1)
-							).map((v) => ({
-								value: v,
-								color: ['red', 'blue', 'green', 'yellow'].filter(
-									(color) => !playersOnline.some((p) => p.color === color)
-								)[0]
-							}))
-						)
-					}
-				]
-			});
+		await update(ref(db, `${$lobbyCode}/`), {
+			players: [
+				...playersOnline,
+				{
+					name: $playerName,
+					connections: -1,
+					color: ['red', 'blue', 'green', 'yellow'].filter(
+						(color) => !playersOnline.some((p) => p.color === color)
+					)[0],
+					deck: duplicate(
+						shuffle(
+							Array(9)
+								.fill(0)
+								.map((_, i) => i + 1)
+						).map((v) => ({
+							value: v,
+							color: ['red', 'blue', 'green', 'yellow'].filter(
+								(color) => !playersOnline.some((p) => p.color === color)
+							)[0]
+						}))
+					)
+				}
+			]
+		});
 
-			$lobbyConnected = true;
-			listenToLobby($lobbyCode);
-		} else {
-			stopListeningToLobby();
-			$lobbyConnected = false;
-		}
+		$lobbyConnected = true;
+		listenToLobby($lobbyCode);
 	}
 
 	function closeLobby() {
@@ -282,6 +286,7 @@
 	}
 
 	async function leaveLobby() {
+		stopListeningToLobby();
 		if ($players.length === 1) {
 			closeLobby();
 			return;
@@ -295,7 +300,6 @@
 				host: $players.filter((p) => p.name !== $playerName)[0].name
 			});
 		}
-		stopListeningToLobby();
 		resetApp();
 	}
 
@@ -321,7 +325,7 @@
 </script>
 
 <main class="container">
-	<h1 class="mt-2 mb-4">
+	<h1 class="mt-2 mb-4 fw-bold">
 		<span class="text-danger">p</span>
 		<span class="text-info">u</span>
 		<span class="text-warning">n</span>
@@ -369,7 +373,8 @@
 					<button
 						class="btn btn-primary w-100"
 						on:click={createLobby}
-						disabled={$playerName.length === 0}>Raum erstellen</button
+						disabled={$playerName.length === 0 || ($host !== '' && $host !== $playerName)}
+						>Raum erstellen</button
 					>
 				{/if}
 			</div>
