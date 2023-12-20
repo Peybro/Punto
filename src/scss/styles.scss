@@ -4,6 +4,10 @@ $success: #78b728;
 $warning: #f1b300;
 $dark: #161616;
 
+html {
+	background-color: $dark;
+}
+
 .grid-container {
 	display: grid;
 	grid-template:
