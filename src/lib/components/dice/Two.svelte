@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Color } from "$lib/types";
-	import { getBeautifulColors } from "$lib/utils";
+	import type { Color } from '$lib/types';
+	import { getBeautifulColors } from '$lib/utils';
 
 	export let color: Color;
 </script>

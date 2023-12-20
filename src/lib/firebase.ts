@@ -1,16 +1,15 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDjR4l8QPm9EkToAexbseyXQW8IJX5T6aI",
-  authDomain: "punto-6e7e1.firebaseapp.com",
-  databaseURL:
-    "https://punto-6e7e1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "punto-6e7e1",
-  storageBucket: "punto-6e7e1.appspot.com",
-  messagingSenderId: "35289506336",
-  appId: "1:35289506336:web:6c933561bb601fafb2d245",
+	apiKey: 'AIzaSyDjR4l8QPm9EkToAexbseyXQW8IJX5T6aI',
+	authDomain: 'punto-6e7e1.firebaseapp.com',
+	databaseURL: 'https://punto-6e7e1-default-rtdb.europe-west1.firebasedatabase.app',
+	projectId: 'punto-6e7e1',
+	storageBucket: 'punto-6e7e1.appspot.com',
+	messagingSenderId: '35289506336',
+	appId: '1:35289506336:web:6c933561bb601fafb2d245'
 };
 
 // Initialize Firebase
