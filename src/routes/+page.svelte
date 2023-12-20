@@ -459,13 +459,20 @@
 				}}>Info</button
 			>
 		{/if}
-		<button
-			class="btn btn-primary"
-			on:click={startRound}
-			disabled={(dev ? false : $players.length !== 4 && $playerName === 'Lonewolf') ||
-				$playerName !== $host ||
-				$roundHasStarted}>Start</button
-		>
+		<!-- start alone -->
+		{#if $playerName === 'Lonewolf' || dev}
+			<button
+				class="btn btn-primary"
+				on:click={startRound}
+				disabled={$playerName !== $host || $roundHasStarted}>Start</button
+			>
+		{:else}
+			<button
+				class="btn btn-primary"
+				on:click={startRound}
+				disabled={$players.length !== 4 || $playerName !== $host || $roundHasStarted}>Start</button
+			>
+		{/if}
 		<button
 			class="btn btn-warning"
 			on:click={resetLobby}
