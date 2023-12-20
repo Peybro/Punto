@@ -493,34 +493,36 @@
 			>
 		{/if}
 
-		{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
-			<div class="d-flex my-4">
-				<h4 class="">
-					Zug #{$gameState.turn + 1}:
-					<span
-						class={`p-1 rounded bg-${
-							getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
-						}`}
-						>{$players[$gameState.currentPlayerIndex].name}
-					</span>
-				</h4>
+		{#if $roundHasStarted || $gameState.turn > 0}
+			{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
+				<div class="d-flex my-4">
+					<h4 class="">
+						Zug #{$gameState.turn + 1}:
+						<span
+							class={`p-1 rounded bg-${
+								getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
+							}`}
+							>{$players[$gameState.currentPlayerIndex].name}
+						</span>
+					</h4>
 
-				<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden">
-					<Face
-						value={$players[$gameState.currentPlayerIndex].deck[0].value}
-						color={$players[$gameState.currentPlayerIndex].deck[0].color}
-					/>
+					<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden">
+						<Face
+							value={$players[$gameState.currentPlayerIndex].deck[0].value}
+							color={$players[$gameState.currentPlayerIndex].deck[0].color}
+						/>
+					</div>
+
+					<!-- <button
+				class={`col btn btn-dark border-light text-${
+					getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
+				}`}
+				style="aspect-ratio: 1/1">{$players[$gameState.currentPlayerIndex].deck[0].value}</button
+			> -->
 				</div>
 
-				<!-- <button
-					class={`col btn btn-dark border-light text-${
-						getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
-					}`}
-					style="aspect-ratio: 1/1">{$players[$gameState.currentPlayerIndex].deck[0].value}</button
-				> -->
-			</div>
-
-			<Board />
+				<Board />
+			{/if}
 		{/if}
 	{:else}
 		<h1 class="mt-5">Kein Raum verbunden</h1>
