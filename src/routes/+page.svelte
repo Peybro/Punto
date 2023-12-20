@@ -83,6 +83,7 @@
 
 			if (fourInARow()) {
 				// TODO: after win it's needed to press Start twice for new round
+				// TODO: multiple win toasts when starting new
 				toast(
 					`${
 						$gameState.currentPlayerIndex < $players.length - 1
@@ -465,26 +466,32 @@
 					infoVisible = !infoVisible;
 				}}>Info</button
 			>
-		{/if}
-		<!-- start alone -->
-		{#if $playerName === 'Lonewolf' || dev}
-			<button
-				class="btn btn-primary"
-				on:click={startRound}
-				disabled={$playerName !== $host || $roundHasStarted}>Start</button
-			>
 		{:else}
+			<h4>Warte darauf dass der Host die Runde beginnt...</h4>
+		{/if}
+
+		{#if $host === $playerName}
+			<!-- start alone -->
+			{#if $playerName === 'Lonewolf' || dev}
+				<button
+					class="btn btn-primary"
+					on:click={startRound}
+					disabled={$playerName !== $host || $roundHasStarted}>Start</button
+				>
+			{:else}
+				<button
+					class="btn btn-primary"
+					on:click={startRound}
+					disabled={$players.length !== 4 || $playerName !== $host || $roundHasStarted}
+					>Start</button
+				>
+			{/if}
 			<button
-				class="btn btn-primary"
-				on:click={startRound}
-				disabled={$players.length !== 4 || $playerName !== $host || $roundHasStarted}>Start</button
+				class="btn btn-warning"
+				on:click={resetLobby}
+				disabled={$playerName !== $host || !$roundHasStarted}>Runde beenden</button
 			>
 		{/if}
-		<button
-			class="btn btn-warning"
-			on:click={resetLobby}
-			disabled={$playerName !== $host || !$roundHasStarted}>Runde beenden</button
-		>
 
 		{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
 			<div class="d-flex my-4">

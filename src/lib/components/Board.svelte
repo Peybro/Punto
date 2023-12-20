@@ -4,6 +4,7 @@
 	import { ref, update } from 'firebase/database';
 	import Face from './dice/Face.svelte';
 	import { getBeautifulColors } from '$lib/utils';
+	import { dev } from '$app/environment';
 
 	/**
 	 * Plays a card on the board.
@@ -27,6 +28,7 @@
 		});
 
 		await update(ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}`), {
+			// TODO: empty decks
 			deck: $players[$gameState.currentPlayerIndex].deck.slice(1)
 		});
 
@@ -83,8 +85,34 @@
 	 * @param cardIndex
 	 */
 	function isAllowedField(rowIndex: number, cardIndex: number) {
-		// TODO: block fields that are beyond 6x6 or cannot be reached anymore
+		// check if the field is in the allowed area
+		let minI = -1;
+		let maxI = -1;
+		let minJ = -1;
+		let maxJ = -1;
+
+		if (getPlayedBoardDimensions().width === 6) {
+			minI = getMinAndMaxIndices().maxY - 5;
+			maxI = getMinAndMaxIndices().minY + 5;
+		}
+
+		if (getPlayedBoardDimensions().height === 6) {
+			minJ = getMinAndMaxIndices().maxX - 5;
+			maxJ = getMinAndMaxIndices().minX + 5;
+		}
+
+		// console.log(minI, maxI, minJ, maxJ);
+
 		return (
+			// (minJ >= 0 &&
+			// 	cardIndex >= minJ &&
+			// 	maxJ >= 0 &&
+			// 	cardIndex <= maxJ &&
+			// 	minI >= 0 &&
+			// 	rowIndex >= minI &&
+			// 	maxI >= 0 &&
+			// 	rowIndex <= maxI) ||
+
 			// first round
 			($gameState.turn === 0 && rowIndex === 5 && cardIndex === 5) ||
 			// upper left corner
@@ -186,7 +214,7 @@
 							? 'bg-dark border-1'
 							: isAllowedField(rowIndex, cardIndex)
 								? 'bg-secondary border-1 border-secondary'
-								: 'invisible border-1'
+								: `${dev ? 'bg-success' : 'invisible'} border-1`
 					} text-${getBeautifulColors(card.color)?.bootstrap}`}
 					on:click={() => playCard(rowIndex, cardIndex)}
 					disabled={$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
