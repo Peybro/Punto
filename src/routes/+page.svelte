@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { db } from '$lib/firebase';
 	import { get, ref, set, onValue, off, update } from 'firebase/database';
-	import { toast } from '@zerodevx/svelte-toast';
+	// import { toast } from '@zerodevx/svelte-toast';
+	import toast, { Toaster } from 'svelte-french-toast';
 	import Board from '$lib/components/Board.svelte';
 	import {
 		playerName,
@@ -10,13 +11,14 @@
 		host,
 		players,
 		gameState,
-		roundHasStarted
+		roundHasStarted,
+		codeCopied
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import { browser } from '$app/environment';
 	import type { Color, Player } from '$lib/types';
 	import { dev } from '$app/environment';
-	import { getBeautifulColors } from '$lib/utils';
+	import { copyTextToClipboard, getBeautifulColors } from '$lib/utils';
 
 	async function resetLobby() {
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
@@ -60,7 +62,7 @@
 		onValue(ref(db, `${code}/`), (snap) => {
 			const data = snap.val();
 			if (data === null) {
-				toast.push('Raum nicht gefunden!');
+				toast.error('Raum nicht gefunden!');
 				leaveLobby();
 				return;
 			}
@@ -69,7 +71,7 @@
 				$players.some((p) => p.name === $playerName) &&
 				!data.players.some((p: Player) => p.name === $playerName)
 			) {
-				toast.push('Du wurdest gekickt!');
+				toast.error('Du wurdest gekickt!');
 				leaveLobby();
 				return;
 			}
@@ -81,12 +83,13 @@
 
 			if (isInARowOfSameColor(4)) {
 				// TODO: fix double win message
-				toast.push(
+				toast(
 					`${
 						$gameState.currentPlayerIndex < $players.length - 1
 							? $players[$gameState.currentPlayerIndex].name
 							: $players[0].name
-					} hat gewonnen!`
+					} hat gewonnen!`,
+					{ icon: '🎉' }
 				);
 				$roundHasStarted = false;
 			}
@@ -207,7 +210,7 @@
 
 	async function createLobby() {
 		if ($playerName === '') {
-			toast.push('Bitte gib einen Namen ein!');
+			toast.error('Bitte gib einen Namen ein!');
 			return;
 		}
 
@@ -247,13 +250,13 @@
 		let legitToJoin = true;
 
 		if ($playerName === '') {
-			toast.push('Bitte gib einen Namen ein!');
+			toast.error('Bitte gib einen Namen ein!');
 			legitToJoin = false;
 			return;
 		}
 
 		if ($lobbyCode.length !== 6) {
-			toast.push('Bitte gib einen gültigen Raumcode ein!');
+			toast.error('Bitte gib einen gültigen Raumcode ein!');
 			legitToJoin = false;
 			return;
 		}
@@ -267,7 +270,7 @@
 		});
 
 		if (playersOnline.some((p) => p.name === $playerName)) {
-			toast.push('Es gibt bereits einen Spieler mit diesem Namen!');
+			toast.error('Es gibt bereits einen Spieler mit diesem Namen!');
 			legitToJoin = false;
 			return;
 		}
@@ -361,63 +364,107 @@
 		disabled={$lobbyConnected}
 	/>
 	{#if $lobbyConnected && $host === $playerName}
-		<button class="btn btn-primary" on:click={closeLobby}>Raum schließen</button>
+		<button class="btn btn-danger" on:click={closeLobby}>Raum schließen</button>
 	{:else}
 		<button class="btn btn-primary" on:click={createLobby} disabled={$playerName.length === 0}
 			>Raum erstellen</button
 		>
 	{/if}
-	<input
-		type="text"
-		class="form-control"
-		value={$lobbyCode}
-		on:input={(e) => ($lobbyCode = e.currentTarget.value.toUpperCase())}
-		placeholder="Lobby Code"
-		disabled={$lobbyConnected}
-	/>
+
+	<div class="input-group">
+		<input
+			type="text"
+			class="form-control"
+			value={$lobbyCode}
+			on:input={(e) => ($lobbyCode = e.currentTarget.value.toUpperCase())}
+			placeholder="Lobby Code"
+			disabled={$lobbyConnected}
+		/>
+		{#if navigator.clipboard && $lobbyConnected}
+			<button class="btn btn-outline-primary" on:click={() => copyTextToClipboard($lobbyCode)}
+				>{#if $codeCopied}
+					<i class="bi bi-clipboard-check"></i>
+				{:else}<i class="bi bi-clipboard-plus"></i>
+				{/if}</button
+			>
+		{/if}
+	</div>
+
 	{#if $lobbyConnected}
-		<button class="btn btn-primary" on:click={leaveLobby}>Raum verlassen</button>
+		<button class="btn btn-warning" on:click={leaveLobby}>Raum verlassen</button>
 	{:else}
-		<button class="btn btn-primary" on:click={joinLobby} disabled={$lobbyCode.length !== 6}>Raum betreten</button>
+		<button class="btn btn-primary" on:click={joinLobby} disabled={$lobbyCode.length !== 6}
+			>Raum betreten</button
+		>
 	{/if}
 
 	{#if $lobbyConnected}
-		<div style="display: flex; justify-content: space-around;">
-			{#each $players as player}
-				<div style="background-color: {getBeautifulColors(player.color)}">
-					{player.name}
-					<!-- {#each player.deck as card}{card.value}{/each} -->
-					{#if player.name === $host}
-						(Host)
-					{/if}
-					{#if player.name === $playerName}
-						(Du)
-					{/if}
-
-					{#if $playerName === $host && player.name !== $host}
-						<button on:click={() => kickPlayer(player.name)}>Kick</button>
-					{/if}
-				</div>
-			{/each}
+		<div class="container">
+			<div class="my-4 row">
+				{#each $players as player}
+					<div class="btn-group col">
+						<button type="button" class={`bg-${getBeautifulColors(player.color)?.bootstrap}`}
+							>{player.name}
+							{#if player.name === $host}
+								(Host)
+							{/if}</button
+						>
+						<button
+							type="button"
+							class="btn btn-danger dropdown-toggle dropdown-toggle-split"
+							data-bs-toggle="dropdown"
+						>
+							<span class="visually-hidden">Toggle Dropdown</span>
+						</button>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>rot</a>
+							</li>
+							<li>
+								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>blau</a>
+							</li>
+							<li>
+								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>gelb</a>
+							</li>
+							<li>
+								<a class="dropdown-item" role="button" on:click={() => console.log('test')}>grün</a>
+							</li>
+							{#if $playerName === $host && player.name !== $host}
+								<li><hr class="dropdown-divider" /></li>
+								<li>
+									<a class="dropdown-item" role="button" on:click={() => kickPlayer(player.name)}
+										>Kick</a
+									>
+								</li>
+							{/if}
+						</ul>
+					</div>
+				{/each}
+				{#each Array(4 - $players.length) as _}
+					<div class="col bg-secondary p-2 border">[unbesetzt]</div>
+				{/each}
+			</div>
 		</div>
 
 		<button
+			class="btn btn-primary"
 			on:click={startRound}
 			disabled={(dev ? false : $players.length !== 4) || $playerName !== $host || $roundHasStarted}
 			>Start</button
 		>
-		<button on:click={resetLobby} disabled={$playerName !== $host || !$roundHasStarted}
-			>Runde beenden</button
+		<button
+			class="btn btn-warning"
+			on:click={resetLobby}
+			disabled={$playerName !== $host || !$roundHasStarted}>Runde beenden</button
 		>
 
 		{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
 			<h3>
 				Zug #{$gameState.turn + 1}:
 				<span
-					class={$players[$gameState.currentPlayerIndex]?.color}
-					style="background-color: {getBeautifulColors(
-						$players[$gameState.currentPlayerIndex]?.color
-					)}"
+					class={`bg-${
+						getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
+					}`}
 					>{$players[$gameState.currentPlayerIndex].name}:
 					{$players[$gameState.currentPlayerIndex].deck[0].value}</span
 				>

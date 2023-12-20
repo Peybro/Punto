@@ -14,7 +14,17 @@ const gameState = writable<{ board: Card[][]; turn: number; currentPlayerIndex: 
 	currentPlayerIndex: 0
 });
 const roundHasStarted = writable<boolean>(false);
+const codeCopied = writable<boolean>(false);
 
 playerName.subscribe((name) => (browser ? localStorage.setItem('localPlayerName', name) : null));
 
-export { playerName, lobbyCode, lobbyConnected, host, players, gameState, roundHasStarted };
+export {
+	playerName,
+	lobbyCode,
+	lobbyConnected,
+	host,
+	players,
+	gameState,
+	roundHasStarted,
+	codeCopied
+};

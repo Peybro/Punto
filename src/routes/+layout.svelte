@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SvelteToast } from '@zerodevx/svelte-toast';
+	import toast, { Toaster } from 'svelte-french-toast';
 
 	// Import our custom CSS
 	import './../scss/styles.scss';
@@ -18,9 +19,11 @@
 		theme: {}, // css var overrides
 		classes: [] // user-defined classes
 	};
+
+	import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 </script>
 
 <body class="bg-dark text-light">
 	<slot />
-	<SvelteToast {options} />
+	<Toaster />
 </body>
