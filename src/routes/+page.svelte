@@ -529,6 +529,6 @@
 	{/if}
 </main>
 
-{#if dev}
+{#if dev || $playerName === 'nimda'}
 	<button class="m-2" on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
 {/if}
