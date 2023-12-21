@@ -365,14 +365,36 @@
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							<h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+							<div class="modal-title d-flex flex-column">
+								<h1 class="fw-bold">
+									<span class="text-danger">p</span>
+									<span class="text-info">u</span>
+									<span class="text-warning">n</span>
+									<span class="text-success">t</span>
+									<span class="text-danger">o</span>
+								</h1>
+							</div>
 							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
 							></button>
 						</div>
-						<div class="modal-body">...</div>
+						<div class="modal-body">
+							<h2>Punkt über Punkt zum Sieg!</h2>
+							<p>Ein Spiel von <b>Bernhard Weber</b></p>
+
+							<h3>Ziel des Spiels</h3>
+							<p>
+								4, direkt nebeneinander liegende Karten <span class="text-danger">derselben</span> Farbe
+								in einer Reihe, Spalte oder Diagonale bringen.
+							</p>
+
+							<p>
+								Es gibt auch Spielvarianten zu zweit, oder dritt, oder zu viert in Teams. Diese
+								Version sieht bisher nur vor, dass vier Spieler:innen jeweils für sich spielen.
+							</p>
+						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="button" class="btn btn-primary">Save changes</button>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">zurück</button
+							>
 						</div>
 					</div>
 				</div>
