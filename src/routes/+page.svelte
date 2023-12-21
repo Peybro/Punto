@@ -333,13 +333,53 @@
 </script>
 
 <main class="container">
-	<h1 class="mt-2 mb-4 fw-bold">
-		<span class="text-danger">p</span>
-		<span class="text-info">u</span>
-		<span class="text-warning">n</span>
-		<span class="text-success">t</span>
-		<span class="text-danger">o</span>
-	</h1>
+	<div class="d-flex justify-content-between mt-2">
+		<h1 class="fw-bold">
+			<span class="text-danger">p</span>
+			<span class="text-info">u</span>
+			<span class="text-warning">n</span>
+			<span class="text-success">t</span>
+			<span class="text-danger">o</span>
+		</h1>
+		<div class="d-flex">
+			{#if $roundHasStarted}
+				<button
+					class="btn btn-dark"
+					on:click={() => {
+						infoVisible = !infoVisible;
+					}}><i class="bi bi-info-circle"></i> Lobby</button
+				>
+			{/if}
+			<!-- Button trigger modal -->
+			<button
+				type="button"
+				class="btn btn-dark"
+				data-bs-toggle="modal"
+				data-bs-target="#instructionModal"
+			>
+				<i class="bi bi-question-circle"></i>
+			</button>
+
+			<!-- Modal -->
+			<div class="modal fade" id="instructionModal" tabindex="-1">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+							></button>
+						</div>
+						<div class="modal-body">...</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary">Save changes</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<p style="font-size: 0.7rem">by Bernhard Weber</p>
 
 	{#if infoVisible}
 		<div class="row g-1">
@@ -406,71 +446,57 @@
 			<h4 class="text-start mt-4">Spieler</h4>
 			<div class="row text-center g-1 mb-4">
 				{#each $players as player, i}
-					<div class="btn-group col-xs-6 col-sm-3">
-						<button type="button" class={`btn bg-${getBeautifulColors(player.color)?.bootstrap}`}
-							>{player.name}
+					<div class="dropdown col-xs-6 col-sm-3">
+						<button
+							class={`btn btn-${getBeautifulColors(player.color)?.bootstrap} text-break w-100`}
+							class:dropdown-toggle={player.name === $playerName || $playerName === $host}
+							type="button"
+							data-bs-toggle={`${
+								player.name === $playerName || $playerName === $host ? 'dropdown' : ''
+							}`}
+						>
+							{player.name}
 							{#if player.name === $host}
 								(Host)
-							{/if}</button
-						>
-						{#if player.name === $playerName || $playerName === $host}
-							<button
-								type="button"
-								class={`btn btn-${
-									getBeautifulColors(player.color)?.bootstrap
-								} dropdown-toggle dropdown-toggle-split`}
-								data-bs-toggle="dropdown"
-							>
-								<span class="visually-hidden">Toggle Dropdown</span>
-							</button>
-
-							<ul class="dropdown-menu bg-dark">
-								{#each ['red', 'blue', 'green', 'yellow'] as color}
-									<li>
-										<button
-											class={`dropdown-item bg-${getBeautifulColors(color)?.bootstrap}`}
-											on:click={() =>
-												update(ref(db, `${$lobbyCode}/players/${i}`), {
-													color: color
-												})}
-											disabled={$players.some((p) => p.color === color) || $roundHasStarted}
-										>
-											{['Rot', 'Blau', 'Grün', 'Gelb'][
-												['red', 'blue', 'green', 'yellow'].indexOf(color)
-											]}
-										</button>
-									</li>
-								{/each}
-								{#if $playerName === $host && player.name !== $host}
-									<li><hr class="dropdown-divider" /></li>
-									<li>
-										<button class="dropdown-item" on:click={() => kickPlayer(player.name)}
-											>Kick</button
-										>
-									</li>
-								{/if}
-							</ul>
-						{/if}
+							{/if}
+						</button>
+						<ul class="dropdown-menu">
+							{#each ['red', 'blue', 'green', 'yellow'] as color}
+								<li>
+									<button
+										class={`dropdown-item text-${getBeautifulColors(color)?.bootstrap} fw-bold`}
+										on:click={() =>
+											update(ref(db, `${$lobbyCode}/players/${i}`), {
+												color: color
+											})}
+										disabled={$players.some((p) => p.color === color) || $roundHasStarted}
+									>
+										{['Rot', 'Blau', 'Grün', 'Gelb'][
+											['red', 'blue', 'green', 'yellow'].indexOf(color)
+										]}
+									</button>
+								</li>
+							{/each}
+							{#if $playerName === $host && player.name !== $host}
+								<li><hr class="dropdown-divider" /></li>
+								<li>
+									<button class="dropdown-item" on:click={() => kickPlayer(player.name)}
+										>Kick</button
+									>
+								</li>
+							{/if}
+						</ul>
 					</div>
 				{/each}
 				{#each Array(4 - $players.length) as _}
-					<div class="btn-group col-xs-6 col-sm-3">
-						<button type="button" class="btn btn-outline-secondary col-xs-6 col-sm-3" disabled
-							>[unbesetzt]</button
-						>
+					<div class="dropdown col-xs-6 col-sm-3">
+						<button class="btn btn-outline-secondary w-100" disabled>[unbesetzt]</button>
 					</div>
 				{/each}
 			</div>
 		{/if}
 
-		{#if $roundHasStarted}
-			<button
-				class="btn btn-outline-secondary"
-				on:click={() => {
-					infoVisible = !infoVisible;
-				}}>Info</button
-			>
-		{:else}
+		{#if !$roundHasStarted}
 			<h4>Warte darauf dass der Host die Runde beginnt...</h4>
 		{/if}
 
@@ -510,12 +536,16 @@
 						</span>
 					</h4>
 
-					<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden">
-						<Face
-							value={$players[$gameState.currentPlayerIndex].deck[0].value}
-							color={$players[$gameState.currentPlayerIndex].deck[0].color}
-						/>
-					</div>
+					{#if $players[$gameState.currentPlayerIndex].deck !== undefined}
+						<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden">
+							<Face
+								value={$players[$gameState.currentPlayerIndex].deck[0].value}
+								color={$players[$gameState.currentPlayerIndex].deck[0].color}
+							/>
+						</div>
+					{:else}
+						<h4 class="ps-4">Keine Karten mehr</h4>
+					{/if}
 
 					<!-- <button
 				class={`col btn btn-dark border-light text-${

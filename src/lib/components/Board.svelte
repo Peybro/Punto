@@ -35,8 +35,6 @@
 		await update(ref(db, `${$lobbyCode}/gameState`), {
 			currentPlayerIndex: ($gameState.currentPlayerIndex + 1) % $players.length
 		});
-
-		// console.log(getMinAndMaxIndices(), getPlayedBoardDimensions());
 	}
 
 	/**
@@ -85,6 +83,10 @@
 	 * @param cardIndex
 	 */
 	function isAllowedField(rowIndex: number, cardIndex: number) {
+		if ($players[$gameState.currentPlayerIndex].deck === undefined) {
+			return false;
+		}
+
 		// check if the field is in the allowed area
 		let minY = -1;
 		let maxY = -1;
@@ -216,7 +218,8 @@
 								: `${dev ? 'bg-success' : 'invisible'} border-1`
 					} text-${getBeautifulColors(card.color)?.bootstrap}`}
 					on:click={() => playCard(rowIndex, cardIndex)}
-					disabled={$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
+					disabled={$players[$gameState.currentPlayerIndex].deck === undefined ||
+						$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
 						$players[$gameState.currentPlayerIndex].name !== $playerName ||
 						(card.value === 0 && !isAllowedField(rowIndex, cardIndex)) ||
 						!$roundHasStarted}

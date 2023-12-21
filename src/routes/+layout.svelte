@@ -23,7 +23,7 @@
 	// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 </script>
 
-<body class="bg-dark text-light">
+<body class="bg-dark text-light" data-bs-theme="dark">
 	<slot />
 	<Toaster />
 </body>
