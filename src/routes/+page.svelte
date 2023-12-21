@@ -17,12 +17,7 @@
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Player } from '$lib/types';
 	import { dev } from '$app/environment';
-	import {
-		duplicate,
-		fourInARow,
-		getBeautifulColors,
-		shuffle
-	} from '$lib/utils';
+	import { duplicate, fourInARow, getBeautifulColors, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
