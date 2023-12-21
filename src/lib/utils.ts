@@ -1,5 +1,4 @@
 import type { Card, Color } from '$lib/types';
-import { set } from '@firebase/database';
 import { codeCopied } from './store';
 
 function getBeautifulColors(color: Color | string) {

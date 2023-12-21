@@ -4,7 +4,6 @@
 	import toast from 'svelte-french-toast';
 	import Board from '$lib/components/Board.svelte';
 	import {
-		theme,
 		playerName,
 		lobbyCode,
 		lobbyConnected,
@@ -12,7 +11,6 @@
 		players,
 		gameState,
 		roundHasStarted,
-		codeCopied,
 		infoVisible,
 		resetApp
 	} from '$lib/store';
@@ -20,41 +18,14 @@
 	import type { Player } from '$lib/types';
 	import { dev } from '$app/environment';
 	import {
-		copyTextToClipboard,
 		duplicate,
 		fourInARow,
 		getBeautifulColors,
 		shuffle
 	} from '$lib/utils';
-	import InstructionModal from '$lib/components/InstructionModal.svelte';
-	import PuntoText from '$lib/components/PuntoText.svelte';
 	import PlayerList from '$lib/components/PlayerList.svelte';
-
-	async function resetLobby() {
-		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
-
-		$players = $players.map((player) => {
-			return {
-				name: player.name,
-				connections: -1,
-				color: player.color,
-				deck: shuffle(
-					duplicate(
-						Array(9)
-							.fill(0)
-							.map((_, i) => i + 1)
-					).map((v) => ({ value: v, color: player.color }))
-				)
-			};
-		});
-		$gameState = {
-			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
-			turn: 0,
-			currentPlayerIndex: 0
-		};
-
-		$infoVisible = true;
-	}
+	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
+	import Heading from '$lib/components/Heading.svelte';
 
 	function listenToLobby(code: string) {
 		onValue(ref(db, `${code}/`), (snap) => {
@@ -106,6 +77,70 @@
 
 	function stopListeningToLobby() {
 		off(ref(db, `${$lobbyCode}/`));
+	}
+
+	function closeLobby() {
+		stopListeningToLobby();
+		set(ref(db, `${$lobbyCode}/`), null);
+		resetApp();
+	}
+
+	async function leaveLobby() {
+		stopListeningToLobby();
+		if ($players.length === 1) {
+			closeLobby();
+			return;
+		}
+		await set(
+			ref(db, `${$lobbyCode}/players/`),
+			$players.filter((p) => p.name !== $playerName)
+		);
+		if ($host === $playerName) {
+			await update(ref(db, `${$lobbyCode}/`), {
+				host: $players.filter((p) => p.name !== $playerName)[0].name
+			});
+		}
+		resetApp();
+	}
+
+	async function resetLobby() {
+		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+
+		$players = $players.map((player) => {
+			return {
+				name: player.name,
+				connections: -1,
+				color: player.color,
+				deck: shuffle(
+					duplicate(
+						Array(9)
+							.fill(0)
+							.map((_, i) => i + 1)
+					).map((v) => ({ value: v, color: player.color }))
+				)
+			};
+		});
+		$gameState = {
+			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
+			turn: 0,
+			currentPlayerIndex: 0
+		};
+
+		$infoVisible = true;
+	}
+
+	async function startRound() {
+		resetLobby();
+
+		await set(ref(db, `${$lobbyCode}/players`), shuffle($players));
+
+		await set(ref(db, `${$lobbyCode}/gameState`), {
+			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
+			turn: 0,
+			currentPlayerIndex: 0
+		});
+
+		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}
 
 	async function createLobby() {
@@ -209,122 +244,13 @@
 		$lobbyConnected = true;
 		listenToLobby($lobbyCode);
 	}
-
-	function closeLobby() {
-		stopListeningToLobby();
-		set(ref(db, `${$lobbyCode}/`), null);
-		resetApp();
-	}
-
-	async function leaveLobby() {
-		stopListeningToLobby();
-		if ($players.length === 1) {
-			closeLobby();
-			return;
-		}
-		await set(
-			ref(db, `${$lobbyCode}/players/`),
-			$players.filter((p) => p.name !== $playerName)
-		);
-		if ($host === $playerName) {
-			await update(ref(db, `${$lobbyCode}/`), {
-				host: $players.filter((p) => p.name !== $playerName)[0].name
-			});
-		}
-		resetApp();
-	}
-
-	async function startRound() {
-		resetLobby();
-
-		await set(ref(db, `${$lobbyCode}/players`), shuffle($players));
-
-		await set(ref(db, `${$lobbyCode}/gameState`), {
-			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
-			turn: 0,
-			currentPlayerIndex: 0
-		});
-
-		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
-	}
 </script>
 
 <div class="container">
-	<div class="d-flex justify-content-between mt-2">
-		<PuntoText />
-		<div class="d-flex">
-			{#if $roundHasStarted}
-				<button
-					class="btn"
-					data-bs-theme={$theme}
-					on:click={() => {
-						$infoVisible = !($infoVisible);
-					}}><i class="bi bi-info-circle"></i> Lobby</button
-				>
-			{/if}
-			<InstructionModal />
-		</div>
-	</div>
-	<p style="font-size: 0.7rem">by Bernhard Weber</p>
+	<Heading />
 
-	{#if infoVisible}
-		<div class="row g-1">
-			<div class="col-xs-12 col-md-6 col-xl-3">
-				<input
-					type="text"
-					class="form-control"
-					bind:value={$playerName}
-					placeholder="Name"
-					disabled={$lobbyConnected}
-				/>
-			</div>
-
-			<div class="col-xs-12 col-md-6 col-xl-3">
-				<div class="input-group">
-					<input
-						type="text"
-						class="form-control"
-						value={$lobbyCode}
-						on:input={(e) => ($lobbyCode = e.currentTarget.value.toUpperCase())}
-						placeholder="Lobby Code"
-						disabled={$lobbyConnected}
-					/>
-					{#if navigator.clipboard && $lobbyConnected}
-						<button class="btn btn-outline-primary" on:click={() => copyTextToClipboard($lobbyCode)}
-							>{#if $codeCopied}
-								<i class="bi bi-clipboard-check"></i>
-							{:else}<i class="bi bi-clipboard-plus"></i>
-							{/if}</button
-						>
-					{/if}
-				</div>
-			</div>
-
-			<div class="col-xs-2 col-md-6 col-xl-3">
-				{#if $lobbyConnected && $host === $playerName}
-					<button class="btn btn-danger w-100" on:click={closeLobby}>Raum schließen</button>
-				{:else}
-					<button
-						class="btn btn-primary w-100"
-						on:click={createLobby}
-						disabled={$playerName.length === 0 || ($host !== '' && $host !== $playerName)}
-						>Raum erstellen</button
-					>
-				{/if}
-			</div>
-
-			<div class="col-xs-6 col-md-6 col-xl-3">
-				{#if $lobbyConnected}
-					<button class="btn btn-warning w-100" on:click={leaveLobby}>Raum verlassen</button>
-				{:else}
-					<button
-						class="btn btn-primary w-100"
-						on:click={joinLobby}
-						disabled={$lobbyCode.length !== 6}>Raum betreten</button
-					>
-				{/if}
-			</div>
-		</div>
+	{#if $infoVisible}
+		<LobbyInfo {createLobby} {joinLobby} {leaveLobby} {closeLobby} />
 	{/if}
 
 	{#if $lobbyConnected}
@@ -377,7 +303,7 @@
 						<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden bg-dark">
 							<Face
 								value={$players[$gameState.currentPlayerIndex].deck[0].value}
-								color={$players[$gameState.currentPlayerIndex].deck[0].color}
+								color={$players[$gameState.currentPlayerIndex].color}
 							/>
 						</div>
 					{:else}
