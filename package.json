@@ -18,6 +18,7 @@
 		"@types/bootstrap": "^5.2.10",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
+		"@vite-pwa/sveltekit": "^0.3.0",
 		"@zerodevx/svelte-toast": "^0.9.5",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^9.1.0",

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 	import toast, { Toaster } from 'svelte-french-toast';
+	import { pwaInfo } from 'virtual:pwa-info'; 
 
 	import { browser } from '$app/environment';
 
@@ -20,8 +21,13 @@
 	// Import our custom CSS
 	import './../scss/styles.scss';
 	browser && import('bootstrap');
-	// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '' 
 </script>
+
+<svelte:head> 
+ 	{@html webManifestLink} 
+</svelte:head>
 
 <body class="bg-dark text-light" data-bs-theme="dark">
 	<slot />
