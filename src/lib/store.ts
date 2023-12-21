@@ -16,8 +16,24 @@ const gameState = writable<{ board: Card[][]; turn: number; currentPlayerIndex: 
 });
 const roundHasStarted = writable<boolean>(false);
 const codeCopied = writable<boolean>(false);
+const infoVisible = writable<boolean>(true);
 
 playerName.subscribe((name) => (browser ? localStorage.setItem('localPlayerName', name) : null));
+
+function resetApp() {
+	playerName.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
+	lobbyCode.set('');
+	lobbyConnected.set(false);
+	host.set('');
+	players.set([]);
+	gameState.set({
+		board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
+		turn: 0,
+		currentPlayerIndex: 0
+	});
+	roundHasStarted.set(false);
+	infoVisible.set(true);
+}
 
 export {
 	theme,
@@ -28,5 +44,7 @@ export {
 	players,
 	gameState,
 	roundHasStarted,
-	codeCopied
+	codeCopied,
+	infoVisible,
+	resetApp
 };
