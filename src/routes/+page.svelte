@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { db } from '$lib/firebase';
 	import { get, ref, set, onValue, off, update } from 'firebase/database';
-	// import { toast } from '@zerodevx/svelte-toast';
-	import toast, { Toaster } from 'svelte-french-toast';
+	import toast from 'svelte-french-toast';
 	import Board from '$lib/components/Board.svelte';
 	import {
 		theme,
@@ -13,15 +12,23 @@
 		players,
 		gameState,
 		roundHasStarted,
-		codeCopied
+		codeCopied,
+		infoVisible,
+		resetApp
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import { browser } from '$app/environment';
-	import type { Color, Player } from '$lib/types';
+	import type { Player } from '$lib/types';
 	import { dev } from '$app/environment';
-	import { copyTextToClipboard, getBeautifulColors } from '$lib/utils';
-
-	let infoVisible = true;
+	import {
+		copyTextToClipboard,
+		duplicate,
+		fourInARow,
+		getBeautifulColors,
+		shuffle
+	} from '$lib/utils';
+	import InstructionModal from '$lib/components/InstructionModal.svelte';
+	import PuntoText from '$lib/components/PuntoText.svelte';
+	import PlayerList from '$lib/components/PlayerList.svelte';
 
 	async function resetLobby() {
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
@@ -46,22 +53,7 @@
 			currentPlayerIndex: 0
 		};
 
-		infoVisible = true;
-	}
-
-	function resetApp() {
-		$playerName = browser ? localStorage.getItem('localPlayerName') || '' : '';
-		$lobbyCode = '';
-		$lobbyConnected = false;
-		$host = '';
-		$players = [];
-		$gameState = {
-			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
-			turn: 0,
-			currentPlayerIndex: 0
-		};
-		$roundHasStarted = false;
-		infoVisible = true;
+		$infoVisible = true;
 	}
 
 	function listenToLobby(code: string) {
@@ -82,7 +74,7 @@
 				return;
 			}
 
-			if ($roundHasStarted && fourInARow()) {
+			if ($roundHasStarted && fourInARow($gameState.board)) {
 				toast(
 					`${
 						$gameState.currentPlayerIndex < $players.length - 1
@@ -92,7 +84,7 @@
 					{ icon: '🎉' }
 				);
 				$roundHasStarted = false;
-				infoVisible = true;
+				$infoVisible = true;
 				return;
 			}
 
@@ -100,13 +92,13 @@
 			$players = data.players;
 			$gameState = data.gameState;
 			$roundHasStarted = data.roundHasStartet;
-			infoVisible = !data.roundHasStartet;
+			$infoVisible = !data.roundHasStartet;
 
 			if ($players.every((p) => p.deck === undefined)) {
 				// TODO: count automatically
 				toast.error('Keine Karten mehr! Es gewinnt der Spieler mit den meisten 3er-Reihen!');
 				$roundHasStarted = false;
-				infoVisible = true;
+				$infoVisible = true;
 				return;
 			}
 		});
@@ -114,81 +106,6 @@
 
 	function stopListeningToLobby() {
 		off(ref(db, `${$lobbyCode}/`));
-	}
-
-	/**
-	 * Returns true if there are at least nr cards of the same color (red, blue, green or yellow) in a row.
-	 * @param nr The number of cards in a row.
-	 */
-	function fourInARow() {
-		const width = $gameState.board[0].length;
-		const height = $gameState.board.length;
-
-		// check horizontal
-		for (let i = 0; i < height; i++) {
-			for (let j = 0; j < width - 3; j++) {
-				if (
-					$gameState.board[i][j].value > 0 &&
-					$gameState.board[i][j].color === $gameState.board[i][j + 1].color &&
-					$gameState.board[i][j].color === $gameState.board[i][j + 2].color &&
-					$gameState.board[i][j].color === $gameState.board[i][j + 3].color
-				) {
-					return true;
-				}
-			}
-		}
-
-		// check vertical
-		for (let i = 0; i < height - 3; i++) {
-			for (let j = 0; j < width; j++) {
-				if (
-					$gameState.board[i][j].value > 0 &&
-					$gameState.board[i][j].color === $gameState.board[i + 1][j].color &&
-					$gameState.board[i][j].color === $gameState.board[i + 2][j].color &&
-					$gameState.board[i][j].color === $gameState.board[i + 3][j].color
-				) {
-					return true;
-				}
-			}
-		}
-
-		// check diagonal (top left to bottom right)
-		for (let i = 3; i < height; i++) {
-			for (let j = 3; j < width; j++) {
-				if (
-					$gameState.board[i][j].value > 0 &&
-					$gameState.board[i][j].color === $gameState.board[i - 1][j - 1].color &&
-					$gameState.board[i][j].color === $gameState.board[i - 2][j - 2].color &&
-					$gameState.board[i][j].color === $gameState.board[i - 3][j - 3].color
-				) {
-					return true;
-				}
-			}
-		}
-
-		// check diagonal (bottom left to top right)
-		for (let i = 3; i < height; i++) {
-			for (let j = 0; j < width - 3; j++) {
-				if (
-					$gameState.board[i][j].value > 0 &&
-					$gameState.board[i][j].color === $gameState.board[i - 1][j + 1].color &&
-					$gameState.board[i][j].color === $gameState.board[i - 2][j + 2].color &&
-					$gameState.board[i][j].color === $gameState.board[i - 3][j + 3].color
-				) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	function duplicate(arr: any[]): any[] {
-		return [...arr, ...arr];
-	}
-
-	function shuffle(arr: any[]): any[] {
-		return arr.sort(() => Math.random() - 0.5);
 	}
 
 	async function createLobby() {
@@ -273,8 +190,8 @@
 					color: ['red', 'blue', 'green', 'yellow'].filter(
 						(color) => !playersOnline.some((p) => p.color === color)
 					)[0],
-					deck: duplicate(
-						shuffle(
+					deck: shuffle(
+						duplicate(
 							Array(9)
 								.fill(0)
 								.map((_, i) => i + 1)
@@ -317,12 +234,6 @@
 		resetApp();
 	}
 
-	async function kickPlayer(name: string) {
-		await update(ref(db, `${$lobbyCode}/`), {
-			players: $players.filter((p) => p.name !== name)
-		});
-	}
-
 	async function startRound() {
 		resetLobby();
 
@@ -340,73 +251,18 @@
 
 <div class="container">
 	<div class="d-flex justify-content-between mt-2">
-		<h1 class="punto fw-bold">
-			<span class="text-danger">p</span>
-			<span class="text-info">u</span>
-			<span class="text-warning">n</span>
-			<span class="text-success">t</span>
-			<span class="text-danger">o</span>
-		</h1>
+		<PuntoText />
 		<div class="d-flex">
 			{#if $roundHasStarted}
 				<button
 					class="btn"
 					data-bs-theme={$theme}
 					on:click={() => {
-						infoVisible = !infoVisible;
+						$infoVisible = !($infoVisible);
 					}}><i class="bi bi-info-circle"></i> Lobby</button
 				>
 			{/if}
-			<!-- Button trigger modal -->
-			<button
-				type="button"
-				class="btn"
-				data-bs-theme={$theme}
-				data-bs-toggle="modal"
-				data-bs-target="#instructionModal"
-			>
-				<i class="bi bi-question-circle"></i>
-			</button>
-
-			<!-- Modal -->
-			<div class="modal fade" id="instructionModal" tabindex="-1">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<div class="modal-title d-flex flex-column">
-								<h1 class="punto fw-bold">
-									<span class="text-danger">p</span>
-									<span class="text-info">u</span>
-									<span class="text-warning">n</span>
-									<span class="text-success">t</span>
-									<span class="text-danger">o</span>
-								</h1>
-							</div>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-							></button>
-						</div>
-						<div class="modal-body">
-							<h2>Punkt über Punkt zum Sieg!</h2>
-							<p>Ein Spiel von <b>Bernhard Weber</b></p>
-
-							<h3>Ziel des Spiels</h3>
-							<p>
-								4, direkt nebeneinander liegende Karten <span class="text-danger">derselben</span> Farbe
-								in einer Reihe, Spalte oder Diagonale bringen.
-							</p>
-
-							<p>
-								Es gibt auch Spielvarianten zu zweit, oder dritt, oder zu viert in Teams. Diese
-								Version sieht bisher nur vor, dass vier Spieler:innen jeweils für sich spielen.
-							</p>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">zurück</button
-							>
-						</div>
-					</div>
-				</div>
-			</div>
+			<InstructionModal />
 		</div>
 	</div>
 	<p style="font-size: 0.7rem">by Bernhard Weber</p>
@@ -474,56 +330,7 @@
 	{#if $lobbyConnected}
 		{#if infoVisible}
 			<h4 class="text-start mt-4">Spieler</h4>
-			<div class="row text-center g-1 mb-4">
-				{#each $players as player, i}
-					<div class="dropdown col-xs-6 col-sm-3">
-						<button
-							class={`btn btn-${getBeautifulColors(player.color)?.bootstrap} text-break w-100`}
-							class:dropdown-toggle={player.name === $playerName || $playerName === $host}
-							type="button"
-							data-bs-toggle={`${
-								player.name === $playerName || $playerName === $host ? 'dropdown' : ''
-							}`}
-						>
-							{player.name}
-							{#if player.name === $host}
-								(Host)
-							{/if}
-						</button>
-						<ul class="dropdown-menu">
-							{#each ['red', 'blue', 'green', 'yellow'] as color}
-								<li>
-									<button
-										class={`dropdown-item text-${getBeautifulColors(color)?.bootstrap} fw-bold`}
-										on:click={() =>
-											update(ref(db, `${$lobbyCode}/players/${i}`), {
-												color: color
-											})}
-										disabled={$players.some((p) => p.color === color) || $roundHasStarted}
-									>
-										{['Rot', 'Blau', 'Grün', 'Gelb'][
-											['red', 'blue', 'green', 'yellow'].indexOf(color)
-										]}
-									</button>
-								</li>
-							{/each}
-							{#if $playerName === $host && player.name !== $host}
-								<li><hr class="dropdown-divider" /></li>
-								<li>
-									<button class="dropdown-item" on:click={() => kickPlayer(player.name)}
-										>Kick</button
-									>
-								</li>
-							{/if}
-						</ul>
-					</div>
-				{/each}
-				{#each Array(4 - $players.length) as _}
-					<div class="dropdown col-xs-6 col-sm-3">
-						<button class="btn btn-outline-secondary w-100" disabled>[unbesetzt]</button>
-					</div>
-				{/each}
-			</div>
+			<PlayerList />
 		{/if}
 
 		{#if !$roundHasStarted}
