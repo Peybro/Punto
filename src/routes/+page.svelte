@@ -81,9 +81,7 @@
 				return;
 			}
 
-			if (fourInARow()) {
-				// TODO: after win it's needed to press Start twice for new round
-				// TODO: multiple win toasts when starting new
+			if ($roundHasStarted && fourInARow()) {
 				toast(
 					`${
 						$gameState.currentPlayerIndex < $players.length - 1
@@ -101,8 +99,15 @@
 			$players = data.players;
 			$gameState = data.gameState;
 			$roundHasStarted = data.roundHasStartet;
-
 			infoVisible = !data.roundHasStartet;
+
+			if ($players.every((p) => p.deck === undefined)) {
+				// TODO: count automatically
+				toast.error('Keine Karten mehr! Es gewinnt der Spieler mit den meisten 3er-Reihen!');
+				$roundHasStarted = false;
+				infoVisible = true;
+				return;
+			}
 		});
 	}
 
@@ -320,15 +325,15 @@
 	async function startRound() {
 		resetLobby();
 
-		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
-
 		await set(ref(db, `${$lobbyCode}/players`), shuffle($players));
-
+		
 		await set(ref(db, `${$lobbyCode}/gameState`), {
 			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
 			turn: 0,
 			currentPlayerIndex: 0
 		});
+
+		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}
 </script>
 

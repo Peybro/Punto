@@ -28,7 +28,6 @@
 		});
 
 		await update(ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}`), {
-			// TODO: empty decks
 			deck: $players[$gameState.currentPlayerIndex].deck.slice(1)
 		});
 
