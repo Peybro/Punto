@@ -101,20 +101,17 @@
 			maxX = getMinAndMaxIndices().minX + 5;
 		}
 
-		console.log(minY, maxY, minX, maxX);
+		if (
+			(minX >= 0 && cardIndex < minX) ||
+			(maxX >= 0 && cardIndex > maxX) ||
+			(minY >= 0 && rowIndex < minY) ||
+			(maxY >= 0 && rowIndex > maxY)
+		) {
+			return false;
+		}
 
 		// TODO: better structuring
 		return (
-			// TODO: merge these conditions correctly
-			// ((minX >= 0 &&
-			// 	cardIndex >= minX &&
-			// 	maxX >= 0 &&
-			// 	cardIndex <= maxX) ||
-			// 	(minY >= 0 &&
-			// 	rowIndex >= minY &&
-			// 	maxY >= 0 &&
-			// 	rowIndex <= maxY)) &&
-
 			// first round
 			($gameState.turn === 0 && rowIndex === 5 && cardIndex === 5) ||
 			// upper left corner

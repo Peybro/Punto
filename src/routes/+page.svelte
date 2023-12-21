@@ -403,8 +403,8 @@
 
 	{#if $lobbyConnected}
 		{#if infoVisible}
-			<div class="row my-4 text-center g-1">
-				<h4 class="text-start">Spieler</h4>
+			<h4 class="text-start mt-4">Spieler</h4>
+			<div class="row text-center g-1 mb-4">
 				{#each $players as player, i}
 					<div class="btn-group col-xs-6 col-sm-3">
 						<button type="button" class={`btn bg-${getBeautifulColors(player.color)?.bootstrap}`}
@@ -454,7 +454,11 @@
 					</div>
 				{/each}
 				{#each Array(4 - $players.length) as _}
-					<div class={`col-xs-6 col-sm-3 bg-secondary p-2 rounded`}>[unbesetzt]</div>
+					<div class="btn-group col-xs-6 col-sm-3">
+						<button type="button" class="btn btn-outline-secondary col-xs-6 col-sm-3" disabled
+							>[unbesetzt]</button
+						>
+					</div>
 				{/each}
 			</div>
 		{/if}
