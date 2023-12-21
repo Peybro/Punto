@@ -3,6 +3,7 @@ import { browser } from '$app/environment';
 
 import type { Player, Card } from './types';
 
+const theme = writable<string>('dark');
 const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
 const lobbyCode = writable<string>('');
 const lobbyConnected = writable<boolean>(false);
@@ -19,6 +20,7 @@ const codeCopied = writable<boolean>(false);
 playerName.subscribe((name) => (browser ? localStorage.setItem('localPlayerName', name) : null));
 
 export {
+	theme,
 	playerName,
 	lobbyCode,
 	lobbyConnected,

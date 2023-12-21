@@ -1,35 +1,32 @@
 <script lang="ts">
-	import { SvelteToast } from '@zerodevx/svelte-toast';
-	import toast, { Toaster } from 'svelte-french-toast';
-	import { pwaInfo } from 'virtual:pwa-info'; 
+	import { Toaster } from 'svelte-french-toast';
+	import { pwaInfo } from 'virtual:pwa-info';
+	import { set, ref } from 'firebase/database';
+	import { db } from '$lib/firebase';
+	import { dev } from '$app/environment';
+	import { playerName, theme } from '$lib/store';
 
 	import { browser } from '$app/environment';
 
-	// Default options
-	const options = {
-		duration: 4000, // duration of progress bar tween to the `next` value
-		initial: 1, // initial progress bar value
-		next: 0, // next progress value
-		pausable: false, // pause progress bar tween on mouse hover
-		dismissable: true, // allow dismiss with close button
-		reversed: false, // insert new toast to bottom of stack
-		intro: { x: 256 }, // toast intro fly animation settings
-		theme: {}, // css var overrides
-		classes: [] // user-defined classes
-	};
+	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 
 	// Import our custom CSS
 	import './../scss/styles.scss';
 	browser && import('bootstrap');
-
-	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '' 
 </script>
 
-<svelte:head> 
- 	{@html webManifestLink} 
+<svelte:head>
+	{@html webManifestLink}
 </svelte:head>
 
-<body class="bg-dark text-light" data-bs-theme="dark">
+<main data-bs-theme={$theme}>
 	<slot />
 	<Toaster />
-</body>
+</main>
+
+{#if dev || $playerName === 'nimda'}
+	<button class="m-2" on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
+	<button on:click={() => ($theme = $theme === 'dark' ? 'light' : 'dark')}
+		>{$theme === 'dark' ? 'light' : 'dark'}</button
+	>
+{/if}

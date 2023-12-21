@@ -5,6 +5,7 @@
 	import toast, { Toaster } from 'svelte-french-toast';
 	import Board from '$lib/components/Board.svelte';
 	import {
+		theme,
 		playerName,
 		lobbyCode,
 		lobbyConnected,
@@ -337,9 +338,9 @@
 	}
 </script>
 
-<main class="container">
+<div class="container">
 	<div class="d-flex justify-content-between mt-2">
-		<h1 class="fw-bold">
+		<h1 class="punto fw-bold">
 			<span class="text-danger">p</span>
 			<span class="text-info">u</span>
 			<span class="text-warning">n</span>
@@ -349,7 +350,8 @@
 		<div class="d-flex">
 			{#if $roundHasStarted}
 				<button
-					class="btn btn-dark"
+					class="btn"
+					data-bs-theme={$theme}
 					on:click={() => {
 						infoVisible = !infoVisible;
 					}}><i class="bi bi-info-circle"></i> Lobby</button
@@ -358,7 +360,8 @@
 			<!-- Button trigger modal -->
 			<button
 				type="button"
-				class="btn btn-dark"
+				class="btn"
+				data-bs-theme={$theme}
 				data-bs-toggle="modal"
 				data-bs-target="#instructionModal"
 			>
@@ -371,7 +374,7 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<div class="modal-title d-flex flex-column">
-								<h1 class="fw-bold">
+								<h1 class="punto fw-bold">
 									<span class="text-danger">p</span>
 									<span class="text-info">u</span>
 									<span class="text-warning">n</span>
@@ -564,7 +567,7 @@
 					</h4>
 
 					{#if $players[$gameState.currentPlayerIndex].deck !== undefined}
-						<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden">
+						<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden bg-dark">
 							<Face
 								value={$players[$gameState.currentPlayerIndex].deck[0].value}
 								color={$players[$gameState.currentPlayerIndex].deck[0].color}
@@ -573,13 +576,6 @@
 					{:else}
 						<h4 class="ps-4">Keine Karten mehr</h4>
 					{/if}
-
-					<!-- <button
-				class={`col btn btn-dark border-light text-${
-					getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
-				}`}
-				style="aspect-ratio: 1/1">{$players[$gameState.currentPlayerIndex].deck[0].value}</button
-			> -->
 				</div>
 
 				<Board />
@@ -588,8 +584,4 @@
 	{:else}
 		<h1 class="mt-5">Kein Raum verbunden</h1>
 	{/if}
-</main>
-
-{#if dev || $playerName === 'nimda'}
-	<button class="m-2" on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
-{/if}
+</div>

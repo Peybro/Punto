@@ -4,8 +4,10 @@ $success: #78b728;
 $warning: #f1b300;
 $dark: #161616;
 
-html {
-	background-color: $dark;
+.punto {
+	font-family: century-gothic, sans-serif;
+	font-weight: bold;
+	font-style: normal;
 }
 
 .grid-container {
@@ -29,5 +31,9 @@ html {
 	border-radius: 50%;
 }
 
+// Century Gothic
+@import "https://use.typekit.net/oov2wcw.css";
+
+// Bootstrap
 @import 'bootstrap/scss/bootstrap.scss';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
