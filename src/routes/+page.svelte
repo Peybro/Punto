@@ -23,12 +23,11 @@
 	import Heading from '$lib/components/Heading.svelte';
 
 	function listenToLobby(code: string) {
-		onValue(ref(db, `${code}/`), (snap) => {
+		onValue(ref(db, `${code}/`), async (snap) => {
 			const data = snap.val();
 			if (data === null) {
 				toast.error('Raum nicht gefunden!');
 				leaveLobby();
-				return;
 			}
 
 			if (
@@ -40,7 +39,11 @@
 				return;
 			}
 
-			// TODO: start button has to be pressed twice after game has ended
+			$host = data.host;
+			$players = data.players;
+			$gameState = data.gameState;
+			$roundHasStarted = data.roundHasStartet;
+			$infoVisible = !data.roundHasStartet;
 
 			if ($roundHasStarted && fourInARow($gameState.board)) {
 				toast(
@@ -51,25 +54,22 @@
 					} hat gewonnen!`,
 					{ icon: '🎉' }
 				);
-				$roundHasStarted = false;
-				$infoVisible = true;
-				return;
-			}
 
-			$host = data.host;
-			$players = data.players;
-			$gameState = data.gameState;
-			$roundHasStarted = data.roundHasStartet;
-			$infoVisible = !data.roundHasStartet;
+				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+			}
 
 			if ($players.every((p) => p.deck === undefined)) {
 				// TODO: count automatically
 				toast.error('Keine Karten mehr! Es gewinnt der Spieler mit den meisten 3er-Reihen!');
-				$roundHasStarted = false;
-				$infoVisible = true;
-				return;
+				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
 			}
 		});
+	}
+
+	async function startRound() {
+		await resetLobby();
+
+		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}
 
 	function stopListeningToLobby() {
@@ -103,33 +103,31 @@
 	async function resetLobby() {
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
 
-		$players = $players.map((player) => {
-			return {
-				name: player.name,
-				connections: -1,
-				color: player.color,
-				deck: shuffle(
-					duplicate(
-						Array(9)
-							.fill(0)
-							.map((_, i) => i + 1)
-					).map((v) => ({ value: v, color: player.color }))
-				)
-			};
-		});
-		$gameState = {
+		await set(
+			ref(db, `${$lobbyCode}/players/`),
+			$players.map((player) => {
+				return {
+					name: player.name,
+					connections: -1,
+					color: player.color,
+					deck: shuffle(
+						duplicate(
+							Array(9)
+								.fill(0)
+								.map((_, i) => i + 1)
+						).map((v) => ({ value: v, color: player.color }))
+					)
+				};
+			})
+		);
+
+		await set(ref(db, `${$lobbyCode}/gameState`), {
 			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
 			turn: 0,
 			currentPlayerIndex: 0
-		};
+		});
 
 		$infoVisible = true;
-	}
-
-	async function startRound() {
-		await resetLobby();
-
-		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}
 
 	async function createLobby() {
@@ -197,9 +195,19 @@
 		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
 			playersOnline = snap.val();
 		});
-
 		if (playersOnline.some((p: Player) => p.name === $playerName)) {
 			toast.error('Es gibt bereits einen Spieler mit diesem Namen!');
+			stopListeningToLobby();
+			$lobbyConnected = false;
+			return;
+		}
+
+		let roundInProgress = false;
+		await get(ref(db, `${$lobbyCode}/roundHasStartet`)).then((snap: any) => {
+			roundInProgress = snap.val();
+		});
+		if (roundInProgress) {
+			toast.error('Die Runde hat bereits begonnen! Bitte warte bis sie vorbei ist.');
 			stopListeningToLobby();
 			$lobbyConnected = false;
 			return;
