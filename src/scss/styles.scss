@@ -16,19 +16,18 @@ $dark: #161616;
 		'a b c'
 		'd e f'
 		'g h i';
-	grid-gap: 3px;
 	aspect-ratio: 1 / 1;
-	justify-content: space-between;
+	justify-content: space-around;
 	align-items: center;
 	padding: 2px;
-}
 
-.grid-container > div {
-	text-align: center;
-	width: calc(100vw / 50);
-	max-width: 10px;
-	aspect-ratio: 1 / 1;
-	border-radius: 50%;
+	div {
+		text-align: center;
+		width: calc(100vw / 60);
+		max-width: 10px;
+		aspect-ratio: 1 / 1;
+		border-radius: 50%;
+	}
 }
 
 // Century Gothic

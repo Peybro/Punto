@@ -34,10 +34,10 @@
 					in eine Reihe, Spalte oder Diagonale bringen.
 				</p>
 
-				<p>
+				<!-- <p>
 					Es gibt auch Spielvarianten zu zweit, oder dritt, oder zu viert in Teams. Diese Version
 					sieht bisher nur vor, dass vier Spieler:innen jeweils für sich spielen.
-				</p>
+				</p> -->
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">zurück</button>

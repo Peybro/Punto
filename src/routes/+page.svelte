@@ -296,7 +296,7 @@
 					</h4>
 
 					{#if $players[$gameState.currentPlayerIndex].deck !== undefined}
-						<div style="margin-top: -5px;" class="ms-2 p-1 border rounded overflow-hidden bg-dark">
+						<div class="cell ms-2 p-0 border rounded bg-dark">
 							<Face
 								value={$players[$gameState.currentPlayerIndex].deck[0].value}
 								color={$players[$gameState.currentPlayerIndex].color}
@@ -314,3 +314,12 @@
 		<h1 class="mt-5">Kein Raum verbunden</h1>
 	{/if}
 </div>
+
+<style scoped>
+	.cell {
+		margin-top: -5px;
+		width: calc(100vw / 11);
+		max-width: 50px;
+		aspect-ratio: 1/1;
+	}
+</style>

@@ -211,8 +211,8 @@
 				<button
 					class={`p-0 cell rounded overflow-hidden ${
 						card.value > 0
-							? 'bg-dark border-1'
-							: isAllowedField(rowIndex, cardIndex)
+							? 'bg-dark border-1 border'
+							: $roundHasStarted && isAllowedField(rowIndex, cardIndex)
 								? 'bg-secondary border-1 border-secondary'
 								: `${dev ? 'bg-success' : 'invisible'} border-1`
 					} text-${getBeautifulColors(card.color)?.bootstrap}`}
@@ -233,7 +233,9 @@
 
 <style scoped>
 	.cell {
-		width: calc(100% / 10.5);
+		width: calc(100vw / 11);
 		max-width: 50px;
+		margin: 0.5px;
+		aspect-ratio: 1/1;
 	}
 </style>
