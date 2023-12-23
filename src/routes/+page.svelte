@@ -127,15 +127,7 @@
 	}
 
 	async function startRound() {
-		resetLobby();
-
-		await set(ref(db, `${$lobbyCode}/players`), shuffle($players));
-
-		await set(ref(db, `${$lobbyCode}/gameState`), {
-			board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
-			turn: 0,
-			currentPlayerIndex: 0
-		});
+		await resetLobby();
 
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}
