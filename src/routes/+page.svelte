@@ -39,15 +39,8 @@
 				leaveLobby();
 				return;
 			}
-			
-			// TODO: double win message when these declarations are above the next if statement
-			// if they are below, the players who did not win can place one more card and also
-			// trigger multiple win messages when placing 4 in a row
-			$host = data.host;
-			$players = data.players;
-			$gameState = data.gameState;
-			$roundHasStarted = data.roundHasStartet;
-			$infoVisible = !data.roundHasStartet;
+
+			// TODO: start button has to be pressed twice after game has ended
 
 			if ($roundHasStarted && fourInARow($gameState.board)) {
 				toast(
@@ -62,6 +55,12 @@
 				$infoVisible = true;
 				return;
 			}
+
+			$host = data.host;
+			$players = data.players;
+			$gameState = data.gameState;
+			$roundHasStarted = data.roundHasStartet;
+			$infoVisible = !data.roundHasStartet;
 
 			if ($players.every((p) => p.deck === undefined)) {
 				// TODO: count automatically
@@ -263,7 +262,7 @@
 
 		{#if $host === $playerName}
 			<!-- start alone -->
-			{#if $playerName === 'Lonewolf' || dev}
+			{#if dev}
 				<button
 					class="btn btn-primary"
 					on:click={startRound}
@@ -273,8 +272,7 @@
 				<button
 					class="btn btn-primary"
 					on:click={startRound}
-					disabled={$players.length !== 4 || $playerName !== $host || $roundHasStarted}
-					>Start</button
+					disabled={$playerName !== $host || $roundHasStarted}>Start</button
 				>
 			{/if}
 			<button
