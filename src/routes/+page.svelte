@@ -36,7 +36,6 @@
 			) {
 				toast.error('Du wurdest gekickt!');
 				leaveLobby();
-				return;
 			}
 
 			$host = data.host;
@@ -58,7 +57,9 @@
 				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
 				await set(
 					ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
-					$players[$gameState.currentPlayerIndex].wins + 1
+					$players[
+						$gameState.currentPlayerIndex < $players.length - 1 ? $gameState.currentPlayerIndex : 0
+					].wins + 1
 				);
 			}
 
@@ -74,6 +75,7 @@
 	async function startRound() {
 		await resetLobby();
 
+		await update(ref(db, `${$lobbyCode}/`), { players: shuffle($players) });
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}
 
