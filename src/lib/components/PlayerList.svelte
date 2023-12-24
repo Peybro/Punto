@@ -24,6 +24,9 @@
 				{#if player.name === $host}
 					(Host)
 				{/if}
+				{#if player.wins > 0}
+					<div><i class="bi bi-trophy"></i> {player.wins}x</div>
+				{/if}
 			</button>
 			<ul class="dropdown-menu">
 				{#each ['red', 'blue', 'green', 'yellow'] as color}

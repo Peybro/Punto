@@ -4,7 +4,7 @@
 	import { set, ref } from 'firebase/database';
 	import { db } from '$lib/firebase';
 	import { dev } from '$app/environment';
-	import { playerName, theme } from '$lib/store';
+	import { playerName } from '$lib/store';
 
 	import { browser } from '$app/environment';
 
@@ -19,14 +19,11 @@
 	{@html webManifestLink}
 </svelte:head>
 
-<main data-bs-theme={$theme}>
+<main>
 	<slot />
 	<Toaster />
 </main>
 
 {#if dev || $playerName === 'nimda'}
 	<button class="m-2" on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
-	<button on:click={() => ($theme = $theme === 'dark' ? 'light' : 'dark')}
-		>{$theme === 'dark' ? 'light' : 'dark'}</button
-	>
 {/if}

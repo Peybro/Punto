@@ -1,16 +1,9 @@
 <script lang="ts">
-	import { theme } from '$lib/store';
 	import PuntoText from './PuntoText.svelte';
 </script>
 
 <!-- Button trigger modal -->
-<button
-	type="button"
-	class="btn"
-	data-bs-theme={$theme}
-	data-bs-toggle="modal"
-	data-bs-target="#instructionModal"
->
+<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#instructionModal">
 	<i class="bi bi-question-circle"></i>
 </button>
 

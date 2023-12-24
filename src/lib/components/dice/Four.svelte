@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Color } from '$lib/types';
 	import { getBeautifulColors } from '$lib/utils';
-	import { theme } from '$lib/store';
 
 	export let color: Color;
 </script>
@@ -11,7 +10,7 @@
 	<div class={`item2 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
 	<div class={`item3 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
 	<div class={`item4 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`filler`} data-bs-theme={$theme}></div>
+	<div class={`filler`}></div>
 </div>
 
 <style>

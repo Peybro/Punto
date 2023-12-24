@@ -104,4 +104,23 @@ function fourInARow(board: Card[][]) {
 	return false;
 }
 
-export { getBeautifulColors, copyTextToClipboard, duplicate, shuffle, fourInARow };
+// TODO: implement
+/**
+ * Counts the number of threes in a row for each color.
+ * @param board The board to check.
+ */
+function getMostThrees(board: Card[][]) {
+	// return ['red', 'blue', 'yellow', 'green'].map((color) => {
+	// 	let threes = 0;
+	// 	for (let i = 0; i < board.length; i++) {
+	// 		for (let j = 0; j < board[i].length; j++) {
+	// 			if (board[i][j].color === color) {
+	// 					threes++;
+	// 			}
+	// 		}
+	// 	}
+	// 	return { color, threes: threes / 3 };
+	// });
+}
+
+export { getBeautifulColors, copyTextToClipboard, duplicate, shuffle, fourInARow, getMostThrees };

@@ -17,7 +17,7 @@
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Player } from '$lib/types';
 	import { dev } from '$app/environment';
-	import { duplicate, fourInARow, getBeautifulColors, shuffle } from '$lib/utils';
+	import { duplicate, fourInARow, getBeautifulColors, shuffle, getMostThrees } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
@@ -56,10 +56,15 @@
 				);
 
 				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+				await set(
+					ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
+					$players[$gameState.currentPlayerIndex].wins + 1
+				);
 			}
 
-			if ($players.every((p) => p.deck === undefined)) {
-				// TODO: count automatically
+			if ($roundHasStarted && $players.every((p) => p.deck === undefined)) {
+				// TODO: implement
+				// const mostThrees = getMostThrees($players);
 				toast.error('Keine Karten mehr! Es gewinnt der Spieler mit den meisten 3er-Reihen!');
 				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
 			}
@@ -116,7 +121,8 @@
 								.fill(0)
 								.map((_, i) => i + 1)
 						).map((v) => ({ value: v, color: player.color }))
-					)
+					),
+					wins: player.wins
 				};
 			})
 		);
@@ -153,7 +159,8 @@
 								.fill(0)
 								.map((_, i) => i + 1)
 						).map((v) => ({ value: v, color: 'red' }))
-					)
+					),
+					wins: 0
 				}
 			],
 			gameState: {
@@ -318,8 +325,8 @@
 <style scoped>
 	.cell {
 		margin-top: -5px;
-		width: calc(100vw / 11);
+		width: calc(100vw / 10);
 		max-width: 50px;
-		aspect-ratio: 1/1;
+		max-height: 50px;
 	}
 </style>

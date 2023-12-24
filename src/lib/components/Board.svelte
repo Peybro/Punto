@@ -233,9 +233,9 @@
 
 <style scoped>
 	.cell {
-		width: calc(100vw / 11);
+		width: calc(100vw / 10);
 		max-width: 50px;
+		max-height: 50px;
 		margin: 0.5px;
-		aspect-ratio: 1/1;
 	}
 </style>
