@@ -25,7 +25,7 @@
 					(Host)
 				{/if}
 				{#if player.wins > 0}
-					<div><i class="bi bi-trophy"></i> {player.wins}x</div>
+					<span class="ms-2"><i class="bi bi-trophy"></i> {player.wins}x</span>
 				{/if}
 			</button>
 			<ul class="dropdown-menu">
