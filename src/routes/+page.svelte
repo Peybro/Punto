@@ -240,7 +240,8 @@
 								(color) => !playersOnline.some((p) => p.color === color)
 							)[0]
 						}))
-					)
+					),
+					wins: 0
 				}
 			]
 		});
