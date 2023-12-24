@@ -45,16 +45,9 @@
 			$infoVisible = !data.roundHasStartet;
 
 			if ($roundHasStarted && fourInARow($gameState.board)) {
-				toast(
-					`${
-						$gameState.currentPlayerIndex < $players.length - 1
-							? $players[$gameState.currentPlayerIndex].name
-							: $players[0].name
-					} hat gewonnen!`,
-					{ icon: '🎉' }
-				);
-
 				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+
+				toast(`${$players[$gameState.currentPlayerIndex].name} hat gewonnen!`, { icon: '🎉' });
 				await set(
 					ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
 					$players[
