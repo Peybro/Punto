@@ -1,21 +1,6 @@
-import { writable } from 'svelte/store';
 import type { LanguagesType } from './types';
-import { browser } from '$app/environment';
 
-const languageId = writable<string>(
-	browser
-		? localStorage.getItem('languageID') === 'en' ||
-			localStorage.getItem('languageID') === 'de' ||
-			localStorage.getItem('languageID') === 'fr'
-			? localStorage.getItem('languageID') || 'en'
-			: navigator.language.split('-')[0] || 'en'
-		: 'en'
-);
-languageId.subscribe((value: string) => {
-	localStorage.setItem('languageId', value);
-});
-
-const languages: LanguagesType = {
+const translations: LanguagesType = {
 	en: {
 		colors: {
 			red: 'Red',
@@ -195,4 +180,4 @@ const languages: LanguagesType = {
 	}
 };
 
-export { languageId, languages };
+export { translations };

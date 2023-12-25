@@ -3,8 +3,10 @@
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
 	import { update, ref } from 'firebase/database';
-	import { languageId, languages } from '$lib/languageStore';
-	$: selectedLanguage = languages[$languageId];
+	import { translations } from '$lib/translations';
+	import { languageId } from '$lib/store';
+
+	$: selectedLanguage = translations[$languageId];
 
 	async function kickPlayer(name: string) {
 		await update(ref(db, `${$lobbyCode}/`), {

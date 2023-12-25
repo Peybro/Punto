@@ -3,7 +3,7 @@
 	import InstructionModal from './InstructionModal.svelte';
 
 	import { infoVisible, roundHasStarted } from '$lib/store';
-	import { languageId } from '$lib/languageStore';
+	import { languageId } from '$lib/store';
 </script>
 
 <div class="d-flex justify-content-between mt-2">
@@ -19,7 +19,7 @@
 		{/if}
 		<InstructionModal />
 
-		<div class="dropdown p-2 pe-0">
+		<div class="dropdown p-0 pe-0">
 			<button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
 				{$languageId === 'en' ? '🇬🇧' : $languageId === 'fr' ? '🇫🇷' : '🇩🇪'}
 			</button>

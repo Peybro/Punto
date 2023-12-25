@@ -16,8 +16,11 @@ const gameState = writable<{ board: Card[][]; turn: number; currentPlayerIndex: 
 const roundHasStarted = writable<boolean>(false);
 const codeCopied = writable<boolean>(false);
 const infoVisible = writable<boolean>(true);
+const languageId = writable<string>(browser ? navigator.language.split('-')[0] || 'en' : 'en');
 
-playerName.subscribe((name) => (browser ? localStorage.setItem('localPlayerName', name) : null));
+playerName.subscribe((name: string) =>
+	browser ? localStorage.setItem('localPlayerName', name) : null
+);
 
 function resetApp() {
 	playerName.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
@@ -44,5 +47,6 @@ export {
 	roundHasStarted,
 	codeCopied,
 	infoVisible,
-	resetApp
+	resetApp,
+	languageId
 };

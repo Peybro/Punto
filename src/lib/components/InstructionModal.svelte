@@ -1,7 +1,9 @@
 <script lang="ts">
 	import PuntoText from './PuntoText.svelte';
-	import { languageId, languages } from '$lib/languageStore';
-	$: selectedLanguage = languages[$languageId];
+	import { translations } from '$lib/translations';
+	import { languageId } from '$lib/store';
+
+	$: selectedLanguage = translations[$languageId];
 </script>
 
 <!-- Button trigger modal -->

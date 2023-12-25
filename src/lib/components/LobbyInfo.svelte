@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { playerName, lobbyCode, lobbyConnected, host, codeCopied } from '$lib/store';
 	import { copyTextToClipboard } from '$lib/utils';
-	import { languageId, languages } from '$lib/languageStore';
-	$: selectedLanguage = languages[$languageId];
+	import { translations } from '$lib/translations';
+	import { languageId } from '$lib/store';
 
 	export let closeLobby: () => void;
 	export let createLobby: () => void;
 	export let leaveLobby: () => void;
 	export let joinLobby: () => void;
+
+	$: selectedLanguage = translations[$languageId];
 </script>
 
 <div class="row g-1">

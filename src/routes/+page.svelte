@@ -20,9 +20,10 @@
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
-	import { languageId, languages } from '$lib/languageStore';
-	$: selectedLanguage = languages[$languageId];
+	import { translations } from '$lib/translations';
+	import { languageId } from '$lib/store';
 
+	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $playerName;
 	$: currentPlayer = $players[$gameState.currentPlayerIndex];
 
