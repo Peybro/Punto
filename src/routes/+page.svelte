@@ -314,7 +314,7 @@
 
 		{#if !$roundHasStarted}
 			<h4>
-				Warte darauf dass {isHost
+				{isHost
 					? selectedLanguage.waitingForPlayers.self
 					: selectedLanguage.waitingForPlayers.others}
 			</h4>
