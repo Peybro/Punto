@@ -376,7 +376,7 @@
 							<Face value={currentPlayer.deck[0].value} color={currentPlayer.color} />
 						</div>
 					{:else}
-						<h4 class="ps-4">{selectedLanguage.noMoreCards}</h4>
+						<h4>{selectedLanguage.noMoreCards}</h4>
 					{/if}
 				</div>
 
