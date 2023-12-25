@@ -1,6 +1,10 @@
-import type { Card, Color } from '$lib/types';
+import type { Card, Color, GameState } from '$lib/types';
 import { codeCopied } from './store';
 
+/**
+ * Returns a color object with the color, hex and bootstrap color.
+ * @param color
+ */
 function getBeautifulColors(color: Color | string) {
 	return [
 		{ color: 'red', hex: '#dc3522', bootstrap: 'danger' },
@@ -10,6 +14,10 @@ function getBeautifulColors(color: Color | string) {
 	].find((c) => c.color === color);
 }
 
+/**
+ * Copies the given text to the clipboard.
+ * @param text
+ */
 function copyTextToClipboard(text: string) {
 	if (!navigator.clipboard) {
 		return;
@@ -29,10 +37,140 @@ function copyTextToClipboard(text: string) {
 	);
 }
 
+/**
+ * Returns the minimum and maximum indices of the board that are actually used.
+ * @param board
+ * @returns
+ */
+function getMinAndMaxIndices(board: Card[][]) {
+	let minY = board.length;
+	let maxY = 0;
+	let minX = board[0].length;
+	let maxX = 0;
+
+	for (let i = 0; i < board.length; i++) {
+		for (let j = 0; j < board[i].length; j++) {
+			if (board[i][j].value > 0) {
+				if (j < minX) {
+					minX = j;
+				}
+				if (j > maxX) {
+					maxX = j;
+				}
+				if (i < minY) {
+					minY = i;
+				}
+				if (i > maxY) {
+					maxY = i;
+				}
+			}
+		}
+	}
+
+	return { minX, maxX, minY, maxY };
+}
+
+/**
+ * Returns true if the field is allowed to be played on.
+ * @param rowIndex
+ * @param cardIndex
+ */
+function isAllowedField(gameState: GameState, rowIndex: number, cardIndex: number) {
+	const board = gameState.board;
+
+	// check if the field is in the allowed area
+	let minY = -1;
+	let maxY = -1;
+	let minX = -1;
+	let maxX = -1;
+
+	if (getPlayedBoardDimensions(board).height === 6) {
+		minY = getMinAndMaxIndices(board).maxY - 5;
+		maxY = getMinAndMaxIndices(board).minY + 5;
+	}
+
+	if (getPlayedBoardDimensions(board).width === 6) {
+		minX = getMinAndMaxIndices(board).maxX - 5;
+		maxX = getMinAndMaxIndices(board).minX + 5;
+	}
+
+	if (
+		(minX >= 0 && cardIndex < minX) ||
+		(maxX >= 0 && cardIndex > maxX) ||
+		(minY >= 0 && rowIndex < minY) ||
+		(maxY >= 0 && rowIndex > maxY)
+	) {
+		return false;
+	}
+
+	return (
+		// first round
+		(gameState.turn === 0 && rowIndex === 5 && cardIndex === 5) ||
+		// else
+		hasNeighbourCard(board, rowIndex, cardIndex)
+	);
+}
+
+/**
+ * Returns the width and height of the part of the board that are actually used.
+ */
+function getPlayedBoardDimensions(board: Card[][]) {
+	const { minX, maxX, minY, maxY } = getMinAndMaxIndices(board);
+
+	return { height: maxY - minY + 1, width: maxX - minX + 1 };
+}
+
+/**
+ * Returns true if the cell is on the board.
+ * @param row
+ * @param col
+ */
+function cellOnBoard(board: Card[][], row: number, col: number) {
+	return row >= 0 && row < board.length && col >= 0 && col < board.length;
+}
+
+/**
+ * Returns true if the cell has a neighbour card (cell with value > 0).
+ * @param row
+ * @param col
+ */
+function hasNeighbourCard(board: Card[][], row: number, col: number) {
+	return (
+		// cell itself
+		(cellOnBoard(board, row, col) && board[row][col].value > 0) ||
+		// right neighbour
+		(cellOnBoard(board, row, col + 1) && board[row][col + 1].value > 0) ||
+		// right bottom neighbour
+		(cellOnBoard(board, row + 1, col + 1) && board[row + 1][col + 1].value > 0) ||
+		// bottom neighbour
+		(cellOnBoard(board, row + 1, col) && board[row + 1][col].value > 0) ||
+		// left bottom neighbour
+		(cellOnBoard(board, row + 1, col - 1) && board[row + 1][col - 1].value > 0) ||
+		// left neighbour
+		(cellOnBoard(board, row, col - 1) && board[row][col - 1].value > 0) ||
+		// left top neighbour
+		(cellOnBoard(board, row - 1, col - 1) && board[row - 1][col - 1].value > 0) ||
+		// top neighbour
+		(cellOnBoard(board, row - 1, col) && board[row - 1][col].value > 0) ||
+		// right top neighbour
+		(cellOnBoard(board, row - 1, col + 1) && board[row - 1][col + 1].value > 0)
+	);
+}
+
+/**
+ * Returns a new array with the same elements twice.
+ * @param arr array to duplicate
+ * @returns duplicated array
+ */
 function duplicate(arr: any[]): any[] {
 	return [...arr, ...arr];
 }
 
+/**
+ * Returns a shuffled array.
+ * @param arr array to shuffle
+ * @returns shuffled array
+ */
 function shuffle(arr: any[]): any[] {
 	return arr.sort(() => Math.random() - 0.5);
 }
@@ -123,4 +261,16 @@ function getMostThrees(board: Card[][]) {
 	// });
 }
 
-export { getBeautifulColors, copyTextToClipboard, duplicate, shuffle, fourInARow, getMostThrees };
+export {
+	getBeautifulColors,
+	copyTextToClipboard,
+	duplicate,
+	shuffle,
+	fourInARow,
+	getMostThrees,
+	getPlayedBoardDimensions,
+	getMinAndMaxIndices,
+	cellOnBoard,
+	hasNeighbourCard,
+	isAllowedField
+};

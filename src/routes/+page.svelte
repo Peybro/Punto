@@ -16,15 +16,22 @@
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Player } from '$lib/types';
-	import { dev } from '$app/environment';
 	import { duplicate, fourInARow, getBeautifulColors, shuffle, getMostThrees } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 
+	$: isHost = $host === $playerName;
+	$: currentPlayer = $players[$gameState.currentPlayerIndex];
+
+	/**
+	 * Listens to the lobby with the given code and updates the store accordingly
+	 * @param code The lobby code to listen to
+	 */
 	function listenToLobby(code: string) {
-		onValue(ref(db, `${code}/`), async (snap) => {
+		const callback = async (snap: any) => {
 			const data = snap.val();
+
 			if (data === null) {
 				toast.error('Raum nicht gefunden!');
 				leaveLobby();
@@ -38,6 +45,7 @@
 				leaveLobby();
 			}
 
+			// update local state with data from database
 			$host = data.host;
 			$players = data.players;
 			$gameState = data.gameState;
@@ -45,26 +53,45 @@
 			$infoVisible = !data.roundHasStartet;
 
 			if ($roundHasStarted && fourInARow($gameState.board)) {
-				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+				// turn off listener to prevent multiple updates
+				off(ref(db, `${$lobbyCode}/`));
+				// reset currentPlayerIndex to prevent future errors
+				await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
 
-				toast(`${$players[$gameState.currentPlayerIndex].name} hat gewonnen!`, { icon: '🎉' });
+				toast(`${currentPlayer.name} hat gewonnen!`, { icon: '🎉' });
 				await set(
 					ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
-					$players[
-						$gameState.currentPlayerIndex < $players.length - 1 ? $gameState.currentPlayerIndex : 0
-					].wins + 1
+					currentPlayer.wins + 1
 				);
+				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+
+				// turn on listener again
+				onValue(ref(db, `${$lobbyCode}/`), callback);
 			}
 
 			if ($roundHasStarted && $players.every((p) => p.deck === undefined)) {
+				// turn off listener to prevent multiple updates
+				off(ref(db, `${$lobbyCode}/`));
+				// reset currentPlayerIndex to prevent future errors
+				await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
+
 				// TODO: implement
 				// const mostThrees = getMostThrees($players);
 				toast.error('Keine Karten mehr! Es gewinnt der Spieler mit den meisten 3er-Reihen!');
 				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+
+				// turn on listener again
+				onValue(ref(db, `${$lobbyCode}/`), callback);
 			}
-		});
+		};
+
+		// listen to updates from database
+		onValue(ref(db, `${code}/`), callback);
 	}
 
+	/**
+	 * Starts the round by resetting the lobby and shuffling the players
+	 */
 	async function startRound() {
 		await resetLobby();
 
@@ -72,16 +99,25 @@
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}
 
+	/**
+	 * Stops listening to the current lobby
+	 */
 	function stopListeningToLobby() {
 		off(ref(db, `${$lobbyCode}/`));
 	}
 
+	/**
+	 * Closes the lobby and resets the app
+	 */
 	function closeLobby() {
 		stopListeningToLobby();
 		set(ref(db, `${$lobbyCode}/`), null);
 		resetApp();
 	}
 
+	/**
+	 * Current client leaves the lobby and resets the app for itself
+	 */
 	async function leaveLobby() {
 		stopListeningToLobby();
 		if ($players.length === 1) {
@@ -92,7 +128,7 @@
 			ref(db, `${$lobbyCode}/players/`),
 			$players.filter((p) => p.name !== $playerName)
 		);
-		if ($host === $playerName) {
+		if (isHost) {
 			await update(ref(db, `${$lobbyCode}/`), {
 				host: $players.filter((p) => p.name !== $playerName)[0].name
 			});
@@ -100,6 +136,9 @@
 		resetApp();
 	}
 
+	/**
+	 * Resets the lobby to its initial state
+	 */
 	async function resetLobby() {
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
 
@@ -131,6 +170,9 @@
 		$infoVisible = true;
 	}
 
+	/**
+	 * Creates a new lobby with a random code and sets the current client as host
+	 */
 	async function createLobby() {
 		if ($playerName === '') {
 			toast.error('Bitte gib einen Namen ein!');
@@ -169,6 +211,9 @@
 		listenToLobby(newLobbyCode);
 	}
 
+	/**
+	 * Joins a lobby with the given code and sets the current client as player
+	 */
 	async function joinLobby() {
 		if ($playerName === '') {
 			toast.error('Bitte gib einen Namen ein!');
@@ -266,10 +311,12 @@
 		{/if}
 
 		{#if !$roundHasStarted}
-			<h4>Warte darauf dass der Host die Runde beginnt...</h4>
+			<h4>
+				Warte darauf dass {isHost ? 'du die Runde beginnst...' : 'der Host die Runde beginnt...'}
+			</h4>
 		{/if}
 
-		{#if $host === $playerName}
+		{#if isHost}
 			<button
 				class="btn btn-primary"
 				on:click={startRound}
@@ -290,24 +337,18 @@
 				<div class="d-flex my-4">
 					<h4 class="">
 						Zug #{$gameState.turn + 1}:
-						{#if $players[$gameState.currentPlayerIndex].name === $playerName}
-							<h4 class="ps-4">Du bist dran</h4>
+						{#if currentPlayer.name === $playerName}
+							Du bist dran
 						{:else}
-							<span
-								class={`p-1 rounded bg-${
-									getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
-								}`}
-								>{$players[$gameState.currentPlayerIndex].name}
+							<span class={`p-1 rounded bg-${getBeautifulColors(currentPlayer?.color)?.bootstrap}`}
+								>{currentPlayer.name}
 							</span>
 						{/if}
 					</h4>
 
-					{#if $players[$gameState.currentPlayerIndex].deck !== undefined}
+					{#if currentPlayer.deck !== undefined}
 						<div class="cell ms-2 p-0 border rounded bg-dark">
-							<Face
-								value={$players[$gameState.currentPlayerIndex].deck[0].value}
-								color={$players[$gameState.currentPlayerIndex].color}
-							/>
+							<Face value={currentPlayer.deck[0].value} color={currentPlayer.color} />
 						</div>
 					{:else}
 						<h4 class="ps-4">Keine Karten mehr</h4>

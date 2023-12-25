@@ -3,8 +3,10 @@
 	import { db } from '$lib/firebase';
 	import { ref, update } from 'firebase/database';
 	import Face from './dice/Face.svelte';
-	import { getBeautifulColors } from '$lib/utils';
+	import { getBeautifulColors, isAllowedField } from '$lib/utils';
 	import { dev } from '$app/environment';
+
+	$: currentPlayer = $players[$gameState.currentPlayerIndex];
 
 	/**
 	 * Plays a card on the board.
@@ -17,8 +19,8 @@
 				row.map((card, j) => {
 					if (i === rowIndex && j === cardIndex) {
 						return {
-							value: $players[$gameState.currentPlayerIndex].deck[0].value,
-							color: $players[$gameState.currentPlayerIndex].color
+							value: currentPlayer.deck[0].value,
+							color: currentPlayer.color
 						};
 					}
 					return card;
@@ -28,179 +30,12 @@
 		});
 
 		await update(ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}`), {
-			deck: $players[$gameState.currentPlayerIndex].deck.slice(1)
+			deck: currentPlayer.deck.slice(1)
 		});
 
 		await update(ref(db, `${$lobbyCode}/gameState`), {
 			currentPlayerIndex: ($gameState.currentPlayerIndex + 1) % $players.length
 		});
-	}
-
-	/**
-	 * Returns the min and max index of the board that are actually used.
-	 */
-	function getMinAndMaxIndices() {
-		let minY = $gameState.board.length;
-		let maxY = 0;
-		let minX = $gameState.board[0].length;
-		let maxX = 0;
-
-		for (let i = 0; i < $gameState.board.length; i++) {
-			for (let j = 0; j < $gameState.board[i].length; j++) {
-				if ($gameState.board[i][j].value > 0) {
-					if (j < minX) {
-						minX = j;
-					}
-					if (j > maxX) {
-						maxX = j;
-					}
-					if (i < minY) {
-						minY = i;
-					}
-					if (i > maxY) {
-						maxY = i;
-					}
-				}
-			}
-		}
-
-		return { minX, maxX, minY, maxY };
-	}
-
-	/**
-	 * Returns the width and height of the part of the board that are actually used.
-	 */
-	function getPlayedBoardDimensions() {
-		const { minX, maxX, minY, maxY } = getMinAndMaxIndices();
-
-		return { height: maxY - minY + 1, width: maxX - minX + 1 };
-	}
-
-	/**
-	 * Returns true if the field is allowed to be played on.
-	 * @param rowIndex
-	 * @param cardIndex
-	 */
-	function isAllowedField(rowIndex: number, cardIndex: number) {
-		if ($players[$gameState.currentPlayerIndex].deck === undefined) {
-			return false;
-		}
-
-		// check if the field is in the allowed area
-		let minY = -1;
-		let maxY = -1;
-		let minX = -1;
-		let maxX = -1;
-
-		if (getPlayedBoardDimensions().height === 6) {
-			minY = getMinAndMaxIndices().maxY - 5;
-			maxY = getMinAndMaxIndices().minY + 5;
-		}
-
-		if (getPlayedBoardDimensions().width === 6) {
-			minX = getMinAndMaxIndices().maxX - 5;
-			maxX = getMinAndMaxIndices().minX + 5;
-		}
-
-		if (
-			(minX >= 0 && cardIndex < minX) ||
-			(maxX >= 0 && cardIndex > maxX) ||
-			(minY >= 0 && rowIndex < minY) ||
-			(maxY >= 0 && rowIndex > maxY)
-		) {
-			return false;
-		}
-
-		// TODO: better structuring
-		return (
-			// first round
-			($gameState.turn === 0 && rowIndex === 5 && cardIndex === 5) ||
-			// upper left corner
-			(rowIndex === 0 &&
-				rowIndex < $gameState.board.length - 1 &&
-				cardIndex === 0 &&
-				cardIndex < $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex].value > 0)) ||
-			// lower right corner
-			(rowIndex > 0 &&
-				rowIndex === $gameState.board.length - 1 &&
-				cardIndex > 0 &&
-				cardIndex === $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex - 1][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex].value > 0)) ||
-			// upper right corner
-			(rowIndex === 0 &&
-				rowIndex < $gameState.board.length - 1 &&
-				cardIndex > 0 &&
-				cardIndex === $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex - 1].value > 0)) ||
-			// lower left corner
-			(rowIndex > 0 &&
-				rowIndex === $gameState.board.length - 1 &&
-				cardIndex === 0 &&
-				cardIndex < $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex + 1].value > 0)) ||
-			// inner fields
-			(rowIndex > 0 &&
-				rowIndex < $gameState.board.length - 1 &&
-				cardIndex > 0 &&
-				cardIndex < $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex - 1][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex - 1].value > 0)) ||
-			// upper border
-			(rowIndex === 0 &&
-				rowIndex < $gameState.board.length - 1 &&
-				cardIndex > 0 &&
-				cardIndex < $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex - 1].value > 0)) ||
-			// lower border
-			(rowIndex > 0 &&
-				rowIndex === $gameState.board.length - 1 &&
-				cardIndex > 0 &&
-				cardIndex < $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex - 1][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex + 1].value > 0)) ||
-			// left border
-			(rowIndex > 0 &&
-				rowIndex < $gameState.board.length - 1 &&
-				cardIndex === 0 &&
-				cardIndex < $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex + 1].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex + 1].value > 0)) ||
-			// right border
-			(rowIndex > 0 &&
-				rowIndex < $gameState.board.length - 1 &&
-				cardIndex > 0 &&
-				cardIndex === $gameState.board[0].length - 1 &&
-				($gameState.board[rowIndex - 1][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex][cardIndex - 1].value > 0 ||
-					$gameState.board[rowIndex - 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex].value > 0 ||
-					$gameState.board[rowIndex + 1][cardIndex - 1].value > 0))
-		);
 	}
 </script>
 
@@ -212,15 +47,15 @@
 					class={`p-0 cell rounded overflow-hidden ${
 						card.value > 0
 							? 'bg-dark border-1 border'
-							: $roundHasStarted && isAllowedField(rowIndex, cardIndex)
+							: $roundHasStarted && isAllowedField($gameState, rowIndex, cardIndex)
 								? 'bg-secondary border-1 border-secondary'
 								: `${dev ? 'bg-success' : 'invisible'} border-1`
 					} text-${getBeautifulColors(card.color)?.bootstrap}`}
 					on:click={() => playCard(rowIndex, cardIndex)}
-					disabled={$players[$gameState.currentPlayerIndex].deck === undefined ||
-						$players[$gameState.currentPlayerIndex].deck[0].value <= card.value ||
-						$players[$gameState.currentPlayerIndex].name !== $playerName ||
-						(card.value === 0 && !isAllowedField(rowIndex, cardIndex)) ||
+					disabled={currentPlayer.deck === undefined ||
+						currentPlayer.deck[0].value <= card.value ||
+						currentPlayer.name !== $playerName ||
+						(card.value === 0 && !isAllowedField($gameState, rowIndex, cardIndex)) ||
 						!$roundHasStarted}
 				>
 					<Face value={card.value} color={card.color} />

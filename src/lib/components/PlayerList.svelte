@@ -46,7 +46,11 @@
 				{#if $playerName === $host && player.name !== $host}
 					<li><hr class="dropdown-divider" /></li>
 					<li>
-						<button class="dropdown-item" on:click={() => kickPlayer(player.name)}>Kick</button>
+						<button
+							class="dropdown-item"
+							on:click={() => kickPlayer(player.name)}
+							disabled={$roundHasStarted}>Kick</button
+						>
 					</li>
 				{/if}
 			</ul>
