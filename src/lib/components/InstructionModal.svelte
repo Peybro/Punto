@@ -23,7 +23,11 @@
 			</div>
 			<div class="modal-body">
 				<h2>{selectedLanguage.subtitle}</h2>
-				<p>{selectedLanguage.by} <b>Bernhard Weber</b></p>
+				<p>
+					<a href="https://www.gamefactory-spiele.com/punto"
+						>{selectedLanguage.by} <b>Bernhard Weber</b></a
+					>
+				</p>
 
 				<h3>{selectedLanguage.aim.title}</h3>
 				<p>
