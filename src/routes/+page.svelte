@@ -197,6 +197,12 @@
 		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
 			playersOnline = snap.val();
 		});
+		if (playersOnline.length === 4) {
+			toast.error('Dieser Raum ist bereits voll!');
+			stopListeningToLobby();
+			$lobbyConnected = false;
+			return;
+		}
 		if (playersOnline.some((p: Player) => p.name === $playerName)) {
 			toast.error('Es gibt bereits einen Spieler mit diesem Namen!');
 			stopListeningToLobby();
@@ -264,20 +270,14 @@
 		{/if}
 
 		{#if $host === $playerName}
-			<!-- start alone -->
-			{#if dev}
-				<button
-					class="btn btn-primary"
-					on:click={startRound}
-					disabled={$playerName !== $host || $roundHasStarted}>Start</button
-				>
-			{:else}
-				<button
-					class="btn btn-primary"
-					on:click={startRound}
-					disabled={$playerName !== $host || $roundHasStarted}>Start</button
-				>
-			{/if}
+			<button
+				class="btn btn-primary"
+				on:click={startRound}
+				disabled={$playerName !== $host || $roundHasStarted}
+				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
+					? 'Neustart'
+					: 'Start'}</button
+			>
 			<button
 				class="btn btn-warning"
 				on:click={resetLobby}
@@ -290,12 +290,16 @@
 				<div class="d-flex my-4">
 					<h4 class="">
 						Zug #{$gameState.turn + 1}:
-						<span
-							class={`p-1 rounded bg-${
-								getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
-							}`}
-							>{$players[$gameState.currentPlayerIndex].name}
-						</span>
+						{#if $players[$gameState.currentPlayerIndex].name === $playerName}
+							<h4 class="ps-4">Du bist dran</h4>
+						{:else}
+							<span
+								class={`p-1 rounded bg-${
+									getBeautifulColors($players[$gameState.currentPlayerIndex]?.color)?.bootstrap
+								}`}
+								>{$players[$gameState.currentPlayerIndex].name}
+							</span>
+						{/if}
 					</h4>
 
 					{#if $players[$gameState.currentPlayerIndex].deck !== undefined}
