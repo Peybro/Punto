@@ -308,7 +308,7 @@
 
 	{#if $lobbyConnected}
 		{#if $infoVisible}
-			<h4 class="text-start mt-4">Spieler</h4>
+			<h4 class="text-start mt-4">{selectedLanguage.players}</h4>
 			<PlayerList />
 		{/if}
 
