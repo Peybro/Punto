@@ -22,9 +22,18 @@ playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
 );
 
+/**
+ * Resets the app to its initial state
+ */
 function resetApp() {
 	playerName.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
 	lobbyCode.set('');
+
+	// reset code param in URL
+	const urlParams = new URLSearchParams(window.location.search);
+	urlParams.delete('code');
+	window.location.search = urlParams.toString();
+
 	lobbyConnected.set(false);
 	host.set('');
 	players.set([]);
