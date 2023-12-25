@@ -43,10 +43,10 @@ const translations: LanguagesType = {
 			again: 'Restart'
 		},
 		endRound: 'End Round',
-		turn: 'Turn',
+		turn: 'Move',
 		yourTurn: "It's your turn",
 		notConnected: 'No room connected',
-		noMoreCards: 'No more cards!',
+		noMoreCards: 'Round over: No more cards in play!',
 		toasts: {
 			roomNotFound: 'Room not found!',
 			kick: 'You have been kicked!',
@@ -105,7 +105,7 @@ const translations: LanguagesType = {
 		turn: 'Zug',
 		yourTurn: 'Du bist dran',
 		notConnected: 'Kein Raum verbunden',
-		noMoreCards: 'Keine Karten mehr!',
+		noMoreCards: 'Runde zu Ende: Keine Karten mehr im Spiel!',
 		toasts: {
 			roomNotFound: 'Raum nicht gefunden!',
 			kick: 'Du wurdest gekickt!',
@@ -126,7 +126,7 @@ const translations: LanguagesType = {
 			green: 'Vert',
 			yellow: 'Jaune'
 		},
-		subtitle: 'Point par Point vers la Victoire !',
+		subtitle: 'Point par Point vers la Victoire!',
 		by: 'Un jeu créé par',
 		aim: {
 			title: 'Objectif du Jeu',
@@ -164,18 +164,18 @@ const translations: LanguagesType = {
 		turn: 'Tour',
 		yourTurn: "C'est à vous de jouer",
 		notConnected: 'Aucune salle connectée',
-		noMoreCards: 'Plus de cartes !',
+		noMoreCards: 'Fin du tour : plus de cartes en jeu!',
 		toasts: {
-			roomNotFound: 'Salle introuvable !',
-			kick: 'Vous avez été exclu(e) !',
-			win: 'a gagné !',
-			winnerWhenNoCards: 'Le joueur avec le plus de séries de 3 gagne !',
-			nameMissing: 'Veuillez entrer un nom !',
-			roomCodeNotValid: 'Veuillez entrer un code de salle valide !',
-			noMatchingRoom: "Il n'y a aucune salle avec ce code !",
-			roomFull: 'Cette salle est déjà pleine !',
-			nameAlreadyTaken: 'Il y a déjà un joueur avec ce nom !',
-			roundStarted: "La manche a déjà commencé ! Veuillez attendre qu'elle se termine."
+			roomNotFound: 'Salle introuvable!',
+			kick: 'Vous avez été exclu(e)!',
+			win: 'a gagné!',
+			winnerWhenNoCards: 'Le joueur avec le plus de séries de 3 gagne!',
+			nameMissing: 'Veuillez entrer un nom!',
+			roomCodeNotValid: 'Veuillez entrer un code de salle valide!',
+			noMatchingRoom: "Il n'y a aucune salle avec ce code!",
+			roomFull: 'Cette salle est déjà pleine!',
+			nameAlreadyTaken: 'Il y a déjà un joueur avec ce nom!',
+			roundStarted: "La manche a déjà commencé! Veuillez attendre qu'elle se termine."
 		}
 	}
 };

@@ -359,18 +359,19 @@
 		{#if $roundHasStarted || $gameState.turn > 0}
 			{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
 				<div class="d-flex my-4">
-					<h4 class="">
-						{selectedLanguage.turn} #{$gameState.turn + 1}:
-						{#if currentPlayer.name === $playerName}
-							{selectedLanguage.yourTurn}
-						{:else}
-							<span class={`p-1 rounded bg-${getBeautifulColors(currentPlayer?.color)?.bootstrap}`}
-								>{currentPlayer.name}
-							</span>
-						{/if}
-					</h4>
-
 					{#if currentPlayer.deck !== undefined}
+						<h4 class="">
+							{selectedLanguage.turn} #{$gameState.turn + 1}:
+							{#if currentPlayer.name === $playerName}
+								{selectedLanguage.yourTurn}
+							{:else}
+								<span
+									class={`p-1 rounded bg-${getBeautifulColors(currentPlayer?.color)?.bootstrap}`}
+									>{currentPlayer.name}
+								</span>
+							{/if}
+						</h4>
+
 						<div class="cell ms-2 p-0 border rounded bg-dark">
 							<Face value={currentPlayer.deck[0].value} color={currentPlayer.color} />
 						</div>
