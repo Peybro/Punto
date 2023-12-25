@@ -3,6 +3,7 @@
 	import InstructionModal from './InstructionModal.svelte';
 
 	import { infoVisible, roundHasStarted } from '$lib/store';
+	import { languageId } from '$lib/languageStore';
 </script>
 
 <div class="d-flex justify-content-between mt-2">
@@ -17,6 +18,17 @@
 			>
 		{/if}
 		<InstructionModal />
+
+		<div class="dropdown p-2 pe-0">
+			<button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+				{$languageId === 'en' ? '🇬🇧' : $languageId === 'fr' ? '🇫🇷' : '🇩🇪'}
+			</button>
+			<ul class="dropdown-menu">
+				<li><button class="dropdown-item" on:click={() => ($languageId = 'en')}>🇬🇧 English</button></li>
+				<li><button class="dropdown-item" on:click={() => ($languageId = 'fr')}>🇫🇷 Français</button></li>
+				<li><button class="dropdown-item" on:click={() => ($languageId = 'de')}>🇩🇪 Deutsch</button></li>
+			</ul>
+		</div>
 	</div>
 </div>
 <p style="font-size: 0.7rem">by Bernhard Weber</p>

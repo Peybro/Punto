@@ -1,5 +1,7 @@
 <script lang="ts">
 	import PuntoText from './PuntoText.svelte';
+	import { languageId, languages } from '$lib/languageStore';
+	$: selectedLanguage = languages[$languageId];
 </script>
 
 <!-- Button trigger modal -->
@@ -18,22 +20,32 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<h2>Punkt über Punkt zum Sieg!</h2>
-				<p>Ein Spiel von <b>Bernhard Weber</b></p>
+				<h2>{selectedLanguage.subtitle}</h2>
+				<p>{selectedLanguage.by} <b>Bernhard Weber</b></p>
 
-				<h3>Ziel des Spiels</h3>
+				<h3>{selectedLanguage.aim.title}</h3>
 				<p>
-					Vier, direkt nebeneinander liegende Karten <span class="text-danger">derselben</span> Farbe
-					in eine Reihe, Spalte oder Diagonale bringen.
+					{selectedLanguage.aim.text[0]}
+					<span class="text-danger">{selectedLanguage.aim.text[1]}</span>
+					{selectedLanguage.aim.text[2]}
 				</p>
 
-				<!-- <p>
-					Es gibt auch Spielvarianten zu zweit, oder dritt, oder zu viert in Teams. Diese Version
-					sieht bisher nur vor, dass vier Spieler:innen jeweils für sich spielen.
-				</p> -->
+				<h3>{selectedLanguage.rules.title}</h3>
+				<p>
+					{selectedLanguage.rules.text[0]}
+				</p>
+				<p>
+					{selectedLanguage.rules.text[1]}
+				</p>
+
+				<p>
+					{selectedLanguage.rules.text[2]}
+				</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">zurück</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+					>{selectedLanguage.back}</button
+				>
 			</div>
 		</div>
 	</div>
