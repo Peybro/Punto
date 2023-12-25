@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { playerName, lobbyCode, lobbyConnected, host, codeCopied } from '$lib/store';
 	import { copyTextToClipboard } from '$lib/utils';
+	import { languageId, languages } from '$lib/languageStore';
+	$: selectedLanguage = languages[$languageId];
 
 	export let closeLobby: () => void;
 	export let createLobby: () => void;
@@ -42,23 +44,27 @@
 
 	<div class="col-xs-2 col-md-6 col-xl-3">
 		{#if $lobbyConnected && $host === $playerName}
-			<button class="btn btn-danger w-100" on:click={closeLobby}>Raum schließen</button>
+			<button class="btn btn-danger w-100" on:click={closeLobby}
+				>{selectedLanguage.closeRoom}</button
+			>
 		{:else}
 			<button
 				class="btn btn-primary w-100"
 				on:click={createLobby}
 				disabled={$playerName.length === 0 || ($host !== '' && $host !== $playerName)}
-				>Raum erstellen</button
+				>{selectedLanguage.createRoom}</button
 			>
 		{/if}
 	</div>
 
 	<div class="col-xs-6 col-md-6 col-xl-3">
 		{#if $lobbyConnected}
-			<button class="btn btn-warning w-100" on:click={leaveLobby}>Raum verlassen</button>
+			<button class="btn btn-warning w-100" on:click={leaveLobby}
+				>{selectedLanguage.leaveRoom}</button
+			>
 		{:else}
 			<button class="btn btn-primary w-100" on:click={joinLobby} disabled={$lobbyCode.length !== 6}
-				>Raum betreten</button
+				>{selectedLanguage.joinRoom}</button
 			>
 		{/if}
 	</div>

@@ -20,6 +20,8 @@
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
+	import { languageId, languages } from '$lib/languageStore';
+	$: selectedLanguage = languages[$languageId];
 
 	$: isHost = $host === $playerName;
 	$: currentPlayer = $players[$gameState.currentPlayerIndex];
@@ -33,7 +35,7 @@
 			const data = snap.val();
 
 			if (data === null) {
-				toast.error('Raum nicht gefunden!');
+				toast.error(selectedLanguage.toasts.roomNotFound);
 				leaveLobby();
 			}
 
@@ -41,7 +43,7 @@
 				$players.some((p: Player) => p.name === $playerName) &&
 				!data.players.some((p: Player) => p.name === $playerName)
 			) {
-				toast.error('Du wurdest gekickt!');
+				toast.error(selectedLanguage.toasts.kick);
 				leaveLobby();
 			}
 
@@ -58,7 +60,7 @@
 				// reset currentPlayerIndex to prevent future errors
 				await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
 
-				toast(`${currentPlayer.name} hat gewonnen!`, { icon: '🎉' });
+				toast(`${currentPlayer.name} ${selectedLanguage.toasts.win}`, { icon: '🎉' });
 				await set(
 					ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
 					currentPlayer.wins + 1
@@ -77,7 +79,7 @@
 
 				// TODO: implement
 				// const mostThrees = getMostThrees($players);
-				toast.error('Keine Karten mehr! Es gewinnt der Spieler mit den meisten 3er-Reihen!');
+				toast.error(selectedLanguage.toasts.winnerWhenNoCards);
 				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
 
 				// turn on listener again
@@ -175,7 +177,7 @@
 	 */
 	async function createLobby() {
 		if ($playerName === '') {
-			toast.error('Bitte gib einen Namen ein!');
+			toast.error(selectedLanguage.toasts.nameMissing);
 			return;
 		}
 
@@ -216,14 +218,14 @@
 	 */
 	async function joinLobby() {
 		if ($playerName === '') {
-			toast.error('Bitte gib einen Namen ein!');
+			toast.error(selectedLanguage.toasts.nameMissing);
 			stopListeningToLobby();
 			$lobbyConnected = false;
 			return;
 		}
 
 		if ($lobbyCode.length !== 6) {
-			toast.error('Bitte gib einen gültigen Raumcode ein!');
+			toast.error(selectedLanguage.toasts.roomCodeNotValid);
 			stopListeningToLobby();
 			$lobbyConnected = false;
 			return;
@@ -231,7 +233,7 @@
 
 		await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
 			if (snap.val() === null) {
-				toast.error('Es gibt keinen Raum mit diesem Code!');
+				toast.error(selectedLanguage.toasts.noMatchingRoom);
 				stopListeningToLobby();
 				$lobbyConnected = false;
 				return;
@@ -243,13 +245,13 @@
 			playersOnline = snap.val();
 		});
 		if (playersOnline.length === 4) {
-			toast.error('Dieser Raum ist bereits voll!');
+			toast.error(selectedLanguage.toasts.roomFull);
 			stopListeningToLobby();
 			$lobbyConnected = false;
 			return;
 		}
 		if (playersOnline.some((p: Player) => p.name === $playerName)) {
-			toast.error('Es gibt bereits einen Spieler mit diesem Namen!');
+			toast.error(selectedLanguage.toasts.nameAlreadyTaken);
 			stopListeningToLobby();
 			$lobbyConnected = false;
 			return;
@@ -260,7 +262,7 @@
 			roundInProgress = snap.val();
 		});
 		if (roundInProgress) {
-			toast.error('Die Runde hat bereits begonnen! Bitte warte bis sie vorbei ist.');
+			toast.error(selectedLanguage.toasts.roundStarted);
 			stopListeningToLobby();
 			$lobbyConnected = false;
 			return;
@@ -297,7 +299,7 @@
 	}
 </script>
 
-<div class="container">
+<div class="container mb-4">
 	<Heading />
 
 	{#if $infoVisible}
@@ -312,7 +314,9 @@
 
 		{#if !$roundHasStarted}
 			<h4>
-				Warte darauf dass {isHost ? 'du die Runde beginnst...' : 'der Host die Runde beginnt...'}
+				Warte darauf dass {isHost
+					? selectedLanguage.waitingForPlayers.self
+					: selectedLanguage.waitingForPlayers.others}
 			</h4>
 		{/if}
 
@@ -322,13 +326,13 @@
 				on:click={startRound}
 				disabled={$playerName !== $host || $roundHasStarted}
 				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
-					? 'Neustart'
-					: 'Start'}</button
+					? selectedLanguage.startGame.again
+					: selectedLanguage.startGame.new}</button
 			>
 			<button
 				class="btn btn-warning"
 				on:click={resetLobby}
-				disabled={$playerName !== $host || !$roundHasStarted}>Runde beenden</button
+				disabled={$playerName !== $host || !$roundHasStarted}>{selectedLanguage.endRound}</button
 			>
 		{/if}
 
@@ -336,9 +340,9 @@
 			{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
 				<div class="d-flex my-4">
 					<h4 class="">
-						Zug #{$gameState.turn + 1}:
+						{selectedLanguage.turn} #{$gameState.turn + 1}:
 						{#if currentPlayer.name === $playerName}
-							Du bist dran
+							{selectedLanguage.yourTurn}
 						{:else}
 							<span class={`p-1 rounded bg-${getBeautifulColors(currentPlayer?.color)?.bootstrap}`}
 								>{currentPlayer.name}
@@ -351,7 +355,7 @@
 							<Face value={currentPlayer.deck[0].value} color={currentPlayer.color} />
 						</div>
 					{:else}
-						<h4 class="ps-4">Keine Karten mehr</h4>
+						<h4 class="ps-4">{selectedLanguage.noMoreCards}</h4>
 					{/if}
 				</div>
 
@@ -359,7 +363,7 @@
 			{/if}
 		{/if}
 	{:else}
-		<h1 class="mt-5">Kein Raum verbunden</h1>
+		<h1 class="mt-5">{selectedLanguage.notConnected}</h1>
 	{/if}
 </div>
 

@@ -3,6 +3,8 @@
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
 	import { update, ref } from 'firebase/database';
+	import { languageId, languages } from '$lib/languageStore';
+	$: selectedLanguage = languages[$languageId];
 
 	async function kickPlayer(name: string) {
 		await update(ref(db, `${$lobbyCode}/`), {
@@ -39,7 +41,9 @@
 								})}
 							disabled={$players.some((p) => p.color === color) || $roundHasStarted}
 						>
-							{['Rot', 'Blau', 'Grün', 'Gelb'][['red', 'blue', 'green', 'yellow'].indexOf(color)]}
+							{Object.values(selectedLanguage.colors)[
+								['red', 'blue', 'green', 'yellow'].indexOf(color)
+							]}
 						</button>
 					</li>
 				{/each}
@@ -49,7 +53,7 @@
 						<button
 							class="dropdown-item"
 							on:click={() => kickPlayer(player.name)}
-							disabled={$roundHasStarted}>Kick</button
+							disabled={$roundHasStarted}>{selectedLanguage.kick}</button
 						>
 					</li>
 				{/if}
@@ -58,7 +62,7 @@
 	{/each}
 	{#each Array(4 - $players.length) as _}
 		<div class="dropdown col-xs-6 col-sm-3">
-			<button class="btn btn-outline-secondary w-100" disabled>[unbesetzt]</button>
+			<button class="btn btn-outline-secondary w-100" disabled>[{selectedLanguage.free}]</button>
 		</div>
 	{/each}
 </div>
