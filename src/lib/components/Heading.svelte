@@ -24,9 +24,15 @@
 				{$languageId === 'en' ? '🇬🇧' : $languageId === 'fr' ? '🇫🇷' : '🇩🇪'}
 			</button>
 			<ul class="dropdown-menu">
-				<li><button class="dropdown-item" on:click={() => ($languageId = 'en')}>🇬🇧 English</button></li>
-				<li><button class="dropdown-item" on:click={() => ($languageId = 'fr')}>🇫🇷 Français</button></li>
-				<li><button class="dropdown-item" on:click={() => ($languageId = 'de')}>🇩🇪 Deutsch</button></li>
+				<li>
+					<button class="dropdown-item" on:click={() => ($languageId = 'en')}>🇬🇧 English</button>
+				</li>
+				<li>
+					<button class="dropdown-item" on:click={() => ($languageId = 'fr')}>🇫🇷 Français</button>
+				</li>
+				<li>
+					<button class="dropdown-item" on:click={() => ($languageId = 'de')}>🇩🇪 Deutsch</button>
+				</li>
 			</ul>
 		</div>
 	</div>
