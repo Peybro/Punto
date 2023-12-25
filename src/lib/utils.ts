@@ -22,8 +22,9 @@ function copyTextToClipboard(text: string) {
 	if (!navigator.clipboard) {
 		return;
 	}
-	navigator.clipboard.writeText(text).then(
+	// navigator.clipboard.writeText(text).then(
 		function () {
+    navigator.share(text).then(function () {
 			console.log('Copying to clipboard was successful!');
 			codeCopied.set(true);
 
