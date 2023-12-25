@@ -24,7 +24,7 @@ function copyTextToClipboard(text: string) {
 	}
 	navigator.clipboard.writeText(text).then(
 		function () {
-			console.log('Async: Copying to clipboard was successful!');
+			console.log('Copying to clipboard was successful!');
 			codeCopied.set(true);
 
 			setTimeout(() => {
@@ -32,7 +32,7 @@ function copyTextToClipboard(text: string) {
 			}, 3000);
 		},
 		function (err) {
-			console.error('Async: Could not copy text: ', err);
+			console.error('Could not copy text: ', err);
 		}
 	);
 }

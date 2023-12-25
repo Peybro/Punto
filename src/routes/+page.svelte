@@ -12,7 +12,8 @@
 		gameState,
 		roundHasStarted,
 		infoVisible,
-		resetApp
+		resetApp,
+		languageId
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Player } from '$lib/types';
@@ -21,7 +22,8 @@
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import { translations } from '$lib/translations';
-	import { languageId } from '$lib/store';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $playerName;
@@ -54,6 +56,10 @@
 			$gameState = data.gameState;
 			$roundHasStarted = data.roundHasStartet;
 			$infoVisible = !data.roundHasStartet;
+
+			// update url with lobby code
+			$page.url.searchParams.set('code', data.lobbyCode);
+			goto(`?${$page.url.searchParams.toString()}`);
 
 			if ($roundHasStarted && fourInARow($gameState.board)) {
 				// turn off listener to prevent multiple updates
@@ -182,8 +188,21 @@
 			return;
 		}
 
-		const newLobbyCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-		$lobbyCode = newLobbyCode;
+		let newLobbyCode = '';
+
+		let lobbyCodeAlreadyExists = false;
+		await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
+			if (snap.val() !== null) {
+				lobbyCodeAlreadyExists = true;
+			}
+		});
+
+		if ($lobbyCode.length === 6 && !lobbyCodeAlreadyExists) {
+			newLobbyCode = $lobbyCode;
+		} else {
+			newLobbyCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+			$lobbyCode = newLobbyCode;
+		}
 
 		await set(ref(db, `${newLobbyCode}/`), {
 			lobbyCode: newLobbyCode,
@@ -218,57 +237,57 @@
 	 * Joins a lobby with the given code and sets the current client as player
 	 */
 	async function joinLobby() {
+		let validToJoin = true;
+
 		if ($playerName === '') {
 			toast.error(selectedLanguage.toasts.nameMissing);
-			stopListeningToLobby();
 			$lobbyConnected = false;
-			return;
+			validToJoin = false;
 		}
 
 		if ($lobbyCode.length !== 6) {
 			toast.error(selectedLanguage.toasts.roomCodeNotValid);
-			stopListeningToLobby();
 			$lobbyConnected = false;
-			return;
+			validToJoin = false;
 		}
 
 		await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
 			if (snap.val() === null) {
 				toast.error(selectedLanguage.toasts.noMatchingRoom);
-				stopListeningToLobby();
 				$lobbyConnected = false;
-				return;
+				validToJoin = false;
 			}
 		});
 
 		let playersOnline: Player[] | [] = [];
 		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
-			playersOnline = snap.val();
+			if (snap.val()) playersOnline = snap.val();
 		});
 		if (playersOnline.length === 4) {
 			toast.error(selectedLanguage.toasts.roomFull);
-			stopListeningToLobby();
 			$lobbyConnected = false;
-			return;
+			validToJoin = false;
 		}
 		if (playersOnline.some((p: Player) => p.name === $playerName)) {
 			toast.error(selectedLanguage.toasts.nameAlreadyTaken);
-			stopListeningToLobby();
 			$lobbyConnected = false;
-			return;
+			validToJoin = false;
 		}
 
 		let roundInProgress = false;
 		await get(ref(db, `${$lobbyCode}/roundHasStartet`)).then((snap: any) => {
-			roundInProgress = snap.val();
+			if (snap.val()) roundInProgress = snap.val();
 		});
 		if (roundInProgress) {
 			toast.error(selectedLanguage.toasts.roundStarted);
-			stopListeningToLobby();
 			$lobbyConnected = false;
-			return;
+			validToJoin = false;
 		}
 
+		// if any of the above checks failed, return
+		if (!validToJoin) return;
+
+		// else register new player and start listening to lobby changes
 		await update(ref(db, `${$lobbyCode}/`), {
 			players: [
 				...playersOnline,

@@ -3,12 +3,14 @@
 	import { copyTextToClipboard } from '$lib/utils';
 	import { translations } from '$lib/translations';
 	import { languageId } from '$lib/store';
+	import { page } from '$app/stores';
 
 	export let closeLobby: () => void;
 	export let createLobby: () => void;
 	export let leaveLobby: () => void;
 	export let joinLobby: () => void;
 
+	$: $lobbyCode = $page.url.searchParams.get('code') || '';
 	$: selectedLanguage = translations[$languageId];
 </script>
 
