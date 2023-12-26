@@ -24,7 +24,7 @@ const shareData = {
  * Copies the given text to the clipboard.
  * @param text
  */
-function copyTextToClipboard(text: string) {
+async function copyTextToClipboard(text: string) {
 	if (!navigator.clipboard) {
 		return;
 	}
