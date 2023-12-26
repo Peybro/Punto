@@ -104,6 +104,15 @@
 	async function startRound() {
 		await resetLobby();
 
+		// TODO: implement team play with 4 players: each team 2 decks shuffled, 
+		// team turns after each other, win with 5 cards in a row of one color
+
+		if ($players.length === 2) {
+			// TODO: implement 2 decks for each player
+		} else if ($players.length === 3) {
+			// TODO: implement 1 deck and 6 cards of forth color for each player
+		}
+
 		await update(ref(db, `${$lobbyCode}/`), { players: shuffle($players) });
 		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
 	}

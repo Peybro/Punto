@@ -8,7 +8,7 @@ const translations: LanguagesType = {
 			green: 'Green',
 			yellow: 'Yellow'
 		},
-		subtitle: 'Dot by Dot to Victory!',
+		subtitle: 'Point over point to victory!',
 		by: 'A game by',
 		aim: {
 			title: 'Objective of the Game',
