@@ -14,34 +14,26 @@ function getBeautifulColors(color: Color | string) {
 	].find((c) => c.color === color);
 }
 
-const shareData = {
-  title: "MDN",
-  text: "Learn web development on MDN!",
-  url: "https://developer.mozilla.org",
-};
-
 /**
  * Copies the given text to the clipboard.
  * @param text
  */
 async function copyTextToClipboard(text: string) {
-	if (!navigator.clipboard) {
-		return;
-	}
-	// navigator.clipboard.writeText(text).then(
-    await navigator.share(shareData)
- 	// function () {
-			// console.log('Copying to clipboard was successful!');
+	if (navigator.share) {
+	 	await navigator.share({
+     title: 'Punto',
+     text: 'Willst du mit mir Punto spielen?',
+     url: ''
+   });
+	} else {
+   if (!navigator.clipboard) return;
+	  await navigator.clipboard.writeText(text)
 			codeCopied.set(true);
 
 			setTimeout(() => {
 				codeCopied.set(false);
 			}, 3000);
-		// },
-	// 	function (err) {
-		//	console.error('Could not copy text: ', err);
-//		}
-	//);
+	 },
 }
 
 /**
