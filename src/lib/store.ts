@@ -46,8 +46,9 @@ function resetApp() {
 	lobbyCode.set('');
 
 	// reset code param in URL
-	// window.history.replaceState({}, 'Punto', window.location.origin);
-	replaceState(window.location.origin, '');
+ // TODO
+	window.history.replaceState({}, 'Punto', window.location.origin);
+	// replaceState(window.location.origin, '');
 
 	lobbyConnected.set(false);
 	host.set('');
