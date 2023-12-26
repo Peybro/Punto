@@ -21,7 +21,7 @@ const languageId = writable<string>(browser ? navigator.language.split('-')[0] |
 const invitation = {
 	title: 'Punto',
 	text: "Let's play Punto!",
-	url: window.location.toString()
+	url: window.location.href.toString()
 };
 
 playerName.subscribe((name: string) =>
