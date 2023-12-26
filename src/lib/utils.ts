@@ -14,6 +14,12 @@ function getBeautifulColors(color: Color | string) {
 	].find((c) => c.color === color);
 }
 
+const shareData = {
+  title: "MDN",
+  text: "Learn web development on MDN!",
+  url: "https://developer.mozilla.org",
+};
+
 /**
  * Copies the given text to the clipboard.
  * @param text
@@ -23,18 +29,18 @@ function copyTextToClipboard(text: string) {
 		return;
 	}
 	// navigator.clipboard.writeText(text).then(
-	//	function () {
-    navigator.share(text).then(function () {
-			console.log('Copying to clipboard was successful!');
+    await navigator.share(shareData)
+ 	// function () {
+			// console.log('Copying to clipboard was successful!');
 			codeCopied.set(true);
 
 			setTimeout(() => {
 				codeCopied.set(false);
 			}, 3000);
-		},
-		function (err) {
-			console.error('Could not copy text: ', err);
-		}
+		// },
+	// 	function (err) {
+		//	console.error('Could not copy text: ', err);
+//		}
 	);
 }
 
