@@ -23,7 +23,7 @@ const invitation = {
 	text: "Let's play Punto!",
 	url: 'https://punto.vercel.app'
 };
-const neutralColor = writable<string>("");
+const neutralColor = writable<string>('');
 
 playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
@@ -57,7 +57,7 @@ function resetApp() {
 	});
 	roundHasStarted.set(false);
 	infoVisible.set(true);
-	neutralColor.set("");
+	neutralColor.set('');
 }
 
 export {

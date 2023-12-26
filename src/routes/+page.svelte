@@ -14,9 +14,7 @@
 		infoVisible,
 		resetApp,
 		languageId,
-
 		neutralColor
-
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Color, Player } from '$lib/types';
@@ -111,13 +109,13 @@
 		// TODO: implement team play with 4 players: each team 2 decks shuffled,
 		// team turns after each other, win with 5 cards in a row of one color
 
-		if ($players.length === 2) {
-			const colorsInUse = $players.map((p) => p.color?.toString());
-			const colorsNotInUse = ['red', 'blue', 'green', 'yellow'].filter(
-				(color) => !colorsInUse.includes(color)
-			);
+		const colorsInUse = (playerArr: Player[]) => playerArr.map((p) => p.color?.toString());
+		const colorsNotInUse = (playerArr: Player[]) =>
+			['red', 'blue', 'green', 'yellow'].filter((color) => !colorsInUse(playerArr).includes(color));
 
-			colorsNotInUse.forEach((color, i) => {
+		// two player round
+		if ($players.length === 2) {
+			colorsNotInUse($players).forEach((color, i) => {
 				$players[i].deck = shuffle([
 					...$players[i].deck,
 					...duplicate(
@@ -130,32 +128,26 @@
 
 			await set(ref(db, `${$lobbyCode}/players/`), $players);
 
+			// three player round
 		} else if ($players.length === 3) {
-			// TODO: implement 1 deck and 6 cards of forth color for each player
-			const colorsInUse = $players.map((p) => p.color?.toString());
-			const colorsNotInUse = ['red', 'blue', 'green', 'yellow'].filter(
-				(color) => !colorsInUse.includes(color)
-			);
-
 			const lastDeck = shuffle(
 				duplicate(
 					Array(9)
 						.fill(0)
 						.map((_, i) => i + 1)
-				).map((v) => ({ value: v, color: colorsNotInUse[0] }))
+				).map((v) => ({ value: v, color: colorsNotInUse($players)[0] }))
 			);
 
 			$players.forEach((player) => {
-				player.deck = shuffle([...player.deck, ...lastDeck.slice(0, 6)]);
-				// lastDeck.splice(0, 6);
+				player.deck = shuffle([...player.deck, ...lastDeck.splice(0, 6)]);
 			});
 
-			await set(ref(db, `${$lobbyCode}/neutralColor`), colorsNotInUse[0]);
+			await set(ref(db, `${$lobbyCode}/neutralColor`), colorsNotInUse($players)[0]);
 			await set(ref(db, `${$lobbyCode}/players/`), $players);
 		}
 
-		await update(ref(db, `${$lobbyCode}/`), { players: shuffle($players) });
-		await set(ref(db, `${$lobbyCode}/roundHasStartet`), true);
+		// one and four player rounds
+		await update(ref(db, `${$lobbyCode}/`), { players: shuffle($players), roundHasStarted: true });
 	}
 
 	/**
@@ -226,7 +218,7 @@
 			currentPlayerIndex: 0
 		});
 
-		await set(ref(db, `${$lobbyCode}/neutralColor`), "");
+		await set(ref(db, `${$lobbyCode}/neutralColor`), '');
 
 		$infoVisible = true;
 	}
@@ -279,7 +271,7 @@
 				turn: 0,
 				currentPlayerIndex: 0
 			},
-			neutralColor: ""
+			neutralColor: ''
 		});
 
 		$lobbyConnected = true;
