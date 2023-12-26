@@ -19,7 +19,7 @@ function getBeautifulColors(color: Color | string) {
  * @param text
  */
 async function copyTextToClipboard(text: string) {
-	if (navigator.share) {
+	if (navigator.share && typeOf window !== undefined) {
 	 	await navigator.share({
      title: 'Punto',
      text: 'Willst du mit mir Punto spielen?',
@@ -27,7 +27,7 @@ async function copyTextToClipboard(text: string) {
    });
 	} else {
    if (!navigator.clipboard) return;
-	  await navigator.clipboard.writeText(text)
+	  await navigator.clipboard.writeText(text);
 			codeCopied.set(true);
 
 			setTimeout(() => {
