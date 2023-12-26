@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
-import type { Player, Card } from './types';
+import type { Player, Card, Color } from './types';
 import { translations } from './translations';
 
 const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
@@ -21,8 +21,9 @@ const languageId = writable<string>(browser ? navigator.language.split('-')[0] |
 const invitation = {
 	title: 'Punto',
 	text: "Let's play Punto!",
-	url: "https://punto.vercel.app"
+	url: 'https://punto.vercel.app'
 };
+const neutralColor = writable<string>("");
 
 playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
@@ -44,9 +45,7 @@ function resetApp() {
 	lobbyCode.set('');
 
 	// reset code param in URL
-	const urlParams = new URLSearchParams(window.location.search);
-	urlParams.delete('code');
-	window.location.search = urlParams.toString();
+	window.history.replaceState({}, 'Punto', window.location.origin);
 
 	lobbyConnected.set(false);
 	host.set('');
@@ -58,6 +57,7 @@ function resetApp() {
 	});
 	roundHasStarted.set(false);
 	infoVisible.set(true);
+	neutralColor.set("");
 }
 
 export {
@@ -72,5 +72,6 @@ export {
 	infoVisible,
 	resetApp,
 	languageId,
-	invitation
+	invitation,
+	neutralColor
 };

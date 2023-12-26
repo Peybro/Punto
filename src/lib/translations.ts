@@ -130,7 +130,7 @@ const translations: LanguagesType = {
 			green: 'Vert',
 			yellow: 'Jaune'
 		},
-		subtitle: 'Point par Point vers la Victoire!',
+		subtitle: 'La victoire point par point!',
 		by: 'Un jeu créé par',
 		aim: {
 			title: 'Objectif du Jeu',

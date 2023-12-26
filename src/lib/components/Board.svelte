@@ -20,7 +20,7 @@
 					if (i === rowIndex && j === cardIndex) {
 						return {
 							value: currentPlayer.deck[0].value,
-							color: currentPlayer.color
+							color: currentPlayer.deck[0].color
 						};
 					}
 					return card;
