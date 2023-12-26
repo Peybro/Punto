@@ -71,7 +71,7 @@
 	{#if navigator.share && browser}
 		<div>
 			<button
-				class="btn btn-outline-primary w-100"
+				class="btn btn-outline-primary w-100 mt-1"
 				on:click={() => {
 					navigator.share(invitation);
 				}}>{selectedLanguage.shareText} <i class="bi bi-share-fill"></i></button
