@@ -41,7 +41,7 @@ function copyTextToClipboard(text: string) {
 	// 	function (err) {
 		//	console.error('Could not copy text: ', err);
 //		}
-	);
+	//);
 }
 
 /**
