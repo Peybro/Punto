@@ -21,7 +21,7 @@ const languageId = writable<string>(browser ? navigator.language.split('-')[0] |
 const invitation = {
 	title: 'Punto',
 	text: "Let's play Punto!",
-	url: window.location.href.toString()
+	url: "https://punto.vercel.app"
 };
 
 playerName.subscribe((name: string) =>
@@ -30,6 +30,10 @@ playerName.subscribe((name: string) =>
 
 languageId.subscribe((id: string) => {
 	invitation.text = translations[id].inviteText;
+});
+
+lobbyCode.subscribe((code: string) => {
+	invitation.url = `${window.location.origin.toString()}/?code=${code}`;
 });
 
 /**
