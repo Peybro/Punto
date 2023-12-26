@@ -23,7 +23,7 @@ async function copyTextToClipboard(text: string) {
 	 	await navigator.share({
      title: 'Punto',
      text: 'Willst du mit mir Punto spielen?',
-     url: window.location
+     url: window.location.href.toString()
    });
 	} else {
    if (!navigator.clipboard) return;
