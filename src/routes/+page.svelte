@@ -55,8 +55,8 @@
 			$host = data.host;
 			$players = data.players;
 			$gameState = data.gameState;
-			$roundHasStarted = data.roundHasStartet;
-			$infoVisible = !data.roundHasStartet;
+			$roundHasStarted = data.roundHasStarted;
+			$infoVisible = !data.roundHasStarted;
 			$neutralColor = data.neutralColor;
 
 			// update url with lobby code
@@ -74,7 +74,7 @@
 					ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
 					currentPlayer.wins + 1
 				);
-				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+				await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
 
 				// turn on listener again
 				onValue(ref(db, `${$lobbyCode}/`), callback);
@@ -89,7 +89,7 @@
 				// TODO: implement
 				// const mostThrees = getMostThrees($players);
 				toast.error(selectedLanguage.toasts.winnerWhenNoCards);
-				await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+				await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
 
 				// turn on listener again
 				onValue(ref(db, `${$lobbyCode}/`), callback);
@@ -109,9 +109,15 @@
 		// TODO: implement team play with 4 players: each team 2 decks shuffled,
 		// team turns after each other, win with 5 cards in a row of one color
 
-		const colorsInUse = (playerArr: Player[]) => playerArr.map((p) => p.color?.toString());
-		const colorsNotInUse = (playerArr: Player[]) =>
-			['red', 'blue', 'green', 'yellow'].filter((color) => !colorsInUse(playerArr).includes(color));
+		function colorsInUse(playerArr: Player[]) {
+			return playerArr.map((p) => p.color?.toString());
+		}
+
+		function colorsNotInUse(playerArr: Player[]) {
+			return ['red', 'blue', 'green', 'yellow'].filter(
+				(color) => !colorsInUse(playerArr).includes(color)
+			);
+		}
 
 		// two player round
 		if ($players.length === 2) {
@@ -191,7 +197,7 @@
 	 * Resets the lobby to its initial state
 	 */
 	async function resetLobby() {
-		await set(ref(db, `${$lobbyCode}/roundHasStartet`), false);
+		await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
 
 		await set(
 			ref(db, `${$lobbyCode}/players/`),
@@ -320,7 +326,7 @@
 		}
 
 		let roundInProgress = false;
-		await get(ref(db, `${$lobbyCode}/roundHasStartet`)).then((snap: any) => {
+		await get(ref(db, `${$lobbyCode}/roundHasStarted`)).then((snap: any) => {
 			if (snap.val()) roundInProgress = snap.val();
 		});
 		if (roundInProgress) {

@@ -3,6 +3,7 @@ import { browser } from '$app/environment';
 
 import type { Player, Card, Color } from './types';
 import { translations } from './translations';
+import { replaceState } from '$app/navigation';
 
 const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
 const lobbyCode = writable<string>('');
@@ -45,7 +46,8 @@ function resetApp() {
 	lobbyCode.set('');
 
 	// reset code param in URL
-	window.history.replaceState({}, 'Punto', window.location.origin);
+	// window.history.replaceState({}, 'Punto', window.location.origin);
+	replaceState(window.location.origin, '');
 
 	lobbyConnected.set(false);
 	host.set('');
