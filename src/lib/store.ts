@@ -49,7 +49,7 @@ function resetApp() {
 	// TODO: does not work...
 	// replaceState(window.location.origin, '/');
 	// pushState(window.location.origin, '');
-	goto(window.location.origin, { replaceState: true})
+	goto(window.location.origin, { replaceState: true });
 
 	lobbyConnected.set(false);
 	host.set('');

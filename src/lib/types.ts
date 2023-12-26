@@ -65,7 +65,7 @@ type LanguageType = {
 		two: string;
 		three: string;
 		four: string;
-	}
+	};
 };
 
 type LanguagesType = {
