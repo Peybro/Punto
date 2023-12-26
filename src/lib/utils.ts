@@ -19,7 +19,7 @@ function getBeautifulColors(color: Color | string) {
  * @param text
  */
 async function copyTextToClipboard(text: string) {
-	if (navigator.share && typeOf window !== undefined) {
+	if (navigator.share && typeof window !== undefined) {
 	 	await navigator.share({
      title: 'Punto',
      text: 'Willst du mit mir Punto spielen?',
