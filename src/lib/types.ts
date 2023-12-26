@@ -58,6 +58,8 @@ type LanguageType = {
 		nameAlreadyTaken: string;
 		roundStarted: string;
 	};
+	shareText: string;
+	inviteText: string;
 };
 
 type LanguagesType = {

@@ -58,7 +58,9 @@ const translations: LanguagesType = {
 			roomFull: 'This room is already full!',
 			nameAlreadyTaken: 'There is already a player with this name!',
 			roundStarted: 'The round has already started! Please wait until it is over.'
-		}
+		},
+		shareText: 'Invite Friends',
+		inviteText: 'Do you want to play Punto with me?'
 	},
 	de: {
 		colors: {
@@ -117,7 +119,9 @@ const translations: LanguagesType = {
 			roomFull: 'Dieser Raum ist bereits voll!',
 			nameAlreadyTaken: 'Es gibt bereits einen Spieler mit diesem Namen!',
 			roundStarted: 'Die Runde hat bereits begonnen! Bitte warte bis sie vorbei ist.'
-		}
+		},
+		shareText: 'Freunde einladen',
+		inviteText: 'Willst du mit mir Punto spielen?'
 	},
 	fr: {
 		colors: {
@@ -176,7 +180,9 @@ const translations: LanguagesType = {
 			roomFull: 'Cette salle est déjà pleine!',
 			nameAlreadyTaken: 'Il y a déjà un joueur avec ce nom!',
 			roundStarted: "La manche a déjà commencé! Veuillez attendre qu'elle se termine."
-		}
+		},
+		shareText: 'Inviter des Amis',
+		inviteText: 'Veux-tu jouer à Punto avec moi?'
 	}
 };
 

@@ -328,7 +328,9 @@
 
 	{#if $lobbyConnected}
 		{#if $infoVisible}
-			<h4 class="text-start mt-4">{selectedLanguage.players}</h4>
+			<div class="d-flex justify-content-between">
+				<h4 class="text-start mt-4">{selectedLanguage.players}</h4>
+			</div>
 			<PlayerList />
 		{/if}
 

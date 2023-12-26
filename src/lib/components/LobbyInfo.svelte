@@ -39,7 +39,7 @@
 				<button class="btn btn-outline-primary" on:click={() => copyTextToClipboard($lobbyCode)}
 					>{#if $codeCopied}
 						<i class="bi bi-clipboard-check"></i>
-					{:else}<i class={`bi bi-${navigator.share ? 'share-fill' : 'clipboard-plus'}`}></i>
+					{:else}<i class="bi bi-clipboard-plus"></i>
 					{/if}</button
 				>
 			{/if}

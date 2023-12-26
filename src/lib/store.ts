@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
 import type { Player, Card } from './types';
+import { translations } from './translations';
 
 const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
 const lobbyCode = writable<string>('');
@@ -17,10 +18,19 @@ const roundHasStarted = writable<boolean>(false);
 const codeCopied = writable<boolean>(false);
 const infoVisible = writable<boolean>(true);
 const languageId = writable<string>(browser ? navigator.language.split('-')[0] || 'en' : 'en');
+const invitation = {
+	title: 'Punto',
+	text: "Let's play Punto!",
+	url: window.location.toString()
+};
 
 playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
 );
+
+languageId.subscribe((id: string) => {
+	invitation.text = translations[id].inviteText;
+});
 
 /**
  * Resets the app to its initial state
@@ -57,5 +67,6 @@ export {
 	codeCopied,
 	infoVisible,
 	resetApp,
-	languageId
+	languageId,
+	invitation
 };

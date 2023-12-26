@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { players, lobbyCode, host, roundHasStarted, playerName } from '$lib/store';
+	import { players, lobbyCode, host, roundHasStarted, playerName, invitation } from '$lib/store';
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
 	import { update, ref } from 'firebase/database';
 	import { translations } from '$lib/translations';
 	import { languageId } from '$lib/store';
+	import { browser } from '$app/environment';
 
 	$: selectedLanguage = translations[$languageId];
 
@@ -63,8 +64,18 @@
 		</div>
 	{/each}
 	{#each Array(4 - $players.length) as _}
-		<div class="dropdown col-xs-6 col-sm-3">
+		<div class="col-xs-6 col-sm-3">
 			<button class="btn btn-outline-secondary w-100" disabled>[{selectedLanguage.free}]</button>
 		</div>
 	{/each}
+	{#if navigator.share && browser}
+		<div>
+			<button
+				class="btn btn-primary w-100"
+				on:click={() => {
+					navigator.share(invitation);
+				}}>{selectedLanguage.shareText} <i class="bi bi-share-fill"></i></button
+			>
+		</div>
+	{/if}
 </div>

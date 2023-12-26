@@ -1,5 +1,5 @@
 import type { Card, Color, GameState } from '$lib/types';
-import { codeCopied } from './store';
+import { codeCopied, invitation } from './store';
 
 /**
  * Returns a color object with the color, hex and bootstrap color.
@@ -19,21 +19,14 @@ function getBeautifulColors(color: Color | string) {
  * @param text
  */
 async function copyTextToClipboard(text: string) {
-	if (navigator.share && typeof window !== undefined) {
-	 	await navigator.share({
-     title: 'Punto',
-     text: 'Willst du mit mir Punto spielen?',
-     url: window.location
-   });
-	 } else {
-   if (!navigator.clipboard) return;
-	  await navigator.clipboard.writeText(text);
-			codeCopied.set(true);
+	if (!navigator.clipboard) return;
 
-			setTimeout(() => {
-				codeCopied.set(false);
-			}, 3000);
-	 }
+	await navigator.clipboard.writeText(text);
+	codeCopied.set(true);
+
+	setTimeout(() => {
+		codeCopied.set(false);
+	}, 3000);
 }
 
 /**
