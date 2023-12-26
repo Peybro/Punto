@@ -51,6 +51,8 @@
 				leaveLobby();
 			}
 
+			console.table(data.players);
+
 			// update local state with data from database
 			$host = data.host;
 			$players = data.players;
@@ -146,12 +148,18 @@
 				).map((v) => ({ value: v, color: colorsNotInUse($players)[0] }))
 			);
 
-			$players.forEach((player) => {
-				player.deck = shuffle([...player.deck, ...lastDeck.splice(0, 6)]);
+			const tempPlayers = $players.map((player) => {
+				return {
+					name: player.name,
+					connections: player.connections,
+					color: player.color,
+					deck: shuffle([...player.deck, ...lastDeck.splice(0, 6)]),
+					wins: player.wins
+				};
 			});
 
 			await set(ref(db, `${$lobbyCode}/neutralColor`), colorsNotInUse($players)[0]);
-			await set(ref(db, `${$lobbyCode}/players/`), $players);
+			await set(ref(db, `${$lobbyCode}/players/`), tempPlayers);
 		}
 
 		// one and four player rounds
@@ -420,7 +428,12 @@
 						{:else if $players.length === 2}
 							{selectedLanguage.gameTypes.two}
 						{:else if $players.length === 3}
-							{selectedLanguage.gameTypes.three}
+							{selectedLanguage.gameTypes.three[0]}
+
+							<span class={`p-1 rounded bg-${getBeautifulColors($neutralColor)?.bootstrap}`}
+								>{selectedLanguage.gameTypes.three[1]}
+							</span>
+							{selectedLanguage.gameTypes.three[2]}
 						{:else if $players.length === 4}
 							{selectedLanguage.gameTypes.four}
 						{/if}

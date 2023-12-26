@@ -63,7 +63,7 @@ type LanguageType = {
 	gameTypes: {
 		one: string;
 		two: string;
-		three: string;
+		three: [string, string, string];
 		four: string;
 	};
 };
