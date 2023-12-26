@@ -25,7 +25,7 @@ async function copyTextToClipboard(text: string) {
      text: 'Willst du mit mir Punto spielen?',
      url: window.location.href.toString()
    });
-	} else {
+	 } else {
    if (!navigator.clipboard) return;
 	  await navigator.clipboard.writeText(text);
 			codeCopied.set(true);
@@ -33,7 +33,7 @@ async function copyTextToClipboard(text: string) {
 			setTimeout(() => {
 				codeCopied.set(false);
 			}, 3000);
-	 },
+	 }
 }
 
 /**
