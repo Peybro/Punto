@@ -24,7 +24,7 @@
 	import Heading from '$lib/components/Heading.svelte';
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { goto, pushState, replaceState } from '$app/navigation';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $playerName;
@@ -62,6 +62,8 @@
 			// update url with lobby code
 			$page.url.searchParams.set('code', data.lobbyCode);
 			goto(`?${$page.url.searchParams.toString()}`);
+			// TODO: does not work...
+			// pushState("", `?${$page.url.searchParams.toString()}`);
 
 			if ($roundHasStarted && fourInARow($gameState.board, $neutralColor)) {
 				// turn off listener to prevent multiple updates
@@ -411,6 +413,19 @@
 
 		{#if $roundHasStarted || $gameState.turn > 0}
 			{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
+				{#if $roundHasStarted}
+					<p class="mt-1">
+						{#if $players.length === 1}
+							{selectedLanguage.gameTypes.one}
+						{:else if $players.length === 2}
+							{selectedLanguage.gameTypes.two}
+						{:else if $players.length === 3}
+							{selectedLanguage.gameTypes.three}
+						{:else if $players.length === 4}
+							{selectedLanguage.gameTypes.four}
+						{/if}
+					</p>
+				{/if}
 				<div class="d-flex my-4">
 					{#if currentPlayer.deck !== undefined}
 						{#if $roundHasStarted}

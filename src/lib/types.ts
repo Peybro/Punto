@@ -60,6 +60,12 @@ type LanguageType = {
 	};
 	shareText: string;
 	inviteText: string;
+	gameTypes: {
+		one: string;
+		two: string;
+		three: string;
+		four: string;
+	}
 };
 
 type LanguagesType = {

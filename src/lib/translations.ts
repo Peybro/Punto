@@ -60,7 +60,14 @@ const translations: LanguagesType = {
 			roundStarted: 'The round has already started! Please wait until it is over.'
 		},
 		shareText: 'Invite Friends',
-		inviteText: 'Do you want to play Punto with me?'
+		inviteText: 'Do you want to play Punto with me?',
+		gameTypes: {
+			one: '1-Player-Mode: Your toughest opponent is yourself.',
+			two: '2-Player-Mode: Each player plays with two colors.',
+			three:
+				'3-Player-Mode: Each player plays with one color. The fourth color is neutral and does not win with 4 in a row.',
+			four: '4-Player-Mode: Each player plays with one color.'
+		}
 	},
 	de: {
 		colors: {
@@ -121,7 +128,14 @@ const translations: LanguagesType = {
 			roundStarted: 'Die Runde hat bereits begonnen! Bitte warte bis sie vorbei ist.'
 		},
 		shareText: 'Freunde einladen',
-		inviteText: 'Willst du mit mir Punto spielen?'
+		inviteText: 'Willst du mit mir Punto spielen?',
+		gameTypes: {
+			one: '1-Spieler-Modus: Dein härtester Gegner bist du selbst.',
+			two: '2-Spieler-Modus: Jeder spielt mit zwei Farben.',
+			three:
+				'3-Spieler-Modus: Jeder spielt mit einer Farbe. Die vierte Farbe ist neutral und gewinnt nicht mit 4 in einer Reihe.',
+			four: '4-Spieler-Modus: Jeder spielt mit einer Farbe.'
+		}
 	},
 	fr: {
 		colors: {
@@ -182,7 +196,14 @@ const translations: LanguagesType = {
 			roundStarted: "La manche a déjà commencé! Veuillez attendre qu'elle se termine."
 		},
 		shareText: 'Inviter des Amis',
-		inviteText: 'Veux-tu jouer à Punto avec moi?'
+		inviteText: 'Veux-tu jouer à Punto avec moi?',
+		gameTypes: {
+			one: "Mode 1 joueur: Votre adversaire le plus coriace, c'est vous-même.",
+			two: 'Mode 2 joueurs: Chacun joue avec deux couleurs.',
+			three:
+				'Mode 3 joueurs: Chacun joue avec une couleur. La quatrième couleur est neutre et ne gagne pas avec 4 en ligne.',
+			four: 'Mode 4 joueurs: Chacun joue avec une couleur.'
+		}
 	}
 };
 

@@ -3,7 +3,7 @@ import { browser } from '$app/environment';
 
 import type { Player, Card, Color } from './types';
 import { translations } from './translations';
-import { replaceState } from '$app/navigation';
+import { goto, pushState, replaceState } from '$app/navigation';
 
 const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
 const lobbyCode = writable<string>('');
@@ -43,12 +43,13 @@ lobbyCode.subscribe((code: string) => {
  */
 function resetApp() {
 	playerName.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
-	lobbyCode.set('');
+	// lobbyCode.set('');
 
 	// reset code param in URL
- // TODO
-	window.history.replaceState({}, 'Punto', window.location.origin);
-	// replaceState(window.location.origin, '');
+	// TODO: does not work...
+	// replaceState(window.location.origin, '/');
+	// pushState(window.location.origin, '');
+	goto(window.location.origin, { replaceState: true})
 
 	lobbyConnected.set(false);
 	host.set('');
