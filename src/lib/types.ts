@@ -66,6 +66,7 @@ type LanguageType = {
 		three: [string, string, string];
 		four: string;
 	};
+	order: string;
 };
 
 type LanguagesType = {

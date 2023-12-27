@@ -391,7 +391,7 @@
 		{#if $infoVisible}
 			<div class="d-flex justify-content-between">
 				<h4 class="text-start mt-4">
-					{$roundHasStarted ? 'Reihenfolge' : selectedLanguage.players}
+					{$roundHasStarted ? selectedLanguage.order : selectedLanguage.players}
 				</h4>
 			</div>
 			<PlayerList />
@@ -441,30 +441,34 @@
 						{/if}
 					</p>
 				{/if}
-				<div class="d-flex my-4">
+				<div class="d-flex">
 					{#if currentPlayer.deck !== undefined}
 						{#if $roundHasStarted}
-							<h4 class="">
-								{selectedLanguage.turn} #{$gameState.turn + 1}:
-								{#if currentPlayer.name === $playerName}
-									{selectedLanguage.yourTurn}
-								{:else}
-									<span
-										class={`p-1 rounded bg-${getBeautifulColors(currentPlayer?.color)?.bootstrap}`}
-										>{currentPlayer.name}
-									</span>
-								{/if}
-							</h4>
+							<div class="d-flex flex-column">
+								<h4 class="">
+									{selectedLanguage.turn} #{$gameState.turn + 1}:
+									{#if currentPlayer.name === $playerName}
+										{selectedLanguage.yourTurn}
+									{:else}
+										<span
+											class={`p-1 rounded bg-${
+												getBeautifulColors(currentPlayer?.color)?.bootstrap
+											}`}
+											>{currentPlayer.name}
+										</span>
+									{/if}
+								</h4>
+
+								<h6 class="next pt-1 text-secondary">
+									Next: {$gameState.currentPlayerIndex === $players.length
+										? $players[0].name
+										: $players[$gameState.currentPlayerIndex].name}
+								</h6>
+							</div>
 
 							<div class="cell ms-2 p-0 border rounded bg-dark">
 								<Face value={currentPlayer.deck[0].value} color={currentPlayer.deck[0].color} />
 							</div>
-
-							<h6 class="pt-1 ms-4 text-secondary">
-								Next: {$gameState.currentPlayerIndex === $players.length
-									? $players[0].name
-									: $players[$gameState.currentPlayerIndex].name}
-							</h6>
 						{/if}
 					{:else}
 						<h4>{selectedLanguage.noMoreCards}</h4>
@@ -480,8 +484,11 @@
 </div>
 
 <style scoped>
+	.next {
+		margin-top: -10px;
+	}
+
 	.cell {
-		margin-top: -5px;
 		width: calc(100vw / 10);
 		max-width: 50px;
 		max-height: 50px;

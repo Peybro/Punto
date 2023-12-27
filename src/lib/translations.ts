@@ -70,7 +70,8 @@ const translations: LanguagesType = {
 				'is neutral and does not win with 4 in a row.'
 			],
 			four: '4-Player-Mode: Each player plays with one color.'
-		}
+		},
+		order: 'Order'
 	},
 	de: {
 		colors: {
@@ -141,7 +142,8 @@ const translations: LanguagesType = {
 				'ist neutral und gewinnt nicht mit 4 in einer Reihe.'
 			],
 			four: '4-Spieler-Modus: Jeder spielt mit einer Farbe.'
-		}
+		},
+		order: 'Reihenfolge'
 	},
 	fr: {
 		colors: {
@@ -212,7 +214,8 @@ const translations: LanguagesType = {
 				"est neutre et ne gagne pas avec 4 d'affilée."
 			],
 			four: 'Mode 4 Joueurs : Chaque joueur joue avec une couleur.'
-		}
+		},
+		order: 'Ordre'
 	}
 };
 

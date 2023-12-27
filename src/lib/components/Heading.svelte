@@ -2,8 +2,11 @@
 	import PuntoText from './PuntoText.svelte';
 	import InstructionModal from './InstructionModal.svelte';
 
-	import { gameState, infoVisible, roundHasStarted } from '$lib/store';
+	import { infoVisible, roundHasStarted } from '$lib/store';
 	import { languageId } from '$lib/store';
+	import { translations } from '$lib/translations';
+
+	$: selectedLanguage = translations[$languageId];
 </script>
 
 <div class="d-flex justify-content-between mt-2">
@@ -14,7 +17,7 @@
 				class="btn"
 				on:click={() => {
 					$infoVisible = !$infoVisible;
-				}}><i class="bi bi-list-ol"></i> Reihenfolge</button
+				}}><i class="bi bi-list-ol"></i> {selectedLanguage.order}</button
 			>
 		{/if}
 		<InstructionModal />
