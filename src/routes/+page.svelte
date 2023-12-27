@@ -14,7 +14,8 @@
 		infoVisible,
 		resetApp,
 		languageId,
-		neutralColor
+		neutralColor,
+		uuid
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Color, Player } from '$lib/types';
@@ -50,8 +51,6 @@
 				toast.error(selectedLanguage.toasts.kick);
 				leaveLobby();
 			}
-
-			console.table(data.players);
 
 			// update local state with data from database
 			$host = data.host;
@@ -151,7 +150,7 @@
 			const tempPlayers = $players.map((player) => {
 				return {
 					name: player.name,
-					connections: player.connections,
+					uuid: player.uuid,
 					color: player.color,
 					deck: shuffle([...player.deck, ...lastDeck.splice(0, 6)]),
 					wins: player.wins
@@ -270,7 +269,7 @@
 			players: [
 				{
 					name: $playerName,
-					connections: -1,
+					uuid: $uuid,
 					color: 'red',
 					deck: shuffle(
 						duplicate(
@@ -324,12 +323,13 @@
 		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
 			if (snap.val()) playersOnline = snap.val();
 		});
-		if (playersOnline.length === 4) {
+		if (playersOnline.length === 4 && !playersOnline.some((p) => p.name === $playerName)) {
 			toast.error(selectedLanguage.toasts.roomFull);
 			$lobbyConnected = false;
 			validToJoin = false;
 		}
-		if (playersOnline.some((p: Player) => p.name === $playerName)) {
+
+		if (playersOnline.some((p: Player) => p.name === $playerName && p.uuid !== $uuid)) {
 			toast.error(selectedLanguage.toasts.nameAlreadyTaken);
 			$lobbyConnected = false;
 			validToJoin = false;
@@ -350,29 +350,31 @@
 
 		// else register new player and start listening to lobby changes
 		await update(ref(db, `${$lobbyCode}/`), {
-			players: [
-				...playersOnline,
-				{
-					name: $playerName,
-					connections: -1,
-					color: ['red', 'blue', 'green', 'yellow'].filter(
-						(color) => !playersOnline.some((p) => p.color === color)
-					)[0],
-					deck: shuffle(
-						duplicate(
-							Array(9)
-								.fill(0)
-								.map((_, i) => i + 1)
-						).map((v) => ({
-							value: v,
+			players: playersOnline.some((p: Player) => p.name === $playerName && p.uuid === $uuid)
+				? playersOnline
+				: [
+						...playersOnline,
+						{
+							name: $playerName,
+							uuid: $uuid,
 							color: ['red', 'blue', 'green', 'yellow'].filter(
 								(color) => !playersOnline.some((p) => p.color === color)
-							)[0]
-						}))
-					),
-					wins: 0
-				}
-			]
+							)[0],
+							deck: shuffle(
+								duplicate(
+									Array(9)
+										.fill(0)
+										.map((_, i) => i + 1)
+								).map((v) => ({
+									value: v,
+									color: ['red', 'blue', 'green', 'yellow'].filter(
+										(color) => !playersOnline.some((p) => p.color === color)
+									)[0]
+								}))
+							),
+							wins: 0
+						}
+					]
 		});
 
 		$lobbyConnected = true;

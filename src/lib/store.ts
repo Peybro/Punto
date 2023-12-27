@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-
 import type { Player, Card, Color } from './types';
 import { translations } from './translations';
 import { goto, pushState, replaceState } from '$app/navigation';
+import { v4 as uuidV4 } from 'uuid';
 
 const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
 const lobbyCode = writable<string>('');
@@ -25,6 +25,7 @@ const invitation = {
 	url: 'https://punto.vercel.app'
 };
 const neutralColor = writable<string>('');
+const uuid = writable<string>(browser ? localStorage.getItem('uuid') || uuidV4() : uuidV4());
 
 playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
@@ -37,6 +38,10 @@ languageId.subscribe((id: string) => {
 lobbyCode.subscribe((code: string) => {
 	if (typeof window === 'undefined') return;
 	invitation.url = `${window.location.origin.toString()}/?code=${code}`;
+});
+
+uuid.subscribe((id: string) => {
+	browser ? localStorage.setItem('uuid', id) : null;
 });
 
 /**
@@ -78,5 +83,6 @@ export {
 	resetApp,
 	languageId,
 	invitation,
-	neutralColor
+	neutralColor,
+	uuid
 };
