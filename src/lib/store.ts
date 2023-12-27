@@ -35,6 +35,7 @@ languageId.subscribe((id: string) => {
 });
 
 lobbyCode.subscribe((code: string) => {
+	if (typeof window === 'undefined') return;
 	invitation.url = `${window.location.origin.toString()}/?code=${code}`;
 });
 

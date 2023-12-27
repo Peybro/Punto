@@ -1,26 +1,28 @@
 import type { Card, Color, GameState } from '$lib/types';
-import { ref, set, update } from 'firebase/database';
-import { codeCopied, invitation } from './store';
-import { db } from './firebase';
+import { codeCopied } from './store';
 
 /**
  * Returns a color object with the color, hex and bootstrap color.
  * @param color
  */
-function getBeautifulColors(color: Color | string) {
+function getBeautifulColors(color: Color | string): {
+	color: Color;
+	hex: string;
+	bootstrap: string;
+} {
 	return [
 		{ color: 'red', hex: '#dc3522', bootstrap: 'danger' },
 		{ color: 'blue', hex: '#02ace7', bootstrap: 'info' },
 		{ color: 'green', hex: '#78b728', bootstrap: 'success' },
 		{ color: 'yellow', hex: '#f1b300', bootstrap: 'warning' }
-	].find((c) => c.color === color);
+	].find((c) => c.color === color) as { color: Color; hex: string; bootstrap: string };
 }
 
 /**
  * Copies the given text to the clipboard.
  * @param text
  */
-async function copyTextToClipboard(text: string) {
+async function copyTextToClipboard(text: string): Promise<void> {
 	if (!navigator.clipboard) return;
 
 	await navigator.clipboard.writeText(text);
@@ -36,7 +38,12 @@ async function copyTextToClipboard(text: string) {
  * @param board
  * @returns
  */
-function getMinAndMaxIndices(board: Card[][]) {
+function getMinAndMaxIndices(board: Card[][]): {
+	minX: number;
+	maxX: number;
+	minY: number;
+	maxY: number;
+} {
 	let minY = board.length;
 	let maxY = 0;
 	let minX = board[0].length;
@@ -69,7 +76,7 @@ function getMinAndMaxIndices(board: Card[][]) {
  * @param rowIndex
  * @param cardIndex
  */
-function isAllowedField(gameState: GameState, rowIndex: number, cardIndex: number) {
+function isAllowedField(gameState: GameState, rowIndex: number, cardIndex: number): boolean {
 	const board = gameState.board;
 
 	// check if the field is in the allowed area
@@ -108,7 +115,7 @@ function isAllowedField(gameState: GameState, rowIndex: number, cardIndex: numbe
 /**
  * Returns the width and height of the part of the board that are actually used.
  */
-function getPlayedBoardDimensions(board: Card[][]) {
+function getPlayedBoardDimensions(board: Card[][]): { width: number; height: number } {
 	const { minX, maxX, minY, maxY } = getMinAndMaxIndices(board);
 
 	return { height: maxY - minY + 1, width: maxX - minX + 1 };
@@ -119,7 +126,7 @@ function getPlayedBoardDimensions(board: Card[][]) {
  * @param row
  * @param col
  */
-function cellOnBoard(board: Card[][], row: number, col: number) {
+function cellOnBoard(board: Card[][], row: number, col: number): boolean {
 	return row >= 0 && row < board.length && col >= 0 && col < board.length;
 }
 
@@ -128,7 +135,7 @@ function cellOnBoard(board: Card[][], row: number, col: number) {
  * @param row
  * @param col
  */
-function hasNeighbourCard(board: Card[][], row: number, col: number) {
+function hasNeighbourCard(board: Card[][], row: number, col: number): boolean {
 	return (
 		// cell itself
 		(cellOnBoard(board, row, col) && board[row][col].value > 0) ||
@@ -166,14 +173,18 @@ function duplicate(arr: any[]): any[] {
  * @returns shuffled array
  */
 function shuffle(arr: any[]): any[] {
-	return arr.sort(() => Math.random() - 0.5);
+	for (let i = arr.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[arr[i], arr[j]] = [arr[j], arr[i]];
+	}
+	return arr;
 }
 
 /**
  * Returns true if there are at least nr cards of the same color (red, blue, green or yellow) in a row.
  * @param nr The number of cards in a row.
  */
-function fourInARow(board: Card[][], neutralColor: string) {
+function fourInARow(board: Card[][], neutralColor: string): boolean {
 	const width = board[0].length;
 	const height = board.length;
 
@@ -240,23 +251,90 @@ function fourInARow(board: Card[][], neutralColor: string) {
 	return false;
 }
 
-// TODO: implement
+// TODO: test
 /**
- * Counts the number of threes in a row for each color.
+ * Counts the number of rows of three cards of the same color for each color separately.
  * @param board The board to check.
  */
-function getMostThrees(board: Card[][]) {
-	// return ['red', 'blue', 'yellow', 'green'].map((color) => {
-	// 	let threes = 0;
-	// 	for (let i = 0; i < board.length; i++) {
-	// 		for (let j = 0; j < board[i].length; j++) {
-	// 			if (board[i][j].color === color) {
-	// 					threes++;
-	// 			}
-	// 		}
-	// 	}
-	// 	return { color, threes: threes / 3 };
-	// });
+function getMostThrees(board: Card[][]): {
+	red: number;
+	blue: number;
+	green: number;
+	yellow: number;
+} {
+	const counts = { red: 0, blue: 0, green: 0, yellow: 0 };
+	const height = board.length;
+	const width = board[0].length;
+
+	// check horizontal
+	for (let i = 0; i < height; i++) {
+		for (let j = 0; j < width - 2; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i][j + 1].color &&
+				board[i][j].color === board[i][j + 2].color
+			) {
+				const color = board[i][j].color;
+				if (color === null) continue;
+				if (color in counts) {
+					counts[color]++;
+				}
+			}
+		}
+	}
+
+	// check vertical
+	for (let i = 0; i < height - 2; i++) {
+		for (let j = 0; j < width; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i + 1][j].color &&
+				board[i][j].color === board[i + 2][j].color
+			) {
+				const color = board[i][j].color;
+				if (color === null) continue;
+				if (color in counts) {
+					counts[color]++;
+				}
+			}
+		}
+	}
+
+	// check diagonal (top left to bottom right)
+	for (let i = 2; i < height; i++) {
+		for (let j = 2; j < width; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i - 1][j - 1].color &&
+				board[i][j].color === board[i - 2][j - 2].color
+			) {
+				const color = board[i][j].color;
+				if (color === null) continue;
+				if (color in counts) {
+					counts[color]++;
+				}
+			}
+		}
+	}
+
+	// check diagonal (bottom left to top right)
+	for (let i = 2; i < height; i++) {
+		for (let j = 0; j < width - 2; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i - 1][j + 1].color &&
+				board[i][j].color === board[i - 2][j + 2].color
+			) {
+				const color = board[i][j].color;
+				if (color === null) continue;
+				if (color in counts) {
+					counts[color]++;
+				}
+			}
+		}
+	}
+
+	return counts;
 }
 
 export {
