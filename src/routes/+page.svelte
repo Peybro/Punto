@@ -42,60 +42,60 @@
 			if (data === null) {
 				toast.error(selectedLanguage.toasts.roomNotFound);
 				await leaveLobby();
-			}
+			} else {
+				if (
+					$players.some((p: Player) => p.name === $playerName) &&
+					!data.players.some((p: Player) => p.name === $playerName)
+				) {
+					toast.error(selectedLanguage.toasts.kick);
+					await leaveLobby();
+				}
 
-			if (
-				$players.some((p: Player) => p.name === $playerName) &&
-				!data.players.some((p: Player) => p.name === $playerName)
-			) {
-				toast.error(selectedLanguage.toasts.kick);
-				await leaveLobby();
-			}
+				// update local state with data from database
+				$host = data.host;
+				$players = data.players;
+				$gameState = data.gameState;
+				$roundHasStarted = data.roundHasStarted;
+				$infoVisible = !data.roundHasStarted;
+				$neutralColor = data.neutralColor;
 
-			// update local state with data from database
-			$host = data.host;
-			$players = data.players;
-			$gameState = data.gameState;
-			$roundHasStarted = data.roundHasStarted;
-			$infoVisible = !data.roundHasStarted;
-			$neutralColor = data.neutralColor;
+				// update url with lobby code
+				$page.url.searchParams.set('code', data.lobbyCode);
+				goto(`?${$page.url.searchParams.toString()}`);
+				// TODO: does not work...
+				// pushState("", `?${$page.url.searchParams.toString()}`);
 
-			// update url with lobby code
-			$page.url.searchParams.set('code', data.lobbyCode);
-			goto(`?${$page.url.searchParams.toString()}`);
-			// TODO: does not work...
-			// pushState("", `?${$page.url.searchParams.toString()}`);
+				if ($roundHasStarted && fourInARow($gameState.board, $neutralColor)) {
+					// turn off listener to prevent multiple updates
+					off(ref(db, `${$lobbyCode}/`));
+					// reset currentPlayerIndex to prevent future errors
+					await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
 
-			if ($roundHasStarted && fourInARow($gameState.board, $neutralColor)) {
-				// turn off listener to prevent multiple updates
-				off(ref(db, `${$lobbyCode}/`));
-				// reset currentPlayerIndex to prevent future errors
-				await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
+					toast(`${currentPlayer.name} ${selectedLanguage.toasts.win}`, { icon: '🎉' });
+					await set(
+						ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
+						currentPlayer.wins + 1
+					);
+					await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
 
-				toast(`${currentPlayer.name} ${selectedLanguage.toasts.win}`, { icon: '🎉' });
-				await set(
-					ref(db, `${$lobbyCode}/players/${$gameState.currentPlayerIndex}/wins`),
-					currentPlayer.wins + 1
-				);
-				await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
+					// turn on listener again
+					onValue(ref(db, `${$lobbyCode}/`), callback);
+				}
 
-				// turn on listener again
-				onValue(ref(db, `${$lobbyCode}/`), callback);
-			}
+				if ($roundHasStarted && $players.every((p) => p.deck === undefined)) {
+					// turn off listener to prevent multiple updates
+					off(ref(db, `${$lobbyCode}/`));
+					// reset currentPlayerIndex to prevent future errors
+					await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
 
-			if ($roundHasStarted && $players.every((p) => p.deck === undefined)) {
-				// turn off listener to prevent multiple updates
-				off(ref(db, `${$lobbyCode}/`));
-				// reset currentPlayerIndex to prevent future errors
-				await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
+					// TODO: implement
+					// const mostThrees = getMostThrees($players);
+					toast.error(selectedLanguage.toasts.winnerWhenNoCards);
+					await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
 
-				// TODO: implement
-				// const mostThrees = getMostThrees($players);
-				toast.error(selectedLanguage.toasts.winnerWhenNoCards);
-				await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
-
-				// turn on listener again
-				onValue(ref(db, `${$lobbyCode}/`), callback);
+					// turn on listener again
+					onValue(ref(db, `${$lobbyCode}/`), callback);
+				}
 			}
 		};
 
@@ -213,7 +213,7 @@
 			$players.map((player) => {
 				return {
 					name: player.name,
-					connections: -1,
+					uuid: player.uuid,
 					color: player.color,
 					deck: shuffle(
 						duplicate(
@@ -297,52 +297,58 @@
 	 * Joins a lobby with the given code and sets the current client as player
 	 */
 	async function joinLobby() {
-		let validToJoin = true;
-
-		if ($playerName === '') {
-			toast.error(selectedLanguage.toasts.nameMissing);
-			$lobbyConnected = false;
-			validToJoin = false;
-		}
-
-		if ($lobbyCode.length !== 6) {
-			toast.error(selectedLanguage.toasts.roomCodeNotValid);
-			$lobbyConnected = false;
-			validToJoin = false;
-		}
-
-		await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
-			if (snap.val() === null) {
-				toast.error(selectedLanguage.toasts.noMatchingRoom);
-				$lobbyConnected = false;
-				validToJoin = false;
-			}
-		});
-
 		let playersOnline: Player[] | [] = [];
 		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
 			if (snap.val()) playersOnline = snap.val();
 		});
-		if (playersOnline.length === 4 && !playersOnline.some((p) => p.name === $playerName)) {
-			toast.error(selectedLanguage.toasts.roomFull);
-			$lobbyConnected = false;
-			validToJoin = false;
-		}
 
-		if (playersOnline.some((p: Player) => p.name === $playerName && p.uuid !== $uuid)) {
-			toast.error(selectedLanguage.toasts.nameAlreadyTaken);
-			$lobbyConnected = false;
-			validToJoin = false;
-		}
+		let validToJoin = true;
+		const playerWasHereBefore = playersOnline.some(
+			(p: Player) => p.name === $playerName && p.uuid === $uuid
+		);
 
-		let roundInProgress = false;
-		await get(ref(db, `${$lobbyCode}/roundHasStarted`)).then((snap: any) => {
-			if (snap.val()) roundInProgress = snap.val();
-		});
-		if (roundInProgress) {
-			toast.error(selectedLanguage.toasts.roundStarted);
-			$lobbyConnected = false;
-			validToJoin = false;
+		if (!playerWasHereBefore) {
+			if ($playerName === '') {
+				toast.error(selectedLanguage.toasts.nameMissing);
+				$lobbyConnected = false;
+				validToJoin = false;
+			}
+
+			if ($lobbyCode.length !== 6) {
+				toast.error(selectedLanguage.toasts.roomCodeNotValid);
+				$lobbyConnected = false;
+				validToJoin = false;
+			}
+
+			await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
+				if (snap.val() === null) {
+					toast.error(selectedLanguage.toasts.noMatchingRoom);
+					$lobbyConnected = false;
+					validToJoin = false;
+				}
+			});
+
+			if (playersOnline.length === 4) {
+				toast.error(selectedLanguage.toasts.roomFull);
+				$lobbyConnected = false;
+				validToJoin = false;
+			}
+
+			if (playersOnline.some((p: Player) => p.name === $playerName)) {
+				toast.error(selectedLanguage.toasts.nameAlreadyTaken);
+				$lobbyConnected = false;
+				validToJoin = false;
+			}
+
+			let roundInProgress = false;
+			await get(ref(db, `${$lobbyCode}/roundHasStarted`)).then((snap: any) => {
+				if (snap.val()) roundInProgress = snap.val();
+			});
+			if (roundInProgress) {
+				toast.error(selectedLanguage.toasts.roundStarted);
+				$lobbyConnected = false;
+				validToJoin = false;
+			}
 		}
 
 		// if any of the above checks failed, return
@@ -350,7 +356,7 @@
 
 		// else register new player and start listening to lobby changes
 		await update(ref(db, `${$lobbyCode}/`), {
-			players: playersOnline.some((p: Player) => p.name === $playerName && p.uuid === $uuid)
+			players: playerWasHereBefore
 				? playersOnline
 				: [
 						...playersOnline,
@@ -462,9 +468,9 @@
 								</h4>
 
 								<h6 class="next pt-1 text-secondary">
-									Next: {$gameState.currentPlayerIndex === $players.length
+									Next: {$gameState.currentPlayerIndex === $players.length - 1
 										? $players[0].name
-										: $players[$gameState.currentPlayerIndex].name}
+										: $players[$gameState.currentPlayerIndex + 1].name}
 								</h6>
 							</div>
 
@@ -491,7 +497,8 @@
 	}
 
 	.cell {
-		width: 40px;
-		height: 40px;
+		margin-top: 2px;
+		width: 45px;
+		height: 45px;
 	}
 </style>

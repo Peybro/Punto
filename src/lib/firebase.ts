@@ -3,7 +3,7 @@ import { getDatabase } from 'firebase/database';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-	apiKey: 'AIzaSyDjR4l8QPm9EkToAexbseyXQW8IJX5T6aI',
+	apiKey: import.meta.env.VITE_API_KEY,
 	authDomain: 'punto-6e7e1.firebaseapp.com',
 	databaseURL: 'https://punto-6e7e1-default-rtdb.europe-west1.firebasedatabase.app',
 	projectId: 'punto-6e7e1',
