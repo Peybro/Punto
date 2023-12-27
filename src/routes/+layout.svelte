@@ -4,7 +4,7 @@
 	import { set, ref } from 'firebase/database';
 	import { db } from '$lib/firebase';
 	import { dev } from '$app/environment';
-	import { playerName } from '$lib/store';
+	import { playerName, lobbyConnected } from '$lib/store';
 
 	import { browser } from '$app/environment';
 
@@ -22,6 +22,7 @@
 <!-- Sicher neu laden/verlassen? -->
 <svelte:window
 	on:beforeunload={(event) => {
+		if (!$lobbyConnected) return;
 		event.preventDefault();
 		event.returnValue = '';
 		return '[Dieser Text wird nicht angezeigt]';
