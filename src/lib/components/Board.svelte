@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameState, players, lobbyCode, playerName, roundHasStarted } from '$lib/store';
+	import { gameState, lobbyCode, playerName, players, roundHasStarted } from '$lib/store';
 	import { db } from '$lib/firebase';
 	import { ref, update } from 'firebase/database';
 	import Face from './dice/Face.svelte';

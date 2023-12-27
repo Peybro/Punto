@@ -19,21 +19,27 @@
 	.seven > .item1 {
 		grid-area: a;
 	}
+
 	.seven > .item2 {
 		grid-area: c;
 	}
+
 	.seven > .item3 {
 		grid-area: d;
 	}
+
 	.seven > .item4 {
 		grid-area: e;
 	}
+
 	.seven > .item5 {
 		grid-area: f;
 	}
+
 	.seven > .item6 {
 		grid-area: g;
 	}
+
 	.seven > .item7 {
 		grid-area: i;
 	}

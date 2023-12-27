@@ -17,15 +17,19 @@
 	.four > .item1 {
 		grid-area: a;
 	}
+
 	.four > .item2 {
 		grid-area: c;
 	}
+
 	.four > .item3 {
 		grid-area: g;
 	}
+
 	.four > .item4 {
 		grid-area: i;
 	}
+
 	.four > .filler {
 		grid-area: e;
 	}

@@ -20,24 +20,31 @@
 	.eight > .item1 {
 		grid-area: a;
 	}
+
 	.eight > .item2 {
 		grid-area: b;
 	}
+
 	.eight > .item3 {
 		grid-area: c;
 	}
+
 	.eight > .item4 {
 		grid-area: d;
 	}
+
 	.eight > .item5 {
 		grid-area: f;
 	}
+
 	.eight > .item6 {
 		grid-area: g;
 	}
+
 	.eight > .item7 {
 		grid-area: h;
 	}
+
 	.eight > .item8 {
 		grid-area: i;
 	}

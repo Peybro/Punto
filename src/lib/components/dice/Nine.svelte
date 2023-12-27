@@ -21,27 +21,35 @@
 	.nine > .item1 {
 		grid-area: a;
 	}
+
 	.nine > .item2 {
 		grid-area: b;
 	}
+
 	.nine > .item3 {
 		grid-area: c;
 	}
+
 	.nine > .item4 {
 		grid-area: d;
 	}
+
 	.nine > .item5 {
 		grid-area: e;
 	}
+
 	.nine > .item6 {
 		grid-area: f;
 	}
+
 	.nine > .item7 {
 		grid-area: g;
 	}
+
 	.nine > .item8 {
 		grid-area: h;
 	}
+
 	.nine > .item9 {
 		grid-area: i;
 	}

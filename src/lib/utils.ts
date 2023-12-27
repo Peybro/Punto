@@ -73,6 +73,7 @@ function getMinAndMaxIndices(board: Card[][]): {
 
 /**
  * Returns true if the field is allowed to be played on.
+ * @param gameState
  * @param rowIndex
  * @param cardIndex
  */
@@ -123,6 +124,7 @@ function getPlayedBoardDimensions(board: Card[][]): { width: number; height: num
 
 /**
  * Returns true if the cell is on the board.
+ * @param board
  * @param row
  * @param col
  */
@@ -132,6 +134,7 @@ function cellOnBoard(board: Card[][], row: number, col: number): boolean {
 
 /**
  * Returns true if the cell has a neighbour card (cell with value > 0).
+ * @param board
  * @param row
  * @param col
  */
@@ -182,7 +185,8 @@ function shuffle(arr: any[]): any[] {
 
 /**
  * Returns true if there are at least nr cards of the same color (red, blue, green or yellow) in a row.
- * @param nr The number of cards in a row.
+ * @param board
+ * @param neutralColor
  */
 function fourInARow(board: Card[][], neutralColor: string): boolean {
 	const width = board[0].length;

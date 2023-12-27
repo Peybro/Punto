@@ -15,9 +15,11 @@
 	.two > .item1 {
 		grid-area: a;
 	}
+
 	.two > .item2 {
 		grid-area: i;
 	}
+
 	.two > .filler {
 		grid-area: e;
 	}

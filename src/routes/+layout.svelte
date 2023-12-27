@@ -1,17 +1,15 @@
 <script lang="ts">
 	import { Toaster } from 'svelte-french-toast';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { set, ref } from 'firebase/database';
+	import { ref, set } from 'firebase/database';
 	import { db } from '$lib/firebase';
-	import { dev } from '$app/environment';
-	import { playerName, lobbyConnected } from '$lib/store';
+	import { browser, dev } from '$app/environment';
+	import { lobbyConnected, playerName } from '$lib/store';
 
-	import { browser } from '$app/environment';
+	import './../scss/styles.scss';
 
 	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 
-	// Import our custom CSS
-	import './../scss/styles.scss';
 	browser && import('bootstrap');
 </script>
 

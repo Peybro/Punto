@@ -15,9 +15,11 @@
 	.three > .item1 {
 		grid-area: a;
 	}
+
 	.three > .item2 {
 		grid-area: e;
 	}
+
 	.three > .item3 {
 		grid-area: i;
 	}

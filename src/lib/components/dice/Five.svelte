@@ -17,15 +17,19 @@
 	.five > .item1 {
 		grid-area: a;
 	}
+
 	.five > .item2 {
 		grid-area: c;
 	}
+
 	.five > .item3 {
 		grid-area: e;
 	}
+
 	.five > .item4 {
 		grid-area: g;
 	}
+
 	.five > .item5 {
 		grid-area: i;
 	}

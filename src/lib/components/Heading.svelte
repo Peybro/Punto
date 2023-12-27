@@ -2,8 +2,7 @@
 	import PuntoText from './PuntoText.svelte';
 	import InstructionModal from './InstructionModal.svelte';
 
-	import { infoVisible, roundHasStarted } from '$lib/store';
-	import { languageId } from '$lib/store';
+	import { infoVisible, languageId, roundHasStarted } from '$lib/store';
 	import { translations } from '$lib/translations';
 
 	$: selectedLanguage = translations[$languageId];
@@ -23,7 +22,7 @@
 		<InstructionModal />
 
 		<div class="dropdown p-0 pe-0">
-			<button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+			<button class="btn dropdown-toggle" data-bs-toggle="dropdown" type="button">
 				{$languageId === 'en' ? '🇬🇧' : $languageId === 'fr' ? '🇫🇷' : '🇩🇪'}
 			</button>
 			<ul class="dropdown-menu">

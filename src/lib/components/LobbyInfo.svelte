@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { playerName, lobbyCode, lobbyConnected, host, codeCopied } from '$lib/store';
+	import { codeCopied, host, languageId, lobbyCode, lobbyConnected, playerName } from '$lib/store';
 	import { copyTextToClipboard } from '$lib/utils';
 	import { translations } from '$lib/translations';
-	import { languageId } from '$lib/store';
 	import { page } from '$app/stores';
 
 	export let closeLobby: () => void;
@@ -17,31 +16,31 @@
 <div class="row g-1">
 	<div class="col-xs-12 col-md-6 col-xl-3">
 		<input
-			type="text"
-			class="form-control"
 			bind:value={$playerName}
-			placeholder="Name"
+			class="form-control"
 			disabled={$lobbyConnected}
+			placeholder="Name"
+			type="text"
 		/>
 	</div>
 
 	<div class="col-xs-12 col-md-6 col-xl-3">
 		<div class="input-group">
 			<input
-				type="text"
 				class="form-control"
-				value={$lobbyCode}
+				disabled={$lobbyConnected}
 				on:input={(e) => ($lobbyCode = e.currentTarget.value.toUpperCase())}
 				placeholder="Lobby Code"
-				disabled={$lobbyConnected}
+				type="text"
+				value={$lobbyCode}
 			/>
 			{#if navigator.clipboard && $lobbyConnected}
-				<button class="btn btn-outline-primary" on:click={() => copyTextToClipboard($lobbyCode)}
-					>{#if $codeCopied}
+				<button class="btn btn-outline-primary" on:click={() => copyTextToClipboard($lobbyCode)}>
+					{#if $codeCopied}
 						<i class="bi bi-clipboard-check"></i>
 					{:else}<i class="bi bi-clipboard-plus"></i>
-					{/if}</button
-				>
+					{/if}
+				</button>
 			{/if}
 		</div>
 	</div>

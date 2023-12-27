@@ -1,31 +1,31 @@
 <script lang="ts">
 	import { db } from '$lib/firebase';
-	import { get, ref, set, onValue, off, update } from 'firebase/database';
+	import { get, off, onValue, ref, set, update } from 'firebase/database';
 	import toast from 'svelte-french-toast';
 	import Board from '$lib/components/Board.svelte';
 	import {
-		playerName,
+		gameState,
+		host,
+		infoVisible,
+		languageId,
 		lobbyCode,
 		lobbyConnected,
-		host,
-		players,
-		gameState,
-		roundHasStarted,
-		infoVisible,
-		resetApp,
-		languageId,
 		neutralColor,
+		playerName,
+		players,
+		resetApp,
+		roundHasStarted,
 		uuid
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import type { Color, Player } from '$lib/types';
-	import { duplicate, fourInARow, getBeautifulColors, shuffle, getMostThrees } from '$lib/utils';
+	import type { Player } from '$lib/types';
+	import { duplicate, fourInARow, getBeautifulColors, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
-	import { goto, pushState, replaceState } from '$app/navigation';
+	import { goto } from '$app/navigation';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $playerName;
@@ -41,7 +41,7 @@
 
 			if (data === null) {
 				toast.error(selectedLanguage.toasts.roomNotFound);
-				leaveLobby();
+				await leaveLobby();
 			}
 
 			if (
@@ -49,7 +49,7 @@
 				!data.players.some((p: Player) => p.name === $playerName)
 			) {
 				toast.error(selectedLanguage.toasts.kick);
-				leaveLobby();
+				await leaveLobby();
 			}
 
 			// update local state with data from database

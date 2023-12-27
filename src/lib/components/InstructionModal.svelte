@@ -7,7 +7,7 @@
 </script>
 
 <!-- Button trigger modal -->
-<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#instructionModal">
+<button class="btn" data-bs-target="#instructionModal" data-bs-toggle="modal" type="button">
 	<i class="bi bi-question-circle"></i>
 </button>
 
@@ -19,7 +19,7 @@
 				<div class="modal-title d-flex flex-column">
 					<PuntoText />
 				</div>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
 			</div>
 			<div class="modal-body">
 				<h2>{selectedLanguage.subtitle}</h2>
@@ -49,7 +49,7 @@
 				</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+				<button class="btn btn-secondary" data-bs-dismiss="modal" type="button"
 					>{selectedLanguage.back}</button
 				>
 			</div>

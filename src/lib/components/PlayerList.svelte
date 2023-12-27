@@ -1,10 +1,17 @@
 <script lang="ts">
-	import { players, lobbyCode, host, roundHasStarted, playerName, invitation } from '$lib/store';
+	import {
+		host,
+		invitation,
+		languageId,
+		lobbyCode,
+		playerName,
+		players,
+		roundHasStarted
+	} from '$lib/store';
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
-	import { update, ref, get, set } from 'firebase/database';
+	import { ref, update } from 'firebase/database';
 	import { translations } from '$lib/translations';
-	import { languageId } from '$lib/store';
 	import { browser } from '$app/environment';
 
 	$: selectedLanguage = translations[$languageId];
@@ -52,7 +59,9 @@
 					</li>
 				{/each}
 				{#if $playerName === $host && player.name !== $host}
-					<li><hr class="dropdown-divider" /></li>
+					<li>
+						<hr class="dropdown-divider" />
+					</li>
 					<li>
 						<button
 							class="dropdown-item"

@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Player, Card, Color } from './types';
+import type { Card, Player } from './types';
 import { translations } from './translations';
-import { goto, pushState, replaceState } from '$app/navigation';
+import { goto } from '$app/navigation';
 import { v4 as uuidV4 } from 'uuid';
 
 const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');

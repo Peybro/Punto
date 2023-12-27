@@ -19,21 +19,27 @@
 	.six > .item1 {
 		grid-area: a;
 	}
+
 	.six > .item2 {
 		grid-area: c;
 	}
+
 	.six > .item3 {
 		grid-area: d;
 	}
+
 	.six > .item4 {
 		grid-area: f;
 	}
+
 	.six > .item5 {
 		grid-area: g;
 	}
+
 	.six > .item6 {
 		grid-area: i;
 	}
+
 	.six > .filler {
 		grid-area: e;
 	}
