@@ -2,7 +2,7 @@
 	import PuntoText from './PuntoText.svelte';
 	import InstructionModal from './InstructionModal.svelte';
 
-	import { infoVisible, roundHasStarted } from '$lib/store';
+	import { gameState, infoVisible, roundHasStarted } from '$lib/store';
 	import { languageId } from '$lib/store';
 </script>
 
@@ -14,7 +14,7 @@
 				class="btn"
 				on:click={() => {
 					$infoVisible = !$infoVisible;
-				}}><i class="bi bi-info-circle"></i> Lobby</button
+				}}><i class="bi bi-list-ol"></i> Reihenfolge</button
 			>
 		{/if}
 		<InstructionModal />

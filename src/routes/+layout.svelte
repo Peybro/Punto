@@ -19,6 +19,15 @@
 	{@html webManifestLink}
 </svelte:head>
 
+<!-- Sicher neu laden/verlassen? -->
+<svelte:window
+	on:beforeunload={(event) => {
+		event.preventDefault();
+		event.returnValue = '';
+		return '[Dieser Text wird nicht angezeigt]';
+	}}
+/>
+
 <main>
 	<slot />
 	<Toaster />

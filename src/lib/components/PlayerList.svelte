@@ -2,7 +2,7 @@
 	import { players, lobbyCode, host, roundHasStarted, playerName, invitation } from '$lib/store';
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
-	import { update, ref } from 'firebase/database';
+	import { update, ref, get, set } from 'firebase/database';
 	import { translations } from '$lib/translations';
 	import { languageId } from '$lib/store';
 	import { browser } from '$app/environment';
@@ -18,13 +18,14 @@
 
 <div class="row text-center g-1 mb-4">
 	{#each $players as player, i}
-		<div class="dropdown col-xs-6 col-sm-3">
+		<div class="dropdown col-sm-6 col-md-3">
 			<button
 				class={`btn btn-${getBeautifulColors(player.color)?.bootstrap} text-break w-100`}
 				class:dropdown-toggle={player.name === $playerName || $playerName === $host}
 				type="button"
 				data-bs-toggle={`${player.name === $playerName || $playerName === $host ? 'dropdown' : ''}`}
 			>
+				{$roundHasStarted ? i + 1 + '.' : ''}
 				{player.name}
 				{#if player.name === $host}
 					(Host)
@@ -63,11 +64,13 @@
 			</ul>
 		</div>
 	{/each}
-	{#each Array(4 - $players.length) as _}
-		<div class="col-xs-6 col-sm-3">
-			<button class="btn btn-outline-secondary w-100" disabled>[{selectedLanguage.free}]</button>
-		</div>
-	{/each}
+	{#if !$roundHasStarted}
+		{#each Array(4 - $players.length) as _}
+			<div class="col-sm-6 col-md-3">
+				<button class="btn btn-outline-secondary w-100" disabled>[{selectedLanguage.free}]</button>
+			</div>
+		{/each}
+	{/if}
 	{#if navigator.share && browser}
 		<div>
 			<button

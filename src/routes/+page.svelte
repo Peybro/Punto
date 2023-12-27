@@ -390,7 +390,9 @@
 	{#if $lobbyConnected}
 		{#if $infoVisible}
 			<div class="d-flex justify-content-between">
-				<h4 class="text-start mt-4">{selectedLanguage.players}</h4>
+				<h4 class="text-start mt-4">
+					{$roundHasStarted ? 'Reihenfolge' : selectedLanguage.players}
+				</h4>
 			</div>
 			<PlayerList />
 		{/if}
@@ -457,6 +459,12 @@
 							<div class="cell ms-2 p-0 border rounded bg-dark">
 								<Face value={currentPlayer.deck[0].value} color={currentPlayer.deck[0].color} />
 							</div>
+
+							<h6 class="pt-1 ms-4 text-secondary">
+								Next: {$gameState.currentPlayerIndex === $players.length
+									? $players[0].name
+									: $players[$gameState.currentPlayerIndex].name}
+							</h6>
 						{/if}
 					{:else}
 						<h4>{selectedLanguage.noMoreCards}</h4>
