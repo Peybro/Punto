@@ -390,7 +390,9 @@
 	{#if $lobbyConnected}
 		{#if $infoVisible}
 			<div class="d-flex justify-content-between">
-				<h4 class="text-start mt-4">{selectedLanguage.players}</h4>
+				<h4 class="text-start mt-4">
+					{$roundHasStarted ? 'Reihenfolge' : selectedLanguage.players}
+				</h4>
 			</div>
 			<PlayerList />
 		{/if}

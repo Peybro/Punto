@@ -1,5 +1,7 @@
 import type { Card, Color, GameState } from '$lib/types';
+import { ref, set, update } from 'firebase/database';
 import { codeCopied, invitation } from './store';
+import { db } from './firebase';
 
 /**
  * Returns a color object with the color, hex and bootstrap color.
