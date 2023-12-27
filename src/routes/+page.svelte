@@ -459,6 +459,12 @@
 							<div class="cell ms-2 p-0 border rounded bg-dark">
 								<Face value={currentPlayer.deck[0].value} color={currentPlayer.deck[0].color} />
 							</div>
+
+							<h6 class="pt-1 ms-4 text-secondary">
+								Next: {$gameState.currentPlayerIndex === $players.length
+									? $players[0].name
+									: $players[$gameState.currentPlayerIndex].name}
+							</h6>
 						{/if}
 					{:else}
 						<h4>{selectedLanguage.noMoreCards}</h4>
