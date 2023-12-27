@@ -48,7 +48,7 @@
 
 	<div class="col-xs-2 col-md-6 col-xl-3">
 		{#if $lobbyConnected && $host === $playerName}
-			<button class="btn btn-danger w-100" on:click={closeLobby}
+			<button class="btn btn-outline-danger w-100" on:click={closeLobby}
 				>{selectedLanguage.closeRoom}</button
 			>
 		{:else}
@@ -63,7 +63,7 @@
 
 	<div class="col-xs-6 col-md-6 col-xl-3">
 		{#if $lobbyConnected}
-			<button class="btn btn-warning w-100" on:click={leaveLobby}
+			<button class="btn btn-outline-warning w-100" on:click={leaveLobby}
 				>{selectedLanguage.leaveRoom}</button
 			>
 		{:else}

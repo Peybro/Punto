@@ -407,7 +407,7 @@
 
 		{#if isHost}
 			<button
-				class="btn btn-primary"
+				class="btn btn-outline-primary"
 				on:click={startRound}
 				disabled={$playerName !== $host || $roundHasStarted}
 				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
@@ -415,7 +415,7 @@
 					: selectedLanguage.startGame.new}</button
 			>
 			<button
-				class="btn btn-warning"
+				class="btn btn-outline-warning"
 				on:click={resetLobby}
 				disabled={$playerName !== $host || !$roundHasStarted}>{selectedLanguage.endRound}</button
 			>
@@ -489,8 +489,7 @@
 	}
 
 	.cell {
-		width: calc(100vw / 10);
-		max-width: 50px;
-		max-height: 50px;
+		width: 50px;
+		height: 50px;
 	}
 </style>
