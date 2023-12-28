@@ -1,23 +1,26 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { Color, type Card, Player, colors, Deck } from './types';
+import { Color, Player, colors, Deck, GameState } from './types';
 import { translations } from './translations';
 import { goto } from '$app/navigation';
 import { v4 as uuidV4 } from 'uuid';
 
-const you = new Player('', uuidV4(), new Color(colors.Red), new Deck(colors.Red), 0);
-let youInLocalStorage = JSON.parse(localStorage.getItem('localPlayerName')) || null
+const you = () => new Player('', uuidV4(), new Color(colors.Red), new Deck(colors.Red), 0);
+const youJson = () => JSON.parse(localStorage.getItem('localPlayerName') || JSON.stringify(you));
+let youInLocalStorage = () => new Player(
+	youJson().name,
+	youJson().uuid,
+	youJson().color,
+	youJson().deck,
+	youJson().wins
+);
 
-const player = writable<Player>(browser ? localStorage.getItem('localPlayerName') || you : you);
+const player = writable<Player>(youInLocalStorage() || JSON.stringify(you()));
 const lobbyCode = writable<string>('');
 const lobbyConnected = writable<boolean>(false);
-const host = writable<Player>(you);
+const host = writable<Player>(youInLocalStorage());
 const players = writable<Player[]>([]);
-const gameState = writable<{ board: Card[][]; turn: number; currentPlayerIndex: number }>({
-	board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
-	turn: 0,
-	currentPlayerIndex: 0
-});
+const gameState = writable<GameState>(new GameState(Array(11).fill(Array(11).fill({ value: 0, color: null })), 0, 0));
 const roundHasStarted = writable<boolean>(false);
 const codeCopied = writable<boolean>(false);
 const infoVisible = writable<boolean>(true);
@@ -30,8 +33,8 @@ const invitation = {
 const neutralColor = writable<Color>(new Color('NULL'));
 const uuid = writable<string>(browser ? localStorage.getItem('uuid') || uuidV4() : uuidV4());
 
-player.subscribe((name: string) =>
-	browser ? localStorage.setItem('localPlayerName', name) : null
+player.subscribe((player: Player) =>
+	browser ? localStorage.setItem('localPlayerName', JSON.stringify(player)) : null
 );
 
 languageId.subscribe((id: string) => {
@@ -50,18 +53,11 @@ uuid.subscribe((id: string) => {
 /**
  * Resets the app to its initial state
  */
-function resetApp() {
-	player.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
-	// lobbyCode.set('');
-
-	// reset code param in URL
-	// TODO: does not work...
-	// replaceState(window.location.origin, '/');
-	// pushState(window.location.origin, '');
-	goto(window.location.origin, { replaceState: true });
-
+async function resetApp(): Promise<void> {
+	player.set(youInLocalStorage());
+	await goto(window.location.origin, { replaceState: true });
 	lobbyConnected.set(false);
-	host.set('');
+	host.set(youInLocalStorage());
 	players.set([]);
 	gameState.set({
 		board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
@@ -70,7 +66,7 @@ function resetApp() {
 	});
 	roundHasStarted.set(false);
 	infoVisible.set(true);
-	neutralColor.set(new Color("NULL"));
+	neutralColor.set(new Color('NULL'));
 }
 
 export {

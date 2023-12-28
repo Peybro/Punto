@@ -24,21 +24,21 @@
 </script>
 
 <div class="row text-center g-1 mb-4">
-	{#each $players as player, i}
+	{#each $players as p, i}
 		<div class="dropdown col-sm-6 col-md-3">
 			<button
-				class={`btn btn-${player.color.Bootstrap} text-break w-100`}
-				class:dropdown-toggle={player.name === $player || $player === $host}
+				class={`btn btn-${p.color.Bootstrap} text-break w-100`}
+				class:dropdown-toggle={p === $player || $player === $host}
 				type="button"
-				data-bs-toggle={`${player.name === $player || $player === $host ? 'dropdown' : ''}`}
+				data-bs-toggle={`${p === $player || $player === $host ? 'dropdown' : ''}`}
 			>
 				{$roundHasStarted ? i + 1 + '.' : ''}
-				{player.name}
-				{#if player.name === $host}
+				{p.name}
+				{#if p === $host}
 					(Host)
 				{/if}
-				{#if player.wins > 0}
-					<span class="ms-2"><i class="bi bi-trophy"></i> {player.wins}x</span>
+				{#if p.wins > 0}
+					<span class="ms-2"><i class="bi bi-trophy"></i> {p.wins}x</span>
 				{/if}
 			</button>
 			<ul class="dropdown-menu">
@@ -63,14 +63,14 @@
 						</button>
 					</li>
 				{/each}
-				{#if $player === $host && player.name !== $host}
+				{#if $player === $host && p !== $host}
 					<li>
 						<hr class="dropdown-divider" />
 					</li>
 					<li>
 						<button
 							class="dropdown-item"
-							on:click={() => kickPlayer(player)}
+							on:click={() => kickPlayer(p)}
 							disabled={$roundHasStarted}>{selectedLanguage.kick}</button
 						>
 					</li>
