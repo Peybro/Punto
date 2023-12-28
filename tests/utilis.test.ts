@@ -1,5 +1,5 @@
-import { describe, beforeEach, test, expect } from 'vitest';
-
+import { describe, beforeEach, test, expect, afterEach } from 'vitest';
+import sinon from 'sinon';
 import {
 	getBeautifulColors,
 	copyTextToClipboard,
@@ -13,6 +13,7 @@ import {
 	fourInARow,
 	getMostThrees
 } from '$lib/utils';
+import { codeCopied } from '$lib/store';
 
 // TODO: write tests for utils.ts
 
@@ -44,92 +45,111 @@ describe('getBeautifulColors', () => {
 });
 
 describe('copyTextToClipboard', () => {
-	// test('copies text to clipboard and sets codeCopied to true', async () => {
-	// 	const text = 'Hello, world!'
-	// 	await copyTextToClipboard(text)
-	// 	expect(navigator.clipboard.readText()).resolves.toBe(text)
-	// 	expect(codeCopied.get()).toBe(true)
-	//   })
-	//   test('sets codeCopied back to false after 3 seconds', async () => {
-	// 	const text = 'Hello, world!'
-	// 	await copyTextToClipboard(text)
-	// 	await new Promise(resolve => setTimeout(resolve, 3000))
-	// 	expect(codeCopied.get()).toBe(false)
-	//   })
-	//   test('does nothing if navigator.clipboard is not available', async () => {
-	// 	const originalClipboard = navigator.clipboard
-	// 	navigator.clipboard = null
-	// 	await copyTextToClipboard('Hello, world!')
-	// 	expect(codeCopied.get()).toBe(false)
-	// 	navigator.clipboard = originalClipboard
-	//   })
+	let clock: any;
+	let writeTextStub: any;
+	let setStub: any;
+
+	beforeEach(() => {
+		clock = sinon.useFakeTimers();
+		writeTextStub = sinon.stub(navigator.clipboard, 'writeText');
+		setStub = sinon.stub(codeCopied, 'set');
+	});
+
+	afterEach(() => {
+		clock.restore();
+		writeTextStub.restore();
+		setStub.restore();
+	});
+
+	test('copies text to clipboard and sets codeCopied to true', async () => {
+		const text = 'Hello, world!';
+		await copyTextToClipboard(text);
+		expect(writeTextStub.calledWith(text)).toBe(true);
+		expect(setStub.calledWith(true)).toBe(true);
+	});
+
+	test('sets codeCopied back to false after 3 seconds', async () => {
+		const text = 'Hello, world!';
+		await copyTextToClipboard(text);
+		clock.tick(3000);
+		expect(setStub.calledWith(false)).toBe(true);
+	});
+
+	test('does nothing if navigator.clipboard is not available', async () => {
+		let originalClipboard: string = '';
+		await navigator.clipboard.read().then((text) => (originalClipboard = text.toString()));
+		navigator.clipboard.writeText('');
+		await copyTextToClipboard('Hello, world!');
+		expect(setStub.called).toBe(false);
+		navigator.clipboard.writeText(originalClipboard);
+	});
 });
 
 describe('getMinAndMaxIndices', () => {
-	// test('returns correct min and max indices for a non-empty board', () => {
-	// 	const board = [
-	// 		[{ value: 0 }, { value: 0 }, { value: 0 }],
-	// 		[{ value: 0 }, { value: 1 }, { value: 0 }],
-	// 		[{ value: 0 }, { value: 0 }, { value: 0 }]
-	// 	];
-	// 	const indices = getMinAndMaxIndices(board);
-	// 	expect(indices).toEqual({ minX: 1, maxX: 1, minY: 1, maxY: 1 });
-	// });
-	// test('returns correct min and max indices for a board with multiple non-zero values', () => {
-	// 	const board = [
-	// 		[{ value: 0 }, { value: 1 }, { value: 0 }],
-	// 		[{ value: 1 }, { value: 0 }, { value: 1 }],
-	// 		[{ value: 0 }, { value: 1 }, { value: 0 }]
-	// 	];
-	// 	const indices = getMinAndMaxIndices(board);
-	// 	expect(indices).toEqual({ minX: 0, maxX: 2, minY: 0, maxY: 2 });
-	// });
-	// test('returns initial values for an empty board', () => {
-	// 	const board = [
-	// 		[{ value: 0 }, { value: 0 }, { value: 0 }],
-	// 		[{ value: 0 }, { value: 0 }, { value: 0 }],
-	// 		[{ value: 0 }, { value: 0 }, { value: 0 }]
-	// 	];
-	// 	const indices = getMinAndMaxIndices(board);
-	// 	expect(indices).toEqual({ minX: 3, maxX: 0, minY: 3, maxY: 0 });
-	// });
+	test('returns correct min and max indices for a non-empty 9x9 board', () => {
+		const board = Array(11).fill(Array(11).fill({ value: 0 }));
+		board[4][4] = { value: 1 };
+		const indices = getMinAndMaxIndices(board);
+		expect(indices).toEqual({ minX: 4, maxX: 4, minY: 4, maxY: 4 });
+	});
+
+	test('returns correct min and max indices for a 9x9 board with multiple non-zero values', () => {
+		const board = Array(11).fill(Array(11).fill({ value: 0 }));
+		board[1][1] = { value: 1 };
+		board[7][7] = { value: 1 };
+		const indices = getMinAndMaxIndices(board);
+		expect(indices).toEqual({ minX: 1, maxX: 7, minY: 1, maxY: 7 });
+	});
+
+	test('returns initial values for an empty 9x9 board', () => {
+		const board = Array(11).fill(Array(11).fill({ value: 0 }));
+		const indices = getMinAndMaxIndices(board);
+		expect(indices).toEqual({ minX: 9, maxX: 0, minY: 9, maxY: 0 });
+	});
 });
 
 describe('isAllowedField', () => {
-	// test('allows the first move to be in the center of the board', () => {
-	// 	const gameState = {
-	// 	  turn: 0,
-	// 	  board: Array(11).fill().map(() => Array(11).fill({ value: 0 }))
-	// 	}
-	// 	const isAllowed = isAllowedField(gameState, 5, 5)
-	// 	expect(isAllowed).toBe(true)
-	//   })
-	//   test('does not allow the first move to be outside the center of the board', () => {
-	// 	const gameState = {
-	// 	  turn: 0,
-	// 	  board: Array(11).fill().map(() => Array(11).fill({ value: 0 }))
-	// 	}
-	// 	const isAllowed = isAllowedField(gameState, 0, 0)
-	// 	expect(isAllowed).toBe(false)
-	//   })
-	//   test('allows a move next to an existing card', () => {
-	// 	const gameState = {
-	// 	  turn: 1,
-	// 	  board: Array(11).fill().map(() => Array(11).fill({ value: 0 }))
-	// 	}
-	// 	gameState.board[5][5] = { value: 1 }
-	// 	const isAllowed = isAllowedField(gameState, 5, 6)
-	// 	expect(isAllowed).toBe(true)
-	//   })
-	//   test('does not allow a move far away from existing cards', () => {
-	// 	const gameState = {
-	// 	  turn: 1,
-	// 	  board: Array(11).fill().map(() => Array(11).fill({ value: 0 }))
-	// 	}
-	// 	gameState.board[5][5] = { value: 1 }
-	// 	const isAllowed = isAllowedField(gameState, 0, 0)
-	// 	expect(isAllowed).toBe(false)
-	//   })
+	test('allows the first move to be in the center of the board', () => {
+		const gameState = {
+			turn: 0,
+			currentPlayerIndex: 0,
+			board: Array(11).fill(Array(11).fill({ value: 0 }))
+		};
+		const isAllowed = isAllowedField(gameState, 5, 5);
+		expect(isAllowed).toBe(true);
+	});
+
+	test('does not allow the first move to be outside the center of the board', () => {
+		const gameState = {
+			turn: 0,
+			currentPlayerIndex: 0,
+			board: Array(11).fill(Array(11).fill({ value: 0 }))
+		};
+		const isAllowed = isAllowedField(gameState, 0, 0);
+		expect(isAllowed).toBe(false);
+	});
+
+	test('allows a move next to an existing card', () => {
+		const gameState = {
+			turn: 1,
+			currentPlayerIndex: 0,
+			board: Array(11).fill(Array(11).fill({ value: 0 }))
+		};
+		gameState.board[5][5] = { value: 1 };
+		const isAllowed = isAllowedField(gameState, 5, 6);
+		expect(isAllowed).toBe(true);
+	});
+
+	test('does not allow a move far away from existing cards', () => {
+		const gameState = {
+			turn: 1,
+			currentPlayerIndex: 0,
+			board: Array(11).fill(Array(11).fill({ value: 0 }))
+		};
+		gameState.board[5][5] = { value: 1 };
+		const isAllowed = isAllowedField(gameState, 0, 0);
+		expect(isAllowed).toBe(false);
+	});
 });
 
 describe('getPlayedBoardDimensions', () => {
@@ -269,52 +289,45 @@ describe('shuffle', () => {
 });
 
 describe('fourInARow', () => {
-	// test('returns true for a board with four in a row horizontally', () => {
-	// 	const board = [
-	// 	  [ { value: 1, color: 'red' }, { value: 1, color: 'red' }, { value: 1, color: 'red' }, { value: 1, color: 'red' } ],
-	// 	  [ { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' } ]
-	// 	]
-	// 	const hasFourInARow = fourInARow(board, 'neutral')
-	// 	expect(hasFourInARow).toBe(true)
-	//   })
-	//   test('returns true for a board with four in a row vertically', () => {
-	// 	const board = [
-	// 	  [ { value: 1, color: 'red' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 1, color: 'red' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 1, color: 'red' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 1, color: 'red' }, { value: 0, color: 'neutral' } ]
-	// 	]
-	// 	const hasFourInARow = fourInARow(board, 'neutral')
-	// 	expect(hasFourInARow).toBe(true)
-	//   })
-	//   test('returns true for a board with four in a row diagonally (top left to bottom right)', () => {
-	// 	const board = [
-	// 	  [ { value: 1, color: 'red' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 0, color: 'neutral' }, { value: 1, color: 'red' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 1, color: 'red' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 1, color: 'red' } ]
-	// 	]
-	// 	const hasFourInARow = fourInARow(board, 'neutral')
-	// 	expect(hasFourInARow).toBe(true)
-	//   })
-	//   test('returns true for a board with four in a row diagonally (bottom left to top right)', () => {
-	// 	const board = [
-	// 	  [ { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 1, color: 'red' } ],
-	// 	  [ { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 1, color: 'red' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 0, color: 'neutral' }, { value: 1, color: 'red' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 1, color: 'red' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' } ]
-	// 	]
-	// 	const hasFourInARow = fourInARow(board, 'neutral')
-	// 	expect(hasFourInARow).toBe(true)
-	//   })
-	//   test('returns false for a board without four in a row', () => {
-	// 	const board = [
-	// 	  [ { value: 1, color: 'red' }, { value: 1, color: 'red' }, { value: 1, color: 'red' }, { value: 0, color: 'neutral' } ],
-	// 	  [ { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' }, { value: 0, color: 'neutral' } ]
-	// 	]
-	// 	const hasFourInARow = fourInARow(board, 'neutral')
-	// 	expect(hasFourInARow).toBe(false)
-	//   })
+	const neutralColor = 'white';
+
+	test('detects four in a row horizontally', () => {
+		const board = Array(9).fill(Array(9).fill({ color: neutralColor, value: 0 }));
+		board[4] = Array(9).fill({ color: 'red', value: 1 });
+		expect(fourInARow(board, neutralColor)).toBe(true);
+	});
+
+	test('detects four in a row vertically', () => {
+		const board = Array(9).fill(Array(9).fill({ color: neutralColor, value: 0 }));
+		for (let i = 0; i < 9; i++) {
+			board[i][4] = { color: 'red', value: 1 };
+		}
+		expect(fourInARow(board, neutralColor)).toBe(true);
+	});
+
+	test('detects four in a row diagonally (top left to bottom right)', () => {
+		const board = Array(9).fill(Array(9).fill({ color: neutralColor, value: 0 }));
+		for (let i = 0; i < 9; i++) {
+			board[i][i] = { color: 'red', value: 1 };
+		}
+		expect(fourInARow(board, neutralColor)).toBe(true);
+	});
+
+	test('detects four in a row diagonally (bottom left to top right)', () => {
+		const board = Array(9).fill(Array(9).fill({ color: neutralColor, value: 0 }));
+		for (let i = 0; i < 9; i++) {
+			board[8 - i][i] = { color: 'red', value: 1 };
+		}
+		expect(fourInARow(board, neutralColor)).toBe(true);
+	});
+
+	test('returns false when there are no four in a row', () => {
+		const board = Array(9).fill(Array(9).fill({ color: neutralColor, value: 0 }));
+		for (let i = 0; i < 9; i++) {
+			board[i][i] = { color: i % 2 === 0 ? 'red' : 'blue', value: 1 };
+		}
+		expect(fourInARow(board, neutralColor)).toBe(false);
+	});
 });
 
 describe('getMostThrees', () => {
