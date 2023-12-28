@@ -4,21 +4,21 @@
 		invitation,
 		languageId,
 		lobbyCode,
-		playerName,
+		player,
 		players,
 		roundHasStarted
 	} from '$lib/store';
-	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
 	import { ref, update } from 'firebase/database';
 	import { translations } from '$lib/translations';
 	import { browser } from '$app/environment';
+	import { Color, Player, colors } from '$lib/types';
 
 	$: selectedLanguage = translations[$languageId];
 
-	async function kickPlayer(name: string) {
+	async function kickPlayer(player: Player) {
 		await update(ref(db, `${$lobbyCode}/`), {
-			players: $players.filter((p) => p.name !== name)
+			players: $players.filter((p) => p !== player)
 		});
 	}
 </script>
@@ -27,10 +27,10 @@
 	{#each $players as player, i}
 		<div class="dropdown col-sm-6 col-md-3">
 			<button
-				class={`btn btn-${getBeautifulColors(player.color)?.bootstrap} text-break w-100`}
-				class:dropdown-toggle={player.name === $playerName || $playerName === $host}
+				class={`btn btn-${player.color.Bootstrap} text-break w-100`}
+				class:dropdown-toggle={player.name === $player || $player === $host}
 				type="button"
-				data-bs-toggle={`${player.name === $playerName || $playerName === $host ? 'dropdown' : ''}`}
+				data-bs-toggle={`${player.name === $player || $player === $host ? 'dropdown' : ''}`}
 			>
 				{$roundHasStarted ? i + 1 + '.' : ''}
 				{player.name}
@@ -42,30 +42,35 @@
 				{/if}
 			</button>
 			<ul class="dropdown-menu">
-				{#each ['red', 'blue', 'green', 'yellow'] as color}
+				{#each [new Color(colors.Red), new Color(colors.Blue), new Color(colors.Green), new Color(colors.Yellow)] as color}
 					<li>
 						<button
-							class={`dropdown-item text-${getBeautifulColors(color)?.bootstrap} fw-bold`}
+							class={`dropdown-item text-${color.Bootstrap} fw-bold`}
 							on:click={() =>
 								update(ref(db, `${$lobbyCode}/players/${i}`), {
-									color: color
+									color: color.value
 								})}
 							disabled={$players.some((p) => p.color === color) || $roundHasStarted}
 						>
 							{Object.values(selectedLanguage.colors)[
-								['red', 'blue', 'green', 'yellow'].indexOf(color)
+								[
+									new Color(colors.Red),
+									new Color(colors.Blue),
+									new Color(colors.Green),
+									new Color(colors.Yellow)
+								].indexOf(color)
 							]}
 						</button>
 					</li>
 				{/each}
-				{#if $playerName === $host && player.name !== $host}
+				{#if $player === $host && player.name !== $host}
 					<li>
 						<hr class="dropdown-divider" />
 					</li>
 					<li>
 						<button
 							class="dropdown-item"
-							on:click={() => kickPlayer(player.name)}
+							on:click={() => kickPlayer(player)}
 							disabled={$roundHasStarted}>{selectedLanguage.kick}</button
 						>
 					</li>
@@ -80,7 +85,7 @@
 			</div>
 		{/each}
 	{/if}
-	{#if navigator.share && browser}
+	{#if navigator.share && browser && $players.length < 4}
 		<div>
 			<button
 				class="btn btn-outline-primary w-100 mt-1"

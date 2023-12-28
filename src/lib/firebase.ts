@@ -1,9 +1,10 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
+import { API_KEY } from '$env/static/private';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-	apiKey: import.meta.env.VITE_API_KEY,
+	apiKey: API_KEY,
 	authDomain: 'punto-6e7e1.firebaseapp.com',
 	databaseURL: 'https://punto-6e7e1-default-rtdb.europe-west1.firebasedatabase.app',
 	projectId: 'punto-6e7e1',

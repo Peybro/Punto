@@ -1,14 +1,17 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Card, Player } from './types';
+import { Color, type Card, Player, colors, Deck } from './types';
 import { translations } from './translations';
 import { goto } from '$app/navigation';
 import { v4 as uuidV4 } from 'uuid';
 
-const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
+const you = new Player('', uuidV4(), new Color(colors.Red), new Deck(colors.Red), 0);
+let youInLocalStorage = JSON.parse(localStorage.getItem('localPlayerName')) || null
+
+const player = writable<Player>(browser ? localStorage.getItem('localPlayerName') || you : you);
 const lobbyCode = writable<string>('');
 const lobbyConnected = writable<boolean>(false);
-const host = writable<string>('');
+const host = writable<Player>(you);
 const players = writable<Player[]>([]);
 const gameState = writable<{ board: Card[][]; turn: number; currentPlayerIndex: number }>({
 	board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
@@ -24,10 +27,10 @@ const invitation = {
 	text: "Let's play Punto!",
 	url: 'https://punto.vercel.app'
 };
-const neutralColor = writable<string>('');
+const neutralColor = writable<Color>(new Color('NULL'));
 const uuid = writable<string>(browser ? localStorage.getItem('uuid') || uuidV4() : uuidV4());
 
-playerName.subscribe((name: string) =>
+player.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
 );
 
@@ -48,7 +51,7 @@ uuid.subscribe((id: string) => {
  * Resets the app to its initial state
  */
 function resetApp() {
-	playerName.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
+	player.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
 	// lobbyCode.set('');
 
 	// reset code param in URL
@@ -67,11 +70,11 @@ function resetApp() {
 	});
 	roundHasStarted.set(false);
 	infoVisible.set(true);
-	neutralColor.set('');
+	neutralColor.set(new Color("NULL"));
 }
 
 export {
-	playerName,
+	player,
 	lobbyCode,
 	lobbyConnected,
 	host,

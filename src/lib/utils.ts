@@ -1,22 +1,22 @@
-import type { Card, Color, GameState } from '$lib/types';
+import { colors, type Card, type Color, type GameState } from '$lib/types';
 import { codeCopied } from './store';
 
-/**
- * Returns a color object with the color, hex and bootstrap color.
- * @param color
- */
-function getBeautifulColors(color: Color | string): {
-	color: Color;
-	hex: string;
-	bootstrap: string;
-} {
-	return [
-		{ color: 'red', hex: '#dc3522', bootstrap: 'danger' },
-		{ color: 'blue', hex: '#02ace7', bootstrap: 'info' },
-		{ color: 'green', hex: '#78b728', bootstrap: 'success' },
-		{ color: 'yellow', hex: '#f1b300', bootstrap: 'warning' }
-	].find((c) => c.color === color) as { color: Color; hex: string; bootstrap: string };
-}
+// /**
+//  * Returns a color object with the color, hex and bootstrap color.
+//  * @param color
+//  */
+// function getBeautifulColors(color: Color | string): {
+// 	color: Color;
+// 	hex: string;
+// 	bootstrap: string;
+// } {
+// 	return [
+// 		{ color: colors.Red, hex: '#dc3522', bootstrap: 'danger' },
+// 		{ color: colors.Blue, hex: '#02ace7', bootstrap: 'info' },
+// 		{ color: colors.Green, hex: '#78b728', bootstrap: 'success' },
+// 		{ color: colors.Yellow, hex: '#f1b300', bootstrap: 'warning' }
+// 	].find((c) => c.color === color) as { color: Color; hex: string; bootstrap: string };
+// }
 
 /**
  * Copies the given text to the clipboard.
@@ -188,7 +188,7 @@ function shuffle(arr: any[]): any[] {
  * @param board
  * @param neutralColor
  */
-function fourInARow(board: Card[][], neutralColor: string): boolean {
+function fourInARow(board: Card[][], neutralColor: Color): boolean {
 	const width = board[0].length;
 	const height = board.length;
 
@@ -266,7 +266,13 @@ function getMostThrees(board: Card[][]): {
 	green: number;
 	yellow: number;
 } {
-	const counts = { red: 0, blue: 0, green: 0, yellow: 0 };
+	const counts = {
+		[colors.Red]: 0,
+		[colors.Blue]: 0,
+		[colors.Green]: 0,
+		[colors.Yellow]: 0,
+		NULL: 0
+	};
 	const height = board.length;
 	const width = board[0].length;
 
@@ -280,8 +286,8 @@ function getMostThrees(board: Card[][]): {
 			) {
 				const color = board[i][j].color;
 				if (color === null) continue;
-				if (color in counts) {
-					counts[color]++;
+				if (color.value in counts) {
+					counts[color.value]++;
 				}
 			}
 		}
@@ -297,8 +303,8 @@ function getMostThrees(board: Card[][]): {
 			) {
 				const color = board[i][j].color;
 				if (color === null) continue;
-				if (color in counts) {
-					counts[color]++;
+				if (color.value in counts) {
+					counts[color.value]++;
 				}
 			}
 		}
@@ -314,8 +320,8 @@ function getMostThrees(board: Card[][]): {
 			) {
 				const color = board[i][j].color;
 				if (color === null) continue;
-				if (color in counts) {
-					counts[color]++;
+				if (color.value in counts) {
+					counts[color.value]++;
 				}
 			}
 		}
@@ -331,8 +337,8 @@ function getMostThrees(board: Card[][]): {
 			) {
 				const color = board[i][j].color;
 				if (color === null) continue;
-				if (color in counts) {
-					counts[color]++;
+				if (color.value in counts) {
+					counts[color.value]++;
 				}
 			}
 		}
@@ -342,7 +348,6 @@ function getMostThrees(board: Card[][]): {
 }
 
 export {
-	getBeautifulColors,
 	copyTextToClipboard,
 	duplicate,
 	shuffle,

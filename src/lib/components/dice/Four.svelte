@@ -6,10 +6,10 @@
 </script>
 
 <div class="grid-container four">
-	<div class={`item1 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item2 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item3 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item4 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item1 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item2 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item3 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item4 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
 	<div class={`filler`}></div>
 </div>
 

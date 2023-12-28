@@ -6,14 +6,14 @@
 </script>
 
 <div class="grid-container eight">
-	<div class={`item1 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item2 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item3 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item4 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item5 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item6 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item7 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
-	<div class={`item8 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item1 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item2 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item3 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item4 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item5 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item6 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item7 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
+	<div class={`item8 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
 </div>
 
 <style scoped>

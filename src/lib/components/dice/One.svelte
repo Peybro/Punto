@@ -6,7 +6,7 @@
 </script>
 
 <div class="grid-container one">
-	<div class={`item1 bg-${getBeautifulColors(color)?.bootstrap}`}></div>
+	<div class={`item1 bg-${getBeautifulColors(color.value)?.bootstrap}`}></div>
 	<div class={`filler1`}></div>
 	<div class={`filler2`}></div>
 </div>
