@@ -72,6 +72,7 @@ type LanguageType = {
 		four: string;
 	};
 	order: string;
+	winsWithThrees: [string, string];
 };
 
 type LanguagesType = {

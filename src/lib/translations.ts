@@ -76,7 +76,8 @@ const translations: LanguagesType = {
 			],
 			four: '4-Player-Mode: Each player plays with one color.'
 		},
-		order: 'Order'
+		order: 'Order',
+		winsWithThrees: ['wins with', '3-in-a-row sets']
 	},
 	de: {
 		colors: {
@@ -153,7 +154,8 @@ const translations: LanguagesType = {
 			],
 			four: '4-Spieler-Modus: Jeder spielt mit einer Farbe.'
 		},
-		order: 'Reihenfolge'
+		order: 'Reihenfolge',
+		winsWithThrees: ['gewinnt mit', '3er-Reihen']
 	},
 	fr: {
 		colors: {
@@ -230,7 +232,8 @@ const translations: LanguagesType = {
 			],
 			four: 'Mode 4 Joueurs : Chaque joueur joue avec une couleur.'
 		},
-		order: 'Ordre'
+		order: 'Ordre',
+		winsWithThrees: ['gagne avec', 'séries de 3']
 	}
 };
 

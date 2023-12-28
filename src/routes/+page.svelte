@@ -557,7 +557,12 @@
 					{:else}
 						<div>
 							<h5>{selectedLanguage.noMoreCards}</h5>
-							<h4>{$winnerWithThrees[0]} gewinnt mit {$winnerWithThrees[1]} Reihen.</h4>
+							<h4>
+								{$winnerWithThrees[0]}
+								{selectedLanguage.winsWithThrees[0]}
+								{$winnerWithThrees[1]}
+								{selectedLanguage.winsWithThrees[1]}.
+							</h4>
 						</div>
 					{/if}
 				</div>
