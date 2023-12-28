@@ -6,7 +6,8 @@
 		lobbyCode,
 		playerName,
 		players,
-		roundHasStarted
+		roundHasStarted,
+		playersOnline
 	} from '$lib/store';
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
@@ -27,11 +28,20 @@
 	{#each $players as player, i}
 		<div class="dropdown col-md-6 col-lg-3">
 			<button
-				class={`btn btn-${getBeautifulColors(player.color)?.bootstrap} text-break w-100`}
+				class={`btn btn-${!$playersOnline.some((p) => p === player.name) ? 'outline-' : ''}${
+					getBeautifulColors(player.color)?.bootstrap
+				} text-break w-100`}
 				class:dropdown-toggle={player.name === $playerName || $playerName === $host}
 				type="button"
 				data-bs-toggle={`${player.name === $playerName || $playerName === $host ? 'dropdown' : ''}`}
 			>
+				{#if $playersOnline.some((p) => p === player.name)}
+					<!-- <i class="bi bi-check-circle-fill float-start"></i> -->
+					<i class="bi bi-wifi float-start"></i>
+				{:else}
+					<!-- <i class="bi bi-x-circle-fill text-danger float-start"></i> -->
+					<i class="bi bi-wifi-off float-start"></i>
+				{/if}
 				{$roundHasStarted ? i + 1 + '.' : ''}
 				{player.name}
 				{#if player.name === $host}
