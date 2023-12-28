@@ -142,7 +142,7 @@
 					const winnerIndex = $players.findIndex((p) => p.color === winner[0]);
 					$winnerWithThrees = [$players[winnerIndex].name, winner[1]];
 
-					toast.error(
+					toast(
 						`${selectedLanguage.toasts.winnerWhenNoCards} (${$players[winnerIndex].name}: ${winner[1]})`
 					);
 
@@ -555,7 +555,7 @@
 							</div>
 						{/if}
 					{:else}
-						<div>
+						<div class="mt-2">
 							<h5>{selectedLanguage.noMoreCards}</h5>
 							<h4>
 								{$winnerWithThrees[0]}
