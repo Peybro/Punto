@@ -415,7 +415,7 @@
 
 		{#if isHost}
 			<button
-				class="btn btn-outline-primary"
+				class="btn btn{$playerName !== $host || $roundHasStarted ? "-outline" : ""}-primary"
 				on:click={startRound}
 				disabled={$playerName !== $host || $roundHasStarted}
 				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
