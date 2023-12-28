@@ -32,6 +32,6 @@
 	<Toaster />
 </main>
 
-{#if dev || $player === 'nimda'}
+{#if dev || $player.name === 'nimda'}
 	<button class="m-2" on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
 {/if}

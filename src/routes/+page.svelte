@@ -14,8 +14,7 @@
 		player,
 		players,
 		resetApp,
-		roundHasStarted,
-		uuid
+		roundHasStarted
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import { Card, Color, colors, Deck, Player } from '$lib/types';
@@ -266,7 +265,7 @@
 			players: [
 				{
 					name: $player,
-					uuid: $uuid,
+					uuid: $player.uuid,
 					color: 'red',
 					deck: shuffle(
 						duplicate(
@@ -301,7 +300,7 @@
 
 		let validToJoin = true;
 		const playerWasHereBefore = playersOnline.some(
-			(p: Player) => p === $player && p.uuid === $uuid
+			(p: Player) => p === $player && p.uuid === $player.uuid
 		);
 
 		if (!playerWasHereBefore) {
@@ -359,7 +358,7 @@
 					...playersOnline,
 					{
 						name: $player,
-						uuid: $uuid,
+						uuid: $player.uuid,
 						color: [
 							new Color(colors.Red),
 							new Color(colors.Blue),

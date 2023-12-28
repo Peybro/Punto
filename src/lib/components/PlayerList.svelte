@@ -1,5 +1,13 @@
 <script lang="ts">
-	import { host, invitation, languageId, lobbyCode, player, players, roundHasStarted } from '$lib/store';
+	import {
+		host,
+		invitation,
+		languageId,
+		lobbyCode,
+		player,
+		players,
+		roundHasStarted
+	} from '$lib/store';
 	import { db } from '$lib/firebase';
 	import { ref, update } from 'firebase/database';
 	import { translations } from '$lib/translations';
@@ -20,9 +28,11 @@
 		<div class="dropdown col-sm-6 col-md-3">
 			<button
 				class={`btn btn-${p.color.Bootstrap} text-break w-100`}
-				class:dropdown-toggle={p === $player || $player === $host}
+				class:dropdown-toggle={p.name === $player.name || $player.name === $host.name}
 				type="button"
-				data-bs-toggle={`${p === $player || $player === $host ? 'dropdown' : ''}`}
+				data-bs-toggle={`${
+					p.name === $player.name || $player.name === $host.name ? 'dropdown' : ''
+				}`}
 			>
 				{$roundHasStarted ? i + 1 + '.' : ''}
 				{p.name}
@@ -51,19 +61,17 @@
 									new Color(colors.Green),
 									new Color(colors.Yellow)
 								].indexOf(color)
-								]}
+							]}
 						</button>
 					</li>
 				{/each}
-				{#if $player === $host && p !== $host}
+				{#if $player.name === $host.name && p.name !== $host.name}
 					<li>
 						<hr class="dropdown-divider" />
 					</li>
 					<li>
-						<button
-							class="dropdown-item"
-							on:click={() => kickPlayer(p)}
-							disabled={$roundHasStarted}>{selectedLanguage.kick}</button
+						<button class="dropdown-item" on:click={() => kickPlayer(p)} disabled={$roundHasStarted}
+							>{selectedLanguage.kick}</button
 						>
 					</li>
 				{/if}
