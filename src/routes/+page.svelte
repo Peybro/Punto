@@ -1,6 +1,16 @@
 <script lang="ts">
 	import { db } from '$lib/firebase';
-	import { get, off, onValue, ref, set, update } from 'firebase/database';
+	import {
+		get,
+		off,
+		onDisconnect,
+		onValue,
+		push,
+		ref,
+		serverTimestamp,
+		set,
+		update
+	} from 'firebase/database';
 	import toast from 'svelte-french-toast';
 	import Board from '$lib/components/Board.svelte';
 	import {
@@ -15,7 +25,8 @@
 		players,
 		resetApp,
 		roundHasStarted,
-		uuid
+		uuid,
+		playersOnline
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Player } from '$lib/types';
@@ -59,10 +70,37 @@
 				$infoVisible = !data.roundHasStarted;
 				$neutralColor = data.neutralColor;
 
+				if (data.presense !== undefined) {
+					// check if someone left
+					const playerWhoLeft = $playersOnline.filter(
+						(p) => !Object.keys(data.presense).includes(p)
+					);
+					if (playerWhoLeft.length > 0) {
+						toast.error(`${playerWhoLeft[0]} ${selectedLanguage.toasts.playerLeft}`);
+					}
+
+					// check if someone joined
+					const playerWhoJoined = Object.keys(data.presense).filter(
+						(p) => !$playersOnline.includes(p)
+					);
+					if (playerWhoJoined.length > 0 && playerWhoJoined[0] !== $playerName) {
+						toast(`${playerWhoJoined[0]} ${selectedLanguage.toasts.playerJoined.new}`);
+					}
+				}
+
+				$playersOnline = [];
+				if (data.presense !== undefined) {
+					Object.keys(data.presense).forEach((p) => {
+						if (data.presense[p].connections !== undefined) {
+							$playersOnline = [...$playersOnline, p];
+						}
+					});
+				}
+
 				// update url with lobby code
 				$page.url.searchParams.set('code', data.lobbyCode);
 				goto(`?${$page.url.searchParams.toString()}`);
-				// TODO: does not work...
+				// TODO: should be better with SvelteKit but does not work...
 				// pushState("", `?${$page.url.searchParams.toString()}`);
 
 				if ($roundHasStarted && fourInARow($gameState.board, $neutralColor)) {
@@ -92,15 +130,28 @@
 					// const mostThrees = getMostThrees($players);
 					toast.error(selectedLanguage.toasts.winnerWhenNoCards);
 					await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
-
-					// turn on listener again
-					onValue(ref(db, `${$lobbyCode}/`), callback);
 				}
 			}
 		};
 
 		// listen to updates from database
 		onValue(ref(db, `${code}/`), callback);
+	}
+
+	function getPresense(code: string) {
+		const connectedRef = ref(db, '.info/connected');
+		off(connectedRef);
+
+		const callback = async (snap: any) => {
+			if (snap.val() === true) {
+				const con = push(ref(db, `${code}/presense/${$playerName}/connections`));
+
+				onDisconnect(con).remove();
+				set(con, true);
+			}
+		};
+
+		onValue(connectedRef, callback);
 	}
 
 	/**
@@ -168,7 +219,8 @@
 	/**
 	 * Stops listening to the current lobby
 	 */
-	function stopListeningToLobby() {
+	async function stopListeningToLobby() {
+		off(ref(db, '.info/connected'));
 		off(ref(db, `${$lobbyCode}/`));
 	}
 
@@ -190,10 +242,8 @@
 			closeLobby();
 			return;
 		}
-		await set(
-			ref(db, `${$lobbyCode}/players/`),
-			$players.filter((p) => p.name !== $playerName)
-		);
+		// indicate that the player left
+		await set(ref(db, `${$lobbyCode}/presense/${$playerName}/connections`), null);
 		if (isHost) {
 			await update(ref(db, `${$lobbyCode}/`), {
 				host: $players.filter((p) => p.name !== $playerName)[0].name
@@ -290,6 +340,7 @@
 		});
 
 		$lobbyConnected = true;
+		getPresense(newLobbyCode);
 		listenToLobby(newLobbyCode);
 	}
 
@@ -384,6 +435,7 @@
 		});
 
 		$lobbyConnected = true;
+		getPresense($lobbyCode);
 		listenToLobby($lobbyCode);
 	}
 </script>

@@ -57,6 +57,11 @@ type LanguageType = {
 		roomFull: string;
 		nameAlreadyTaken: string;
 		roundStarted: string;
+		playerLeft: string;
+		playerJoined: {
+			new: string;
+			again: string;
+		};
 	};
 	shareText: string;
 	inviteText: string;

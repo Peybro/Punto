@@ -26,6 +26,7 @@ const invitation = {
 };
 const neutralColor = writable<string>('');
 const uuid = writable<string>(browser ? localStorage.getItem('uuid') || uuidV4() : uuidV4());
+const playersOnline = writable<string[]>([]);
 
 playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
@@ -84,5 +85,6 @@ export {
 	languageId,
 	invitation,
 	neutralColor,
-	uuid
+	uuid,
+	playersOnline
 };

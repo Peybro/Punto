@@ -57,7 +57,12 @@ const translations: LanguagesType = {
 			noMatchingRoom: 'There is no room with this code!',
 			roomFull: 'This room is already full!',
 			nameAlreadyTaken: 'There is already a player with this name!',
-			roundStarted: 'The round has already started! Please wait until it is over.'
+			roundStarted: 'The round has already started! Please wait until it is over.',
+			playerLeft: 'has left the room!',
+			playerJoined: {
+				new: 'has joined the room!',
+				again: 'has rejoined the room!'
+			}
 		},
 		shareText: 'Invite Friends',
 		inviteText: 'Do you want to play Punto with me?',
@@ -129,7 +134,12 @@ const translations: LanguagesType = {
 			noMatchingRoom: 'Es gibt keinen Raum mit diesem Code!',
 			roomFull: 'Dieser Raum ist bereits voll!',
 			nameAlreadyTaken: 'Es gibt bereits einen Spieler mit diesem Namen!',
-			roundStarted: 'Die Runde hat bereits begonnen! Bitte warte bis sie vorbei ist.'
+			roundStarted: 'Die Runde hat bereits begonnen! Bitte warte bis sie vorbei ist.',
+			playerLeft: 'hat den Raum verlassen!',
+			playerJoined: {
+				new: 'hat den Raum betreten!',
+				again: 'ist wieder da!'
+			}
 		},
 		shareText: 'Freunde einladen',
 		inviteText: 'Willst du mit mir Punto spielen?',
@@ -201,7 +211,12 @@ const translations: LanguagesType = {
 			noMatchingRoom: "Il n'y a aucune salle avec ce code!",
 			roomFull: 'Cette salle est déjà pleine!',
 			nameAlreadyTaken: 'Il y a déjà un joueur avec ce nom!',
-			roundStarted: "La manche a déjà commencé! Veuillez attendre qu'elle se termine."
+			roundStarted: "La manche a déjà commencé! Veuillez attendre qu'elle se termine.",
+			playerLeft: 'a quitté la salle!',
+			playerJoined: {
+				new: 'a rejoint la salle!',
+				again: 'est de retour!'
+			}
 		},
 		shareText: 'Inviter des Amis',
 		inviteText: 'Veux-tu jouer à Punto avec moi?',
