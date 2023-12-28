@@ -415,7 +415,7 @@
 
 		{#if isHost}
 			<button
-				class="btn btn{$playerName !== $host || $roundHasStarted ? "-outline" : ""}-primary"
+				class="btn btn{$playerName !== $host || $roundHasStarted ? '-outline' : ''}-primary"
 				on:click={startRound}
 				disabled={$playerName !== $host || $roundHasStarted}
 				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
@@ -449,7 +449,7 @@
 						{/if}
 					</p>
 				{/if}
-				<div class="d-flex">
+				<div class="d-flex mb-2">
 					{#if currentPlayer.deck !== undefined}
 						{#if $roundHasStarted}
 							<div class="d-flex flex-column">

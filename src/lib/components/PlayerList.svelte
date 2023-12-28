@@ -25,7 +25,7 @@
 
 <div class="row text-center g-1 mb-4">
 	{#each $players as player, i}
-		<div class="dropdown col-sm-6 col-md-3">
+		<div class="dropdown col-md-6 col-lg-3">
 			<button
 				class={`btn btn-${getBeautifulColors(player.color)?.bootstrap} text-break w-100`}
 				class:dropdown-toggle={player.name === $playerName || $playerName === $host}
@@ -75,7 +75,7 @@
 	{/each}
 	{#if !$roundHasStarted}
 		{#each Array(4 - $players.length) as _}
-			<div class="col-sm-6 col-md-3">
+			<div class="col-md-6 col-lg-3">
 				<button class="btn btn-outline-secondary w-100" disabled>[{selectedLanguage.free}]</button>
 			</div>
 		{/each}
