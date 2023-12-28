@@ -26,11 +26,12 @@
 		resetApp,
 		roundHasStarted,
 		uuid,
-		playersOnline
+		playersOnline,
+		winnerWithThrees
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
 	import type { Player } from '$lib/types';
-	import { duplicate, fourInARow, getBeautifulColors, shuffle } from '$lib/utils';
+	import { duplicate, fourInARow, getBeautifulColors, getMostThrees, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
 	import Heading from '$lib/components/Heading.svelte';
@@ -120,16 +121,39 @@
 					onValue(ref(db, `${$lobbyCode}/`), callback);
 				}
 
+				// no more cards left
 				if ($roundHasStarted && $players.every((p) => p.deck === undefined)) {
 					// turn off listener to prevent multiple updates
 					off(ref(db, `${$lobbyCode}/`));
 					// reset currentPlayerIndex to prevent future errors
 					await set(ref(db, `${$lobbyCode}/gameState/currentPlayerIndex`), 0);
 
-					// TODO: implement
-					// const mostThrees = getMostThrees($players);
-					toast.error(selectedLanguage.toasts.winnerWhenNoCards);
+					const mostThrees = (threeCountObj: {
+						red: number;
+						blue: number;
+						green: number;
+						yellow: number;
+					}) =>
+						Object.entries(threeCountObj).reduce(
+							(max, color) => (color[1] > max[1] ? color : max),
+							Object.entries(threeCountObj)[0]
+						);
+					const winner: [string, number] = mostThrees(getMostThrees($gameState.board));
+					const winnerIndex = $players.findIndex((p) => p.color === winner[0]);
+					$winnerWithThrees = [$players[winnerIndex].name, winner[1]];
+
+					toast.error(
+						`${selectedLanguage.toasts.winnerWhenNoCards} (${$players[winnerIndex].name}: ${winner[1]})`
+					);
+
+					await set(
+						ref(db, `${$lobbyCode}/players/${winnerIndex}/wins`),
+						$players[winnerIndex].wins + 1
+					);
 					await set(ref(db, `${$lobbyCode}/roundHasStarted`), false);
+
+					// turn on listener again
+					onValue(ref(db, `${$lobbyCode}/`), callback);
 				}
 			}
 		};
@@ -531,7 +555,10 @@
 							</div>
 						{/if}
 					{:else}
-						<h4>{selectedLanguage.noMoreCards}</h4>
+						<div>
+							<h5>{selectedLanguage.noMoreCards}</h5>
+							<h4>{$winnerWithThrees[0]} gewinnt mit {$winnerWithThrees[1]} Reihen.</h4>
+						</div>
 					{/if}
 				</div>
 

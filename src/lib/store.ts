@@ -27,6 +27,7 @@ const invitation = {
 const neutralColor = writable<string>('');
 const uuid = writable<string>(browser ? localStorage.getItem('uuid') || uuidV4() : uuidV4());
 const playersOnline = writable<string[]>([]);
+const winnerWithThrees = writable<[string, number]>(['', 0]);
 
 playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
@@ -69,6 +70,7 @@ function resetApp() {
 	roundHasStarted.set(false);
 	infoVisible.set(true);
 	neutralColor.set('');
+	winnerWithThrees.set(['', 0]);
 }
 
 export {
@@ -86,5 +88,6 @@ export {
 	invitation,
 	neutralColor,
 	uuid,
-	playersOnline
+	playersOnline,
+	winnerWithThrees
 };
