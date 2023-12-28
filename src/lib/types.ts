@@ -10,7 +10,8 @@ enum colors {
 }
 
 class Color {
-	constructor(public value: colors | 'NULL') {}
+	constructor(public value: colors | 'NULL') {
+	}
 
 	get ColorMap() {
 		return {
@@ -35,7 +36,8 @@ class Card {
 	constructor(
 		public value: CardValue,
 		public color: Color
-	) {}
+	) {
+	}
 }
 
 class Deck {
@@ -45,14 +47,20 @@ class Deck {
 			Array(9)
 				.fill(0)
 				.map((_, j) => j + 1)
-		).map((v) => ({ value: v, color: new Color("NULL") }))
-	) {}
+		).map((v) => ({ value: v, color: new Color('NULL') }))
+	) {
+	}
 
-	shuffle(): void {
-		for (let i = this.cards.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
-		}
+	get Length() {
+		return this.cards.length;
+	}
+
+	get TopCard() {
+		return this.cards[0];
+	}
+
+	playCard(index:number): Card {
+		return this.cards.splice(index,1)[0]
 	}
 
 	static shuffle(arr: any[]): any[] {
@@ -63,16 +71,19 @@ class Deck {
 		return arr;
 	}
 
-	set AddCard(card: Card) {
+	shuffle(): void {
+		for (let i = this.cards.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+		}
+	}
+
+	addCard(card: Card) {
 		this.cards.push(card);
 	}
 
-	get Length() {
-		return this.cards.length;
-	}
-
-	get TopCard() {
-		return this.cards[this.Length - 1];
+	addCards(cards: Card[]) {
+		this.cards = [...this.cards, ...cards];
 	}
 }
 
@@ -83,7 +94,8 @@ class Player {
 		public color: Color,
 		public deck: Deck,
 		public wins: number
-	) {}
+	) {
+	}
 }
 
 class GameState {
@@ -91,7 +103,8 @@ class GameState {
 		public board: Card[][],
 		public turn: number,
 		public currentPlayerIndex: number
-	) {}
+	) {
+	}
 }
 
 type LanguageType = {

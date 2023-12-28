@@ -25,7 +25,7 @@
 				<h2>{selectedLanguage.subtitle}</h2>
 				<p>
 					<a href="https://www.gamefactory-spiele.com/punto"
-						>{selectedLanguage.by} <b>Bernhard Weber</b></a
+					>{selectedLanguage.by} <b>Bernhard Weber</b></a
 					>
 				</p>
 
@@ -50,7 +50,7 @@
 			</div>
 			<div class="modal-footer">
 				<button class="btn btn-secondary" data-bs-dismiss="modal" type="button"
-					>{selectedLanguage.back}</button
+				>{selectedLanguage.back}</button
 				>
 			</div>
 		</div>

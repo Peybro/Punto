@@ -18,7 +18,7 @@
 		uuid
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import { Card, Color, Deck, colors, Player } from '$lib/types';
+	import { Card, Color, colors, Deck, Player } from '$lib/types';
 	import { duplicate, fourInARow, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
@@ -44,8 +44,8 @@
 				await leaveLobby();
 			} else {
 				if (
-					$players.some((p: Player) => p.name === $player) &&
-					!data.players.some((p: Player) => p.name === $player)
+					$players.some((p: Player) => p === $player) &&
+					!data.players.some((p: Player) => p === $player)
 				) {
 					toast.error(selectedLanguage.toasts.kick);
 					await leaveLobby();
@@ -61,7 +61,7 @@
 
 				// update url with lobby code
 				$page.url.searchParams.set('code', data.lobbyCode);
-				goto(`?${$page.url.searchParams.toString()}`);
+				await goto(`?${$page.url.searchParams.toString()}`);
 				// TODO: does not work...
 				// pushState("", `?${$page.url.searchParams.toString()}`);
 
@@ -128,7 +128,8 @@
 		// two player round
 		if ($players.length === 2) {
 			colorsNotInUse($players).forEach((color: Color, i: number) => {
-				$players[i].deck = shuffle([...$players[i].deck, ...new Deck(color).cards]);
+				$players[i].deck.addCards(new Deck(color).cards);
+				$players[i].deck.shuffle();
 			});
 
 			await set(ref(db, `${$lobbyCode}/players/`), $players);
@@ -148,7 +149,7 @@
 					name: player.name,
 					uuid: player.uuid,
 					color: player.color,
-					deck: shuffle([...player.deck, ...lastDeck.splice(0, 6)]),
+					deck: shuffle([...player.deck.cards, ...lastDeck.splice(0, 6)]),
 					wins: player.wins
 				};
 			});
@@ -188,11 +189,11 @@
 		}
 		await set(
 			ref(db, `${$lobbyCode}/players/`),
-			$players.filter((p) => p.name !== $player)
+			$players.filter((p) => p !== $player)
 		);
 		if (isHost) {
 			await update(ref(db, `${$lobbyCode}/`), {
-				host: $players.filter((p) => p.name !== $player)[0].name
+				host: $players.filter((p) => p !== $player)[0].name
 			});
 		}
 		resetApp();
@@ -238,7 +239,7 @@
 	 * Creates a new lobby with a random code and sets the current client as host
 	 */
 	async function createLobby() {
-		if ($player === '') {
+		if ($player.name === '') {
 			toast.error(selectedLanguage.toasts.nameMissing);
 			return;
 		}
@@ -300,11 +301,11 @@
 
 		let validToJoin = true;
 		const playerWasHereBefore = playersOnline.some(
-			(p: Player) => p.name === $player && p.uuid === $uuid
+			(p: Player) => p === $player && p.uuid === $uuid
 		);
 
 		if (!playerWasHereBefore) {
-			if ($player === '') {
+			if ($player.name === '') {
 				toast.error(selectedLanguage.toasts.nameMissing);
 				$lobbyConnected = false;
 				validToJoin = false;
@@ -330,7 +331,7 @@
 				validToJoin = false;
 			}
 
-			if (playersOnline.some((p: Player) => p.name === $player)) {
+			if (playersOnline.some((p: Player) => p === $player)) {
 				toast.error(selectedLanguage.toasts.nameAlreadyTaken);
 				$lobbyConnected = false;
 				validToJoin = false;
@@ -355,34 +356,34 @@
 			players: playerWasHereBefore
 				? playersOnline
 				: [
-						...playersOnline,
-						{
-							name: $player,
-							uuid: $uuid,
-							color: [
-								new Color(colors.Red),
-								new Color(colors.Blue),
-								new Color(colors.Green),
-								new Color(colors.Yellow)
-							].filter((color) => !playersOnline.some((p) => p.color === color))[0],
-							deck: shuffle(
-								duplicate(
-									Array(9)
-										.fill(0)
-										.map((_, i) => i + 1)
-								).map((v) => ({
-									value: v,
-									color: [
-										new Color(colors.Red),
-										new Color(colors.Blue),
-										new Color(colors.Green),
-										new Color(colors.Yellow)
-									].filter((color) => !playersOnline.some((p) => p.color === color))[0]
-								}))
-							),
-							wins: 0
-						}
-					]
+					...playersOnline,
+					{
+						name: $player,
+						uuid: $uuid,
+						color: [
+							new Color(colors.Red),
+							new Color(colors.Blue),
+							new Color(colors.Green),
+							new Color(colors.Yellow)
+						].filter((color) => !playersOnline.some((p) => p.color === color))[0],
+						deck: shuffle(
+							duplicate(
+								Array(9)
+									.fill(0)
+									.map((_, i) => i + 1)
+							).map((v) => ({
+								value: v,
+								color: [
+									new Color(colors.Red),
+									new Color(colors.Blue),
+									new Color(colors.Green),
+									new Color(colors.Yellow)
+								].filter((color) => !playersOnline.some((p) => p.color === color))[0]
+							}))
+						),
+						wins: 0
+					}
+				]
 		});
 
 		$lobbyConnected = true;
@@ -419,15 +420,15 @@
 			<button
 				class="btn btn-outline-primary"
 				on:click={startRound}
-				disabled={$player !== $host || $roundHasStarted}
-				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
-					? selectedLanguage.startGame.again
-					: selectedLanguage.startGame.new}</button
+				disabled={$player.name !== $host.name || $roundHasStarted}
+			>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
+				? selectedLanguage.startGame.again
+				: selectedLanguage.startGame.new}</button
 			>
 			<button
 				class="btn btn-outline-warning"
 				on:click={resetLobby}
-				disabled={$player !== $host || !$roundHasStarted}>{selectedLanguage.endRound}</button
+				disabled={$player.name !== $host.name || !$roundHasStarted}>{selectedLanguage.endRound}</button
 			>
 		{/if}
 
@@ -443,7 +444,7 @@
 							{selectedLanguage.gameTypes.three[0]}
 
 							<span class={`p-1 rounded bg-${$neutralColor?.Bootstrap}`}
-								>{selectedLanguage.gameTypes.three[1]}
+							>{selectedLanguage.gameTypes.three[1]}
 							</span>
 							{selectedLanguage.gameTypes.three[2]}
 						{:else if $players.length === 4}
@@ -457,27 +458,27 @@
 							<div class="d-flex flex-column">
 								<h4 class="">
 									{selectedLanguage.turn} #{$gameState.turn + 1}:
-									{#if currentPlayer.name === $player}
+									{#if currentPlayer === $player}
 										{selectedLanguage.yourTurn}
 									{:else}
 										<span
 											class={`p-1 rounded bg-${
 												currentPlayer?.color?.Bootstrap
 											}`}
-											>{currentPlayer.name}
+										>{currentPlayer.name}
 										</span>
 									{/if}
 								</h4>
 
 								<h6 class="next pt-1 text-secondary">
 									Next: {$gameState.currentPlayerIndex === $players.length - 1
-										? $players[0].name
-										: $players[$gameState.currentPlayerIndex + 1].name}
+									? $players[0].name
+									: $players[$gameState.currentPlayerIndex + 1].name}
 								</h6>
 							</div>
 
 							<div class="cell ms-2 p-0 border rounded bg-dark">
-								<Face value={currentPlayer.deck[0].value} color={currentPlayer.deck[0].color} />
+								<Face value={currentPlayer.deck.cards[0].value} color={currentPlayer.deck.cards[0].color} />
 							</div>
 						{/if}
 					{:else}
@@ -494,13 +495,13 @@
 </div>
 
 <style scoped>
-	.next {
-		margin-top: -10px;
-	}
+    .next {
+        margin-top: -10px;
+    }
 
-	.cell {
-		margin-top: 2px;
-		width: 45px;
-		height: 45px;
-	}
+    .cell {
+        margin-top: 2px;
+        width: 45px;
+        height: 45px;
+    }
 </style>

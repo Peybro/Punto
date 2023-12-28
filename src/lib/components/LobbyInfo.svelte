@@ -16,7 +16,7 @@
 <div class="row g-1">
 	<div class="col-xs-12 col-md-6 col-xl-3">
 		<input
-			bind:value={$player}
+			bind:value={$player.name}
 			class="form-control"
 			disabled={$lobbyConnected}
 			placeholder="Name"
@@ -48,14 +48,14 @@
 	<div class="col-xs-2 col-md-6 col-xl-3">
 		{#if $lobbyConnected && $host === $player}
 			<button class="btn btn-outline-danger w-100" on:click={closeLobby}
-				>{selectedLanguage.closeRoom}</button
+			>{selectedLanguage.closeRoom}</button
 			>
 		{:else}
 			<button
 				class="btn btn-primary w-100"
 				on:click={createLobby}
-				disabled={$player.length === 0 || ($host !== '' && $host !== $player)}
-				>{selectedLanguage.createRoom}</button
+				disabled={$player.name.length === 0 || ($host.name !== '' && $host.name !== $player.name)}
+			>{selectedLanguage.createRoom}</button
 			>
 		{/if}
 	</div>
@@ -63,11 +63,11 @@
 	<div class="col-xs-6 col-md-6 col-xl-3">
 		{#if $lobbyConnected}
 			<button class="btn btn-outline-warning w-100" on:click={leaveLobby}
-				>{selectedLanguage.leaveRoom}</button
+			>{selectedLanguage.leaveRoom}</button
 			>
 		{:else}
 			<button class="btn btn-primary w-100" on:click={joinLobby} disabled={$lobbyCode.length !== 6}
-				>{selectedLanguage.joinRoom}</button
+			>{selectedLanguage.joinRoom}</button
 			>
 		{/if}
 	</div>

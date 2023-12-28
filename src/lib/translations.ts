@@ -44,7 +44,7 @@ const translations: LanguagesType = {
 		},
 		endRound: 'End Round',
 		turn: 'Move',
-		yourTurn: "It's your turn",
+		yourTurn: 'It\'s your turn',
 		notConnected: 'No room connected',
 		noMoreCards: 'Round over: No more cards in play!',
 		toasts: {
@@ -165,7 +165,7 @@ const translations: LanguagesType = {
 		rules: {
 			title: 'Comment Jouer ?',
 			text: [
-				"Les joueurs placent tour à tour la carte du dessus de leur paquet mélangé sur le plateau de jeu. La carte peut être placée sur n'importe quel côté d'une carte déjà posée (marqué par les carrés gris).",
+				'Les joueurs placent tour à tour la carte du dessus de leur paquet mélangé sur le plateau de jeu. La carte peut être placée sur n\'importe quel côté d\'une carte déjà posée (marqué par les carrés gris).',
 				'La carte à poser peut également être placée sur une autre carte déjà posée si elle a une valeur plus élevée.',
 				'Il est recommandé de jouer avec 4 joueurs, mais le jeu peut également être démarré avec moins.'
 			]
@@ -178,7 +178,7 @@ const translations: LanguagesType = {
 		players: 'Joueurs',
 		waitingForPlayers: {
 			self: 'En attente que vous commenciez la partie...',
-			others: "En attente que l'hôte commence la partie..."
+			others: 'En attente que l\'hôte commence la partie...'
 		},
 		kick: 'Exclure',
 		free: 'libre',
@@ -188,7 +188,7 @@ const translations: LanguagesType = {
 		},
 		endRound: 'Terminer la Manche',
 		turn: 'Tour',
-		yourTurn: "C'est à vous de jouer",
+		yourTurn: 'C\'est à vous de jouer',
 		notConnected: 'Aucune salle connectée',
 		noMoreCards: 'Fin du tour : plus de cartes en jeu!',
 		toasts: {
@@ -198,10 +198,10 @@ const translations: LanguagesType = {
 			winnerWhenNoCards: 'Le joueur avec le plus de séries de 3 gagne!',
 			nameMissing: 'Veuillez entrer un nom!',
 			roomCodeNotValid: 'Veuillez entrer un code de salle valide!',
-			noMatchingRoom: "Il n'y a aucune salle avec ce code!",
+			noMatchingRoom: 'Il n\'y a aucune salle avec ce code!',
 			roomFull: 'Cette salle est déjà pleine!',
 			nameAlreadyTaken: 'Il y a déjà un joueur avec ce nom!',
-			roundStarted: "La manche a déjà commencé! Veuillez attendre qu'elle se termine."
+			roundStarted: 'La manche a déjà commencé! Veuillez attendre qu\'elle se termine.'
 		},
 		shareText: 'Inviter des Amis',
 		inviteText: 'Veux-tu jouer à Punto avec moi?',
@@ -211,7 +211,7 @@ const translations: LanguagesType = {
 			three: [
 				'Mode 3 Joueurs : Chaque joueur joue avec une couleur. La',
 				'quatrième couleur',
-				"est neutre et ne gagne pas avec 4 d'affilée."
+				'est neutre et ne gagne pas avec 4 d\'affilée.'
 			],
 			four: 'Mode 4 Joueurs : Chaque joueur joue avec une couleur.'
 		},

@@ -1,18 +1,10 @@
 <script lang="ts">
-	import {
-		host,
-		invitation,
-		languageId,
-		lobbyCode,
-		player,
-		players,
-		roundHasStarted
-	} from '$lib/store';
+	import { host, invitation, languageId, lobbyCode, player, players, roundHasStarted } from '$lib/store';
 	import { db } from '$lib/firebase';
 	import { ref, update } from 'firebase/database';
 	import { translations } from '$lib/translations';
 	import { browser } from '$app/environment';
-	import { Color, Player, colors } from '$lib/types';
+	import { Color, colors, Player } from '$lib/types';
 
 	$: selectedLanguage = translations[$languageId];
 
@@ -59,7 +51,7 @@
 									new Color(colors.Green),
 									new Color(colors.Yellow)
 								].indexOf(color)
-							]}
+								]}
 						</button>
 					</li>
 				{/each}

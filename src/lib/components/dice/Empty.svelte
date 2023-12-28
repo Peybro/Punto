@@ -8,15 +8,15 @@
 </div>
 
 <style scoped>
-	.empty > .filler1 {
-		grid-area: d;
-	}
+    .empty > .filler1 {
+        grid-area: d;
+    }
 
-	.empty > .filler2 {
-		grid-area: e;
-	}
+    .empty > .filler2 {
+        grid-area: e;
+    }
 
-	.empty > .filler3 {
-		grid-area: f;
-	}
+    .empty > .filler3 {
+        grid-area: f;
+    }
 </style>

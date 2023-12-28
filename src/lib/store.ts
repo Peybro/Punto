@@ -1,33 +1,33 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import { Color, Player, colors, Deck, GameState } from './types';
+import { Color, colors, Deck, GameState, Player } from './types';
 import { translations } from './translations';
 import { goto } from '$app/navigation';
 import { v4 as uuidV4 } from 'uuid';
 
-const you = () => new Player('', uuidV4(), new Color(colors.Red), new Deck(colors.Red), 0);
-const youJson = () => JSON.parse(localStorage.getItem('localPlayerName') || JSON.stringify(you));
-let youInLocalStorage = () => new Player(
-	youJson().name,
-	youJson().uuid,
-	youJson().color,
-	youJson().deck,
-	youJson().wins
-);
+const youJson = () =>
+	JSON.parse(
+		localStorage.getItem('localPlayerName') ||
+		JSON.stringify(new Player('', uuidV4(), new Color(colors.Red), new Deck(colors.Red), 0))
+	);
+let youInLocalStorage = () =>
+	new Player(youJson().name, youJson().uuid, youJson().color, youJson().deck, youJson().wins);
 
-const player = writable<Player>(youInLocalStorage() || JSON.stringify(you()));
+const player = writable<Player>(youInLocalStorage() || JSON.stringify(youInLocalStorage()));
 const lobbyCode = writable<string>('');
 const lobbyConnected = writable<boolean>(false);
 const host = writable<Player>(youInLocalStorage());
 const players = writable<Player[]>([]);
-const gameState = writable<GameState>(new GameState(Array(11).fill(Array(11).fill({ value: 0, color: null })), 0, 0));
+const gameState = writable<GameState>(
+	new GameState(Array(11).fill(Array(11).fill({ value: 0, color: null })), 0, 0)
+);
 const roundHasStarted = writable<boolean>(false);
 const codeCopied = writable<boolean>(false);
 const infoVisible = writable<boolean>(true);
 const languageId = writable<string>(browser ? navigator.language.split('-')[0] || 'en' : 'en');
 const invitation = {
 	title: 'Punto',
-	text: "Let's play Punto!",
+	text: 'Let\'s play Punto!',
 	url: 'https://punto.vercel.app'
 };
 const neutralColor = writable<Color>(new Color('NULL'));
@@ -42,8 +42,7 @@ languageId.subscribe((id: string) => {
 });
 
 lobbyCode.subscribe((code: string) => {
-	if (typeof window === 'undefined') return;
-	invitation.url = `${window.location.origin.toString()}/?code=${code}`;
+	if (browser) invitation.url = `${window.location.origin.toString()}/?code=${code}`;
 });
 
 uuid.subscribe((id: string) => {

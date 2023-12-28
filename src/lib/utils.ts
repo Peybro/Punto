@@ -1,4 +1,4 @@
-import { colors, type Card, type Color, type GameState } from '$lib/types';
+import { type Card, type Color, colors, type GameState } from '$lib/types';
 import { codeCopied } from './store';
 
 // /**

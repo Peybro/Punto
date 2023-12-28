@@ -1,7 +1,6 @@
 import { describe, beforeEach, test, expect } from 'vitest';
 
 import {
-	getBeautifulColors,
 	copyTextToClipboard,
 	getMinAndMaxIndices,
 	isAllowedField,
@@ -16,32 +15,32 @@ import {
 
 // TODO: write tests for utils.ts
 
-describe('getBeautifulColors', () => {
-	test('returns correct color object for red', () => {
-		const color = getBeautifulColors('red');
-		expect(color).toEqual({ color: 'red', hex: '#dc3522', bootstrap: 'danger' });
-	});
+// describe('getBeautifulColors', () => {
+// 	test('returns correct color object for red', () => {
+// 		const color = getBeautifulColors('red');
+// 		expect(color).toEqual({ color: 'red', hex: '#dc3522', bootstrap: 'danger' });
+// 	});
 
-	test('returns correct color object for blue', () => {
-		const color = getBeautifulColors('blue');
-		expect(color).toEqual({ color: 'blue', hex: '#02ace7', bootstrap: 'info' });
-	});
+// 	test('returns correct color object for blue', () => {
+// 		const color = getBeautifulColors('blue');
+// 		expect(color).toEqual({ color: 'blue', hex: '#02ace7', bootstrap: 'info' });
+// 	});
 
-	test('returns correct color object for green', () => {
-		const color = getBeautifulColors('green');
-		expect(color).toEqual({ color: 'green', hex: '#78b728', bootstrap: 'success' });
-	});
+// 	test('returns correct color object for green', () => {
+// 		const color = getBeautifulColors('green');
+// 		expect(color).toEqual({ color: 'green', hex: '#78b728', bootstrap: 'success' });
+// 	});
 
-	test('returns correct color object for yellow', () => {
-		const color = getBeautifulColors('yellow');
-		expect(color).toEqual({ color: 'yellow', hex: '#f1b300', bootstrap: 'warning' });
-	});
+// 	test('returns correct color object for yellow', () => {
+// 		const color = getBeautifulColors('yellow');
+// 		expect(color).toEqual({ color: 'yellow', hex: '#f1b300', bootstrap: 'warning' });
+// 	});
 
-	test('returns undefined for invalid color', () => {
-		const color = getBeautifulColors('purple');
-		expect(color).toBeUndefined();
-	});
-});
+// 	test('returns undefined for invalid color', () => {
+// 		const color = getBeautifulColors('purple');
+// 		expect(color).toBeUndefined();
+// 	});
+// });
 
 describe('copyTextToClipboard', () => {
 	// test('copies text to clipboard and sets codeCopied to true', async () => {
