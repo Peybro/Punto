@@ -255,7 +255,73 @@ function fourInARow(board: Card[][], neutralColor: string): boolean {
 	return false;
 }
 
-// TODO: test
+function fiveInARow(board: Card[][]): boolean {
+	const width = board[0].length;
+	const height = board.length;
+
+	// check horizontal
+	for (let i = 0; i < height; i++) {
+		for (let j = 0; j < width - 4; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i][j + 1].color &&
+				board[i][j].color === board[i][j + 2].color &&
+				board[i][j].color === board[i][j + 3].color &&
+				board[i][j].color === board[i][j + 4].color
+			) {
+				return true;
+			}
+		}
+	}
+
+	// check vertical
+	for (let i = 0; i < height - 4; i++) {
+		for (let j = 0; j < width; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i + 1][j].color &&
+				board[i][j].color === board[i + 2][j].color &&
+				board[i][j].color === board[i + 3][j].color &&
+				board[i][j].color === board[i + 4][j].color
+			) {
+				return true;
+			}
+		}
+	}
+
+	// check diagonal (top left to bottom right)
+	for (let i = 4; i < height; i++) {
+		for (let j = 4; j < width; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i - 1][j - 1].color &&
+				board[i][j].color === board[i - 2][j - 2].color &&
+				board[i][j].color === board[i - 3][j - 3].color &&
+				board[i][j].color === board[i - 4][j - 4].color
+			) {
+				return true;
+			}
+		}
+	}
+
+	// check diagonal (bottom left to top right)
+	for (let i = 4; i < height; i++) {
+		for (let j = 0; j < width - 4; j++) {
+			if (
+				board[i][j].value > 0 &&
+				board[i][j].color === board[i - 1][j + 1].color &&
+				board[i][j].color === board[i - 2][j + 2].color &&
+				board[i][j].color === board[i - 3][j + 3].color &&
+				board[i][j].color === board[i - 4][j + 4].color
+			) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 /**
  * Counts the number of rows of three cards of the same color for each color separately.
  * @param board The board to check.

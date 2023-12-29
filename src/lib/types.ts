@@ -8,7 +8,7 @@ type GameState = {
 	currentPlayerIndex: number;
 };
 
-type LanguageType = {
+type Translation = {
 	colors: {
 		red: string;
 		blue: string;
@@ -81,7 +81,7 @@ type LanguageType = {
 };
 
 type LanguagesType = {
-	[key: string]: LanguageType;
+	[key: string]: Translation;
 };
 
-export type { Color, CardValue, Card, Player, GameState, LanguagesType };
+export type { Color, CardValue, Card, Player, GameState, LanguagesType, Translation };

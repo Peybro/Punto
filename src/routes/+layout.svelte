@@ -4,7 +4,7 @@
 	import { ref, set } from 'firebase/database';
 	import { db } from '$lib/firebase';
 	import { browser, dev } from '$app/environment';
-	import { lobbyConnected, player } from '$lib/store';
+	import { lobbyCode, lobbyConnected, player } from '$lib/store';
 
 	import './../scss/styles.scss';
 
@@ -17,13 +17,13 @@
 	{@html webManifestLink}
 </svelte:head>
 
-<!-- Sicher neu laden/verlassen? -->
+<!-- Sure to leave/reload? -->
 <svelte:window
 	on:beforeunload={(event) => {
 		if (!$lobbyConnected) return;
 		event.preventDefault();
 		event.returnValue = '';
-		return '[Dieser Text wird nicht angezeigt]';
+		return '[This text is not visible]';
 	}}
 />
 

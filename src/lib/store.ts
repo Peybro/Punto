@@ -64,12 +64,10 @@ function resetApp() {
 				}
 			: { name: '', uuid: uuidV4() }
 	);
-	// lobbyCode.set('');
 
 	// reset code param in URL
-	// TODO: does not work...
-	// replaceState(window.location.origin, '/');
-	// pushState(window.location.origin, '');
+	// TODO: use replaceState(window.location.origin, '/');
+	// but this won't reset the lobbyCode, even with explicitly lobbyCode.set('');
 	goto(window.location.origin, { replaceState: true });
 
 	lobbyConnected.set(false);

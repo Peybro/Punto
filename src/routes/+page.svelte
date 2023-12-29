@@ -97,6 +97,7 @@
 				// TODO: should be better with SvelteKit but does not work...
 				// pushState("", `?${$page.url.searchParams.toString()}`);
 
+				// check if someone won
 				if ($roundHasStarted && fourInARow($gameState.board, $neutralColor)) {
 					// turn off listener to prevent multiple updates
 					off(ref(db, `${$lobbyCode}/`));
