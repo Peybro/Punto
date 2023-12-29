@@ -6,10 +6,10 @@ import { goto } from '$app/navigation';
 import { v4 as uuidV4 } from 'uuid';
 
 const player = writable<{ name: string; uuid: string }>(
-	browser && localStorage.getItem('localPlayer') !== null
+	browser
 		? {
-				name: JSON.parse(localStorage.getItem('localPlayer') ?? '').name,
-				uuid: JSON.parse(localStorage.getItem('localPlayer') ?? '').uuid
+				name: JSON.parse(localStorage.getItem('localPlayer') ?? '{}').name || '',
+				uuid: JSON.parse(localStorage.getItem('localPlayer') ?? '{}').uuid || uuidV4()
 			}
 		: { name: '', uuid: uuidV4() }
 );
@@ -34,11 +34,7 @@ const invitation = {
 const neutralColor = writable<string>('');
 const playersOnline = writable<string[]>([]);
 const winnerWithThrees = writable<[string, number]>(['', 0]);
-const oldGame = writable(
-	browser && localStorage.getItem('PuntoLobby')
-		? JSON.parse(localStorage.getItem('PuntoLobby') || '{}')
-		: {}
-);
+const oldGame = writable(browser ? JSON.parse(localStorage.getItem('PuntoLobby') ?? '{}') : {});
 
 player.subscribe((player) => {
 	if (browser) localStorage.setItem('localPlayer', JSON.stringify(player));
@@ -63,8 +59,8 @@ function resetApp() {
 	player.set(
 		browser
 			? {
-					name: JSON.parse(localStorage.getItem('localPlayer') || '').name || '',
-					uuid: JSON.parse(localStorage.getItem('localPlayer') || '').uuid || uuidV4()
+					name: JSON.parse(localStorage.getItem('localPlayer') ?? '{}').name || '',
+					uuid: JSON.parse(localStorage.getItem('localPlayer') ?? '{}').uuid || uuidV4()
 				}
 			: { name: '', uuid: uuidV4() }
 	);

@@ -76,17 +76,17 @@
 				$infoVisible = !data.roundHasStarted;
 				$neutralColor = data.neutralColor;
 
-				if (data.presense !== undefined) {
+				if (data.presence !== undefined) {
 					// check if someone left
 					const playerWhoLeft = $playersOnline.filter(
-						(p) => !Object.keys(data.presense).includes(p)
+						(p) => !Object.keys(data.presence).includes(p)
 					);
 					if (playerWhoLeft.length > 0) {
 						toast.error(`${playerWhoLeft[0]} ${selectedLanguage.toasts.playerLeft}`);
 					}
 
 					// check if someone joined
-					const playerWhoJoined = Object.keys(data.presense).filter(
+					const playerWhoJoined = Object.keys(data.presence).filter(
 						(p) => !$playersOnline.includes(p)
 					);
 					if (playerWhoJoined.length > 0 && playerWhoJoined[0] !== $player.name) {
@@ -95,9 +95,9 @@
 				}
 
 				$playersOnline = [];
-				if (data.presense !== undefined) {
-					Object.keys(data.presense).forEach((p) => {
-						if (data.presense[p].connections !== undefined) {
+				if (data.presence !== undefined) {
+					Object.keys(data.presence).forEach((p) => {
+						if (data.presence[p].connections !== undefined) {
 							$playersOnline = [...$playersOnline, p];
 						}
 					});
@@ -167,13 +167,13 @@
 		onValue(ref(db, `${code}/`), callback);
 	}
 
-	function getPresense(code: string) {
+	function getpresence(code: string) {
 		const connectedRef = ref(db, '.info/connected');
 		off(connectedRef);
 
 		const callback = async (snap: any) => {
 			if (snap.val() === true) {
-				const con = push(ref(db, `${code}/presense/${$player.name}/connections`));
+				const con = push(ref(db, `${code}/presence/${$player.name}/connections`));
 
 				onDisconnect(con).remove();
 				set(con, true);
@@ -272,7 +272,7 @@
 			return;
 		}
 		// indicate that the player left
-		await set(ref(db, `${$lobbyCode}/presense/${$player.name}/connections`), null);
+		await set(ref(db, `${$lobbyCode}/presence/${$player.name}/connections`), null);
 		if (isHost) {
 			await update(ref(db, `${$lobbyCode}/`), {
 				host: $players.filter((p) => p.name !== $player.name)[0].name
@@ -369,7 +369,7 @@
 		});
 
 		$lobbyConnected = true;
-		getPresense(newLobbyCode);
+		getpresence(newLobbyCode);
 		listenToLobby(newLobbyCode);
 	}
 
@@ -464,7 +464,7 @@
 		});
 
 		$lobbyConnected = true;
-		getPresense($lobbyCode);
+		getpresence($lobbyCode);
 		listenToLobby($lobbyCode);
 	}
 
