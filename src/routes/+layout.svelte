@@ -4,7 +4,7 @@
 	import { ref, set } from 'firebase/database';
 	import { db } from '$lib/firebase';
 	import { browser, dev } from '$app/environment';
-	import { lobbyConnected, playerName } from '$lib/store';
+	import { lobbyConnected, player } from '$lib/store';
 
 	import './../scss/styles.scss';
 
@@ -32,6 +32,6 @@
 	<Toaster />
 </main>
 
-{#if dev || $playerName === 'nimda'}
+{#if dev || $player.name === 'nimda'}
 	<button class="m-2" on:click={() => set(ref(db, '/'), null)}>Reset DB</button>
 {/if}

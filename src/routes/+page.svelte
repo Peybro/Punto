@@ -21,11 +21,10 @@
 		lobbyCode,
 		lobbyConnected,
 		neutralColor,
-		playerName,
+		player,
 		players,
 		resetApp,
 		roundHasStarted,
-		uuid,
 		playersOnline,
 		winnerWithThrees,
 		oldGame
@@ -43,7 +42,7 @@
 	import { writable } from 'svelte/store';
 
 	$: selectedLanguage = translations[$languageId];
-	$: isHost = $host === $playerName;
+	$: isHost = $host === $player.name;
 	$: currentPlayer = $players[$gameState.currentPlayerIndex];
 
 	/**
@@ -58,11 +57,12 @@
 				toast.error(selectedLanguage.toasts.roomNotFound);
 				await leaveLobby();
 			} else {
-				localStorage.setItem('PuntoLobby', JSON.stringify(data));
+				// save old game state to rejoin if disconnected
+				$oldGame = data;
 
 				if (
-					$players.some((p: Player) => p.name === $playerName) &&
-					!data.players.some((p: Player) => p.name === $playerName)
+					$players.some((p: Player) => p.name === $player.name) &&
+					!data.players.some((p: Player) => p.name === $player.name)
 				) {
 					toast.error(selectedLanguage.toasts.kick);
 					await leaveLobby();
@@ -89,7 +89,7 @@
 					const playerWhoJoined = Object.keys(data.presense).filter(
 						(p) => !$playersOnline.includes(p)
 					);
-					if (playerWhoJoined.length > 0 && playerWhoJoined[0] !== $playerName) {
+					if (playerWhoJoined.length > 0 && playerWhoJoined[0] !== $player.name) {
 						toast(`${playerWhoJoined[0]} ${selectedLanguage.toasts.playerJoined.new}`);
 					}
 				}
@@ -173,7 +173,7 @@
 
 		const callback = async (snap: any) => {
 			if (snap.val() === true) {
-				const con = push(ref(db, `${code}/presense/${$playerName}/connections`));
+				const con = push(ref(db, `${code}/presense/${$player.name}/connections`));
 
 				onDisconnect(con).remove();
 				set(con, true);
@@ -272,10 +272,10 @@
 			return;
 		}
 		// indicate that the player left
-		await set(ref(db, `${$lobbyCode}/presense/${$playerName}/connections`), null);
+		await set(ref(db, `${$lobbyCode}/presense/${$player.name}/connections`), null);
 		if (isHost) {
 			await update(ref(db, `${$lobbyCode}/`), {
-				host: $players.filter((p) => p.name !== $playerName)[0].name
+				host: $players.filter((p) => p.name !== $player.name)[0].name
 			});
 		}
 		resetApp();
@@ -321,7 +321,7 @@
 	 * Creates a new lobby with a random code and sets the current client as host
 	 */
 	async function createLobby() {
-		if ($playerName === '') {
+		if ($player.name === '') {
 			toast.error(selectedLanguage.toasts.nameMissing);
 			return;
 		}
@@ -344,11 +344,11 @@
 
 		await set(ref(db, `${newLobbyCode}/`), {
 			lobbyCode: newLobbyCode,
-			host: $playerName,
+			host: $player.name,
 			players: [
 				{
-					name: $playerName,
-					uuid: $uuid,
+					name: $player.name,
+					uuid: $player.uuid,
 					color: 'red',
 					deck: shuffle(
 						duplicate(
@@ -384,11 +384,11 @@
 
 		let validToJoin = true;
 		const playerWasHereBefore = playersOnline.some(
-			(p: Player) => p.name === $playerName && p.uuid === $uuid
+			(p: Player) => p.name === $player.name && p.uuid === $player.uuid
 		);
 
 		if (!playerWasHereBefore) {
-			if ($playerName === '') {
+			if ($player.name === '') {
 				toast.error(selectedLanguage.toasts.nameMissing);
 				$lobbyConnected = false;
 				validToJoin = false;
@@ -414,7 +414,7 @@
 				validToJoin = false;
 			}
 
-			if (playersOnline.some((p: Player) => p.name === $playerName)) {
+			if (playersOnline.some((p: Player) => p.name === $player.name)) {
 				toast.error(selectedLanguage.toasts.nameAlreadyTaken);
 				$lobbyConnected = false;
 				validToJoin = false;
@@ -441,8 +441,8 @@
 				: [
 						...playersOnline,
 						{
-							name: $playerName,
-							uuid: $uuid,
+							name: $player.name,
+							uuid: $player.uuid,
 							color: ['red', 'blue', 'green', 'yellow'].filter(
 								(color) => !playersOnline.some((p) => p.color === color)
 							)[0],
@@ -473,7 +473,7 @@
 	 */
 	async function handleRejoin() {
 		$lobbyCode = $oldGame.lobbyCode;
-		$playerName = $oldGame.players.find((p: Player) => p.uuid === $uuid)?.name;
+		$player.name = $oldGame.players.find((p: Player) => p.uuid === $player.uuid)?.name;
 		$oldGame = {};
 		await joinLobby();
 	}
@@ -518,9 +518,9 @@
 
 		{#if isHost}
 			<button
-				class="btn btn{$playerName !== $host || $roundHasStarted ? '-outline' : ''}-primary"
+				class="btn btn{$player.name !== $host || $roundHasStarted ? '-outline' : ''}-primary"
 				on:click={startRound}
-				disabled={$playerName !== $host || $roundHasStarted}
+				disabled={$player.name !== $host || $roundHasStarted}
 				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
 					? selectedLanguage.startGame.again
 					: selectedLanguage.startGame.new}</button
@@ -528,7 +528,7 @@
 			<button
 				class="btn btn-outline-warning"
 				on:click={resetLobby}
-				disabled={$playerName !== $host || !$roundHasStarted}>{selectedLanguage.endRound}</button
+				disabled={$player.name !== $host || !$roundHasStarted}>{selectedLanguage.endRound}</button
 			>
 		{/if}
 
@@ -558,7 +558,7 @@
 							<div class="d-flex flex-column">
 								<h4 class="">
 									{selectedLanguage.turn} #{$gameState.turn + 1}:
-									{#if currentPlayer.name === $playerName}
+									{#if currentPlayer.name === $player.name}
 										{selectedLanguage.yourTurn}
 									{:else}
 										<span

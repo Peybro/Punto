@@ -77,7 +77,7 @@ type LanguageType = {
 		title: string;
 		reconnect: string;
 		dismiss: string;
-	}
+	};
 };
 
 type LanguagesType = {

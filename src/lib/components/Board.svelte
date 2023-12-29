@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { gameState, lobbyCode, playerName, players, roundHasStarted } from '$lib/store';
+	import { gameState, lobbyCode, player, players, roundHasStarted } from '$lib/store';
 	import { db } from '$lib/firebase';
 	import { ref, update } from 'firebase/database';
 	import Face from './dice/Face.svelte';
@@ -54,7 +54,7 @@
 					on:click={() => playCard(rowIndex, cardIndex)}
 					disabled={currentPlayer.deck === undefined ||
 						currentPlayer.deck[0].value <= card.value ||
-						currentPlayer.name !== $playerName ||
+						currentPlayer.name !== $player.name ||
 						(card.value === 0 && !isAllowedField($gameState, rowIndex, cardIndex)) ||
 						!$roundHasStarted}
 				>

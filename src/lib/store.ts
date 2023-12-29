@@ -5,7 +5,14 @@ import { translations } from './translations';
 import { goto } from '$app/navigation';
 import { v4 as uuidV4 } from 'uuid';
 
-const playerName = writable<string>(browser ? localStorage.getItem('localPlayerName') || '' : '');
+const player = writable<{ name: string; uuid: string }>(
+	browser && localStorage.getItem('localPlayer') !== null
+		? {
+				name: JSON.parse(localStorage.getItem('localPlayer') ?? '').name,
+				uuid: JSON.parse(localStorage.getItem('localPlayer') ?? '').uuid
+			}
+		: { name: '', uuid: uuidV4() }
+);
 const lobbyCode = writable<string>('');
 const lobbyConnected = writable<boolean>(false);
 const host = writable<string>('');
@@ -25,37 +32,42 @@ const invitation = {
 	url: 'https://punto.vercel.app'
 };
 const neutralColor = writable<string>('');
-const uuid = writable<string>(browser ? localStorage.getItem('uuid') || uuidV4() : uuidV4());
 const playersOnline = writable<string[]>([]);
 const winnerWithThrees = writable<[string, number]>(['', 0]);
-const oldGame = writable(JSON.parse(localStorage.getItem('PuntoLobby') || '{}'));
-
-playerName.subscribe((name: string) =>
-	browser ? localStorage.setItem('localPlayerName', name) : null
+const oldGame = writable(
+	browser && localStorage.getItem('PuntoLobby')
+		? JSON.parse(localStorage.getItem('PuntoLobby') || '{}')
+		: {}
 );
+
+player.subscribe((player) => {
+	if (browser) localStorage.setItem('localPlayer', JSON.stringify(player));
+});
 
 languageId.subscribe((id: string) => {
 	invitation.text = translations[id].inviteText;
 });
 
 lobbyCode.subscribe((code: string) => {
-	if (typeof window === 'undefined') return;
-	invitation.url = `${window.location.origin.toString()}/?code=${code}`;
-});
-
-uuid.subscribe((id: string) => {
-	browser ? localStorage.setItem('uuid', id) : null;
+	if (browser) invitation.url = `${window.location.origin.toString()}/?code=${code}`;
 });
 
 oldGame.subscribe((gameVal) => {
-	browser ? localStorage.setItem('PuntoLobby', JSON.stringify(gameVal)) : null;
+	if (browser) localStorage.setItem('PuntoLobby', JSON.stringify(gameVal));
 });
 
 /**
  * Resets the app to its initial state
  */
 function resetApp() {
-	playerName.set(browser ? localStorage.getItem('localPlayerName') || '' : '');
+	player.set(
+		browser
+			? {
+					name: JSON.parse(localStorage.getItem('localPlayer') || '').name || '',
+					uuid: JSON.parse(localStorage.getItem('localPlayer') || '').uuid || uuidV4()
+				}
+			: { name: '', uuid: uuidV4() }
+	);
 	// lobbyCode.set('');
 
 	// reset code param in URL
@@ -80,7 +92,7 @@ function resetApp() {
 }
 
 export {
-	playerName,
+	player,
 	lobbyCode,
 	lobbyConnected,
 	host,
@@ -93,7 +105,6 @@ export {
 	languageId,
 	invitation,
 	neutralColor,
-	uuid,
 	playersOnline,
 	winnerWithThrees,
 	oldGame

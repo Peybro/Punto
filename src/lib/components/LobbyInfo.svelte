@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { codeCopied, host, languageId, lobbyCode, lobbyConnected, playerName } from '$lib/store';
+	import { codeCopied, host, languageId, lobbyCode, lobbyConnected, player } from '$lib/store';
 	import { copyTextToClipboard } from '$lib/utils';
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
@@ -16,7 +16,7 @@
 <div class="row g-1">
 	<div class="col-xs-12 col-md-6 col-xl-3">
 		<input
-			bind:value={$playerName}
+			bind:value={$player.name}
 			class="form-control"
 			disabled={$lobbyConnected}
 			placeholder="Name"
@@ -46,7 +46,7 @@
 	</div>
 
 	<div class="col-xs-2 col-md-6 col-xl-3">
-		{#if $lobbyConnected && $host === $playerName}
+		{#if $lobbyConnected && $host === $player.name}
 			<button class="btn btn-outline-danger w-100" on:click={closeLobby}
 				>{selectedLanguage.closeRoom}</button
 			>
@@ -54,7 +54,7 @@
 			<button
 				class="btn btn-primary w-100"
 				on:click={createLobby}
-				disabled={$playerName.length === 0 || ($host !== '' && $host !== $playerName)}
+				disabled={$player.name.length === 0 || ($host !== '' && $host !== $player.name)}
 				>{selectedLanguage.createRoom}</button
 			>
 		{/if}
