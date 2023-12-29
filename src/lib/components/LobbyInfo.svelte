@@ -3,11 +3,9 @@
 	import { copyTextToClipboard } from '$lib/utils';
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
+	import { createEventDispatcher } from 'svelte';
 
-	export let closeLobby: () => void;
-	export let createLobby: () => void;
-	export let leaveLobby: () => void;
-	export let joinLobby: () => void;
+	const dispatch = createEventDispatcher();
 
 	$: $lobbyCode = $page.url.searchParams.get('code') || '';
 	$: selectedLanguage = translations[$languageId];
@@ -47,13 +45,13 @@
 
 	<div class="col-xs-2 col-md-6 col-xl-3">
 		{#if $lobbyConnected && $host === $player.name}
-			<button class="btn btn-outline-danger w-100" on:click={closeLobby}
+			<button class="btn btn-outline-danger w-100" on:click={() => dispatch('closeLobby')}
 				>{selectedLanguage.closeRoom}</button
 			>
 		{:else}
 			<button
 				class="btn btn-primary w-100"
-				on:click={createLobby}
+				on:click={() => dispatch('createLobby')}
 				disabled={$player.name.length === 0 || ($host !== '' && $host !== $player.name)}
 				>{selectedLanguage.createRoom}</button
 			>
@@ -62,12 +60,14 @@
 
 	<div class="col-xs-6 col-md-6 col-xl-3">
 		{#if $lobbyConnected}
-			<button class="btn btn-outline-warning w-100" on:click={leaveLobby}
+			<button class="btn btn-outline-warning w-100" on:click={() => dispatch('leaveLobby')}
 				>{selectedLanguage.leaveRoom}</button
 			>
 		{:else}
-			<button class="btn btn-primary w-100" on:click={joinLobby} disabled={$lobbyCode.length !== 6}
-				>{selectedLanguage.joinRoom}</button
+			<button
+				class="btn btn-primary w-100"
+				on:click={() => dispatch('joinLobby')}
+				disabled={$lobbyCode.length !== 6}>{selectedLanguage.joinRoom}</button
 			>
 		{/if}
 	</div>

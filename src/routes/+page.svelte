@@ -484,7 +484,12 @@
 	{/if}
 
 	{#if $infoVisible}
-		<LobbyInfo {createLobby} {joinLobby} {leaveLobby} {closeLobby} />
+		<LobbyInfo
+			on:createLobby={createLobby}
+			on:joinLobby={joinLobby}
+			on:leaveLobby={leaveLobby}
+			on:closeLobby={closeLobby}
+		/>
 	{/if}
 
 	{#if $lobbyConnected}
