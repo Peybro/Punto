@@ -1,16 +1,6 @@
 <script lang="ts">
 	import { db } from '$lib/firebase';
-	import {
-		get,
-		off,
-		onDisconnect,
-		onValue,
-		push,
-		ref,
-		serverTimestamp,
-		set,
-		update
-	} from 'firebase/database';
+	import { get, off, onDisconnect, onValue, push, ref, set, update } from 'firebase/database';
 	import toast from 'svelte-french-toast';
 	import Board from '$lib/components/Board.svelte';
 	import {
@@ -21,16 +11,16 @@
 		lobbyCode,
 		lobbyConnected,
 		neutralColor,
+		oldGame,
 		player,
 		players,
+		playersOnline,
 		resetApp,
 		roundHasStarted,
-		playersOnline,
-		winnerWithThrees,
-		oldGame
+		winnerWithThrees
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import type { GameState, Player } from '$lib/types';
+	import type { Player } from '$lib/types';
 	import { duplicate, fourInARow, getBeautifulColors, getMostThrees, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
@@ -38,8 +28,6 @@
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { writable } from 'svelte/store';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $player.name;

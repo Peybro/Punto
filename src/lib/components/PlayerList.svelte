@@ -6,8 +6,8 @@
 		lobbyCode,
 		player,
 		players,
-		roundHasStarted,
-		playersOnline
+		playersOnline,
+		roundHasStarted
 	} from '$lib/store';
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
