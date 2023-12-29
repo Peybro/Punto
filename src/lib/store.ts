@@ -28,6 +28,7 @@ const neutralColor = writable<string>('');
 const uuid = writable<string>(browser ? localStorage.getItem('uuid') || uuidV4() : uuidV4());
 const playersOnline = writable<string[]>([]);
 const winnerWithThrees = writable<[string, number]>(['', 0]);
+const oldGame = writable(JSON.parse(localStorage.getItem('PuntoLobby') || '{}'));
 
 playerName.subscribe((name: string) =>
 	browser ? localStorage.setItem('localPlayerName', name) : null
@@ -44,6 +45,10 @@ lobbyCode.subscribe((code: string) => {
 
 uuid.subscribe((id: string) => {
 	browser ? localStorage.setItem('uuid', id) : null;
+});
+
+oldGame.subscribe((gameVal) => {
+	browser ? localStorage.setItem('PuntoLobby', JSON.stringify(gameVal)) : null;
 });
 
 /**
@@ -71,6 +76,7 @@ function resetApp() {
 	infoVisible.set(true);
 	neutralColor.set('');
 	winnerWithThrees.set(['', 0]);
+	localStorage.removeItem('PuntoLobby');
 }
 
 export {
@@ -89,5 +95,6 @@ export {
 	neutralColor,
 	uuid,
 	playersOnline,
-	winnerWithThrees
+	winnerWithThrees,
+	oldGame
 };

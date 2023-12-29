@@ -77,7 +77,12 @@ const translations: LanguagesType = {
 			four: '4-Player-Mode: Each player plays with one color.'
 		},
 		order: 'Order',
-		winsWithThrees: ['wins with', '3-in-a-row sets']
+		winsWithThrees: ['wins with', '3-in-a-row sets'],
+		reconnect: {
+			title: 'An older game is still running. Do you want to reconnect?',
+			reconnect: 'Reconnect',
+			dismiss: 'Dismiss'
+		}
 	},
 	de: {
 		colors: {
@@ -155,7 +160,12 @@ const translations: LanguagesType = {
 			four: '4-Spieler-Modus: Jeder spielt mit einer Farbe.'
 		},
 		order: 'Reihenfolge',
-		winsWithThrees: ['gewinnt mit', '3er-Reihen']
+		winsWithThrees: ['gewinnt mit', '3er-Reihen'],
+		reconnect: {
+			title: 'Ein älteres Spiel läuft noch. Möchtest du dich verbinden?',
+			reconnect: 'Verbinden',
+			dismiss: 'Verwerfen'
+		}
 	},
 	fr: {
 		colors: {
@@ -233,7 +243,12 @@ const translations: LanguagesType = {
 			four: 'Mode 4 Joueurs : Chaque joueur joue avec une couleur.'
 		},
 		order: 'Ordre',
-		winsWithThrees: ['gagne avec', 'séries de 3']
+		winsWithThrees: ['gagne avec', 'séries de 3'],
+		reconnect: {
+			title: 'Une ancienne partie est toujours en cours. Voulez-vous vous reconnecter?',
+			reconnect: 'Reconnecter',
+			dismiss: 'Rejeter'
+		}
 	}
 };
 

@@ -73,6 +73,11 @@ type LanguageType = {
 	};
 	order: string;
 	winsWithThrees: [string, string];
+	reconnect: {
+		title: string;
+		reconnect: string;
+		dismiss: string;
+	}
 };
 
 type LanguagesType = {

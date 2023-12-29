@@ -27,10 +27,11 @@
 		roundHasStarted,
 		uuid,
 		playersOnline,
-		winnerWithThrees
+		winnerWithThrees,
+		oldGame
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import type { Player } from '$lib/types';
+	import type { GameState, Player } from '$lib/types';
 	import { duplicate, fourInARow, getBeautifulColors, getMostThrees, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
@@ -38,6 +39,8 @@
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $playerName;
@@ -55,6 +58,8 @@
 				toast.error(selectedLanguage.toasts.roomNotFound);
 				await leaveLobby();
 			} else {
+				localStorage.setItem('PuntoLobby', JSON.stringify(data));
+
 				if (
 					$players.some((p: Player) => p.name === $playerName) &&
 					!data.players.some((p: Player) => p.name === $playerName)
@@ -462,10 +467,32 @@
 		getPresense($lobbyCode);
 		listenToLobby($lobbyCode);
 	}
+
+	/**
+	 * Rejoin a running game if the player was disconnected.
+	 */
+	async function handleRejoin() {
+		$lobbyCode = $oldGame.lobbyCode;
+		$playerName = $oldGame.players.find((p: Player) => p.uuid === $uuid)?.name;
+		$oldGame = {};
+		await joinLobby();
+	}
 </script>
 
 <div class="container mb-4">
 	<Heading />
+
+	{#if $oldGame.roundHasStarted !== undefined && $oldGame.roundHasStarted && $players.length === 0}
+		<h5 class="mt-4">{selectedLanguage.reconnect.title}</h5>
+		<div class="d-flex mb-4">
+			<button class="btn btn-danger w-50" on:click={() => ($oldGame = {})}
+				>{selectedLanguage.reconnect.dismiss}</button
+			>
+			<button class="btn btn-warning w-50 ms-1" on:click={handleRejoin}
+				>{selectedLanguage.reconnect.reconnect}</button
+			>
+		</div>
+	{/if}
 
 	{#if $infoVisible}
 		<LobbyInfo {createLobby} {joinLobby} {leaveLobby} {closeLobby} />
