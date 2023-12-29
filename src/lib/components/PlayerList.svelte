@@ -86,7 +86,7 @@
 		</div>
 	{/each}
 	{#if !$roundHasStarted}
-		{#each Array(4 - $players.length) as _}
+		{#each { length: 4 - $players.length } as _}
 			<div class="col-md-6 col-lg-3">
 				<button class="btn btn-outline-secondary w-100" disabled>[{selectedLanguage.free}]</button>
 			</div>

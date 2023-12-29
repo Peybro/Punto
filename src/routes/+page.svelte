@@ -38,7 +38,7 @@
 	 * @param code The lobby code to listen to
 	 */
 	function listenToLobby(code: string) {
-		const callback = async (snap: any) => {
+		const callback = async (snap) => {
 			const data = snap.val();
 
 			if (data === null) {
@@ -93,7 +93,7 @@
 
 				// update url with lobby code
 				$page.url.searchParams.set('code', data.lobbyCode);
-				goto(`?${$page.url.searchParams.toString()}`);
+				await goto(`?${$page.url.searchParams.toString()}`);
 				// TODO: should be better with SvelteKit but does not work...
 				// pushState("", `?${$page.url.searchParams.toString()}`);
 
@@ -159,12 +159,12 @@
 		const connectedRef = ref(db, '.info/connected');
 		off(connectedRef);
 
-		const callback = async (snap: any) => {
+		const callback = async (snap) => {
 			if (snap.val() === true) {
 				const con = push(ref(db, `${code}/presence/${$player.name}/connections`));
 
-				onDisconnect(con).remove();
-				set(con, true);
+				await onDisconnect(con).remove();
+				await set(con, true);
 			}
 		};
 
@@ -254,7 +254,7 @@
 	 * Current client leaves the lobby and resets the app for itself
 	 */
 	async function leaveLobby() {
-		stopListeningToLobby();
+		await stopListeningToLobby();
 		if ($players.length === 1) {
 			closeLobby();
 			return;
@@ -317,7 +317,7 @@
 		let newLobbyCode = '';
 
 		let lobbyCodeAlreadyExists = false;
-		await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
+		await get(ref(db, `${$lobbyCode}/`)).then((snap) => {
 			if (snap.val() !== null) {
 				lobbyCodeAlreadyExists = true;
 			}
@@ -366,7 +366,7 @@
 	 */
 	async function joinLobby() {
 		let playersOnline: Player[] | [] = [];
-		await get(ref(db, `${$lobbyCode}/players`)).then((snap: any) => {
+		await get(ref(db, `${$lobbyCode}/players`)).then((snap) => {
 			if (snap.val()) playersOnline = snap.val();
 		});
 
@@ -388,7 +388,7 @@
 				validToJoin = false;
 			}
 
-			await get(ref(db, `${$lobbyCode}/`)).then((snap: any) => {
+			await get(ref(db, `${$lobbyCode}/`)).then((snap) => {
 				if (snap.val() === null) {
 					toast.error(selectedLanguage.toasts.noMatchingRoom);
 					$lobbyConnected = false;
@@ -409,7 +409,7 @@
 			}
 
 			let roundInProgress = false;
-			await get(ref(db, `${$lobbyCode}/roundHasStarted`)).then((snap: any) => {
+			await get(ref(db, `${$lobbyCode}/roundHasStarted`)).then((snap) => {
 				if (snap.val()) roundInProgress = snap.val();
 			});
 			if (roundInProgress) {
