@@ -28,6 +28,7 @@
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { fade, fly } from 'svelte/transition';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $player.name;
@@ -38,7 +39,7 @@
 	 * @param code The lobby code to listen to
 	 */
 	function listenToLobby(code: string) {
-		const callback = async (snap) => {
+		const callback = async (snap: { val: () => any }) => {
 			const data = snap.val();
 
 			if (data === null) {
@@ -160,8 +161,8 @@
 		const connectedRef = ref(db, '.info/connected');
 		off(connectedRef);
 
-		const callback = async (snap) => {
-			if (snap.val() === true) {
+		const callback = async (snap: { val: () => any }) => {
+			if (snap.val()) {
 				const con = push(ref(db, `${code}/presence/${$player.name}/connections`));
 
 				await onDisconnect(con).remove();
@@ -527,69 +528,71 @@
 		{/if}
 
 		{#if $roundHasStarted || $gameState.turn > 0}
-			{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
-				{#if $roundHasStarted}
-					<p class="mt-1">
-						{#if $players.length === 1}
-							{selectedLanguage.gameTypes.one}
-						{:else if $players.length === 2}
-							{selectedLanguage.gameTypes.two}
-						{:else if $players.length === 3}
-							{selectedLanguage.gameTypes.three[0]}
+			<div in:fly={{ y: 200, duration: 1000 }} out:fade>
+				{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
+					{#if $roundHasStarted}
+						<p class="mt-1">
+							{#if $players.length === 1}
+								{selectedLanguage.gameTypes.one}
+							{:else if $players.length === 2}
+								{selectedLanguage.gameTypes.two}
+							{:else if $players.length === 3}
+								{selectedLanguage.gameTypes.three[0]}
 
-							<span class={`p-1 rounded bg-${getBeautifulColors($neutralColor)?.bootstrap}`}
-								>{selectedLanguage.gameTypes.three[1]}
-							</span>
-							{selectedLanguage.gameTypes.three[2]}
-						{:else if $players.length === 4}
-							{selectedLanguage.gameTypes.four}
-						{/if}
-					</p>
-				{/if}
-				<div class="d-flex mb-2">
-					{#if currentPlayer.deck !== undefined}
-						{#if $roundHasStarted}
-							<div class="d-flex flex-column">
-								<h4 class="">
-									{selectedLanguage.turn} #{$gameState.turn + 1}:
-									{#if currentPlayer.name === $player.name}
-										{selectedLanguage.yourTurn}
-									{:else}
-										<span
-											class={`p-1 rounded bg-${
-												getBeautifulColors(currentPlayer?.color)?.bootstrap
-											}`}
-											>{currentPlayer.name}
-										</span>
-									{/if}
-								</h4>
-
-								<h6 class="next pt-1 text-secondary">
-									Next: {$gameState.currentPlayerIndex === $players.length - 1
-										? $players[0].name
-										: $players[$gameState.currentPlayerIndex + 1].name}
-								</h6>
-							</div>
-
-							<div class="cell ms-2 p-0 border rounded bg-dark">
-								<Face value={currentPlayer.deck[0].value} color={currentPlayer.deck[0].color} />
-							</div>
-						{/if}
-					{:else}
-						<div class="mt-2">
-							<h5>{selectedLanguage.noMoreCards}</h5>
-							<h4>
-								{$winnerWithThrees[0]}
-								{selectedLanguage.winsWithThrees[0]}
-								{$winnerWithThrees[1]}
-								{selectedLanguage.winsWithThrees[1]}.
-							</h4>
-						</div>
+								<span class={`p-1 rounded bg-${getBeautifulColors($neutralColor)?.bootstrap}`}
+									>{selectedLanguage.gameTypes.three[1]}
+								</span>
+								{selectedLanguage.gameTypes.three[2]}
+							{:else if $players.length === 4}
+								{selectedLanguage.gameTypes.four}
+							{/if}
+						</p>
 					{/if}
-				</div>
+					<div class="d-flex mb-2">
+						{#if currentPlayer.deck !== undefined}
+							{#if $roundHasStarted}
+								<div class="d-flex flex-column">
+									<h4 class="">
+										{selectedLanguage.turn} #{$gameState.turn + 1}:
+										{#if currentPlayer.name === $player.name}
+											{selectedLanguage.yourTurn}
+										{:else}
+											<span
+												class={`p-1 rounded bg-${
+													getBeautifulColors(currentPlayer?.color)?.bootstrap
+												}`}
+												>{currentPlayer.name}
+											</span>
+										{/if}
+									</h4>
 
-				<Board />
-			{/if}
+									<h6 class="next pt-1 text-secondary">
+										Next: {$gameState.currentPlayerIndex === $players.length - 1
+											? $players[0].name
+											: $players[$gameState.currentPlayerIndex + 1].name}
+									</h6>
+								</div>
+
+								<div class="cell ms-2 p-0 border rounded bg-dark">
+									<Face value={currentPlayer.deck[0].value} color={currentPlayer.deck[0].color} />
+								</div>
+							{/if}
+						{:else}
+							<div class="mt-2">
+								<h5>{selectedLanguage.noMoreCards}</h5>
+								<h4>
+									{$winnerWithThrees[0]}
+									{selectedLanguage.winsWithThrees[0]}
+									{$winnerWithThrees[1]}
+									{selectedLanguage.winsWithThrees[1]}.
+								</h4>
+							</div>
+						{/if}
+					</div>
+
+					<Board />
+				{/if}
+			</div>
 		{/if}
 	{:else}
 		<h1 class="mt-5">{selectedLanguage.notConnected}</h1>
