@@ -28,7 +28,7 @@
 	import { translations } from '$lib/translations';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { fade, fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host === $player.name;
@@ -263,6 +263,9 @@
 		}
 		// indicate that the player left
 		await set(ref(db, `${$lobbyCode}/presence/${$player.name}/connections`), null);
+		await update(ref(db, `${$lobbyCode}/`), {
+			players: $players.filter((p) => p.name !== $player.name)
+		});
 		if (isHost) {
 			await update(ref(db, `${$lobbyCode}/`), {
 				host: $players.filter((p) => p.name !== $player.name)[0].name
@@ -528,7 +531,7 @@
 		{/if}
 
 		{#if $roundHasStarted || $gameState.turn > 0}
-			<div in:fly={{ y: 200, duration: 1000 }} out:fade>
+			<div transition:fly={{ y: 200, duration: 1000 }}>
 				{#if $players.length > 0 && $gameState.currentPlayerIndex >= 0}
 					{#if $roundHasStarted}
 						<p class="mt-1">
