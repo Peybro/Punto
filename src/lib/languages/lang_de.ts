@@ -81,5 +81,6 @@ export const lang_de: Translation = {
 		title: 'Ein älteres Spiel läuft noch. Möchtest du dich verbinden?',
 		reconnect: 'Verbinden',
 		dismiss: 'Verwerfen'
-	}
+	},
+	rename: 'Umbenennen'
 };

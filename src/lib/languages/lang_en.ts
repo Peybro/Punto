@@ -81,5 +81,6 @@ export const lang_en: Translation = {
 		title: 'An older game is still running. Do you want to reconnect?',
 		reconnect: 'Reconnect',
 		dismiss: 'Dismiss'
-	}
+	},
+	rename: 'Rename'
 };

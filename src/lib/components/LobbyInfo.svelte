@@ -88,7 +88,7 @@
 			<button
 				class="btn btn-primary w-100"
 				on:click={() => dispatch('createLobby')}
-				disabled={$player.name.length === 0 || ($host.name !== '' && $host.uuid !== $player.uuid)}
+				disabled={$player.name.length < 3 || ($host.name !== '' && $host.uuid !== $player.uuid)}
 				>{selectedLanguage.createRoom}</button
 			>
 		{/if}

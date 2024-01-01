@@ -83,7 +83,8 @@
 						<button
 							class="dropdown-item"
 							on:click={() => renamePlayer(tPlayer.name)}
-							disabled={$roundHasStarted}><i class="bi bi-pencil-square"></i> Umbenennen</button
+							disabled={$roundHasStarted}
+							><i class="bi bi-pencil-square"></i> {selectedLanguage.rename}</button
 						>
 					</li>
 				{/if}

@@ -81,5 +81,6 @@ export const lang_fr: Translation = {
 		title: 'Une ancienne partie est toujours en cours. Voulez-vous vous reconnecter?',
 		reconnect: 'Reconnecter',
 		dismiss: 'Rejeter'
-	}
+	},
+	rename: 'Renommer'
 };

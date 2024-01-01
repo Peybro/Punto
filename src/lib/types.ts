@@ -78,6 +78,7 @@ type Translation = {
 		reconnect: string;
 		dismiss: string;
 	};
+	rename: string;
 };
 
 type LanguagesType = {
