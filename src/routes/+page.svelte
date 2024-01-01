@@ -31,7 +31,7 @@
 	import { fly } from 'svelte/transition';
 
 	$: selectedLanguage = translations[$languageId];
-	$: isHost = $host === $player.name;
+	$: isHost = $host.uuid === $player.uuid;
 	$: currentPlayer = $players[$gameState.currentPlayerIndex];
 
 	/**
@@ -50,8 +50,8 @@
 				$oldGame = data;
 
 				if (
-					$players.some((p: Player) => p.name === $player.name) &&
-					!data.players.some((p: Player) => p.name === $player.name)
+					$players.some((p: Player) => p.uuid === $player.uuid) &&
+					!data.players.some((p: Player) => p.uuid === $player.uuid)
 				) {
 					toast.error(selectedLanguage.toasts.kick);
 					await leaveLobby();
@@ -75,9 +75,8 @@
 					}
 
 					// check if someone joined
-					const playerWhoJoined = Object.keys(data.presence).filter(
-						(p) => !$playersOnline.includes(p)
-					);
+					const playerWhoJoined =
+						$players.find((pl) => !Object.keys(data.presence).includes(pl.uuid))?.name || '';
 					if (playerWhoJoined.length > 0 && playerWhoJoined[0] !== $player.name) {
 						toast(`${playerWhoJoined[0]} ${selectedLanguage.toasts.playerJoined.new}`);
 					}
@@ -163,7 +162,7 @@
 
 		const callback = async (snap: { val: () => any }) => {
 			if (snap.val()) {
-				const con = push(ref(db, `${code}/presence/${$player.name}/connections`));
+				const con = push(ref(db, `${code}/presence/${$player.uuid}/connections`));
 
 				await onDisconnect(con).remove();
 				await set(con, true);
@@ -262,13 +261,15 @@
 			return;
 		}
 		// indicate that the player left
-		await set(ref(db, `${$lobbyCode}/presence/${$player.name}/connections`), null);
+		await set(ref(db, `${$lobbyCode}/presence/${$player.uuid}/connections`), null);
 		await update(ref(db, `${$lobbyCode}/`), {
-			players: $players.filter((p) => p.name !== $player.name)
+			players: $players.filter((p) => p.uuid !== $player.uuid)
 		});
 		if (isHost) {
-			await update(ref(db, `${$lobbyCode}/`), {
-				host: $players.filter((p) => p.name !== $player.name)[0].name
+			const newHost = $players.filter((p) => p.uuid !== $player.uuid)[0];
+			await update(ref(db, `${$lobbyCode}/host`), {
+				name: newHost.name,
+				uuid: newHost.uuid
 			});
 		}
 		resetApp();
@@ -337,7 +338,7 @@
 
 		await set(ref(db, `${newLobbyCode}/`), {
 			lobbyCode: newLobbyCode,
-			host: $player.name,
+			host: { name: $player.name, uuid: $player.uuid },
 			players: [
 				{
 					name: $player.name,
@@ -407,7 +408,7 @@
 				validToJoin = false;
 			}
 
-			if (playersOnline.some((p: Player) => p.name === $player.name)) {
+			if (playersOnline.some((p: Player) => p.uuid === $player.uuid)) {
 				toast.error(selectedLanguage.toasts.nameAlreadyTaken);
 				$lobbyConnected = false;
 				validToJoin = false;
@@ -516,9 +517,9 @@
 
 		{#if isHost}
 			<button
-				class="btn btn{$player.name !== $host || $roundHasStarted ? '-outline' : ''}-primary"
+				class="btn btn{$player.uuid !== $host.uuid || $roundHasStarted ? '-outline' : ''}-primary"
 				on:click={startRound}
-				disabled={$player.name !== $host || $roundHasStarted}
+				disabled={$player.uuid !== $host.uuid || $roundHasStarted}
 				>{!$roundHasStarted && $gameState.board.flat().some((cell) => cell.value > 0)
 					? selectedLanguage.startGame.again
 					: selectedLanguage.startGame.new}</button
@@ -526,7 +527,8 @@
 			<button
 				class="btn btn-outline-warning"
 				on:click={resetLobby}
-				disabled={$player.name !== $host || !$roundHasStarted}>{selectedLanguage.endRound}</button
+				disabled={$player.uuid !== $host.uuid || !$roundHasStarted}
+				>{selectedLanguage.endRound}</button
 			>
 		{/if}
 
@@ -557,7 +559,7 @@
 								<div class="d-flex flex-column">
 									<h4 class="">
 										{selectedLanguage.turn} #{$gameState.turn + 1}:
-										{#if currentPlayer.name === $player.name}
+										{#if currentPlayer.uuid === $player.uuid}
 											{selectedLanguage.yourTurn}
 										{:else}
 											<span

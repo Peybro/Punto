@@ -28,16 +28,16 @@
 	{#each $players as tPlayer, i}
 		<div class="dropdown col-md-6 col-lg-3">
 			<button
-				class={`btn btn-${!$playersOnline.some((p) => p === tPlayer.name) ? 'outline-' : ''}${
+				class={`btn btn-${!$playersOnline.some((p) => p === tPlayer.uuid) ? 'outline-' : ''}${
 					getBeautifulColors(tPlayer.color)?.bootstrap
 				} text-break w-100`}
-				class:dropdown-toggle={tPlayer.name === $player.name || $player.name === $host}
+				class:dropdown-toggle={tPlayer.uuid === $player.uuid || $player.uuid === $host.uuid}
 				type="button"
 				data-bs-toggle={`${
-					tPlayer.name === $player.name || $player.name === $host ? 'dropdown' : ''
+					tPlayer.uuid === $player.uuid || $player.uuid === $host.uuid ? 'dropdown' : ''
 				}`}
 			>
-				{#if $playersOnline.some((p) => p === tPlayer.name)}
+				{#if $playersOnline.some((p) => p === tPlayer.uuid)}
 					<!-- <i class="bi bi-check-circle-fill float-start"></i> -->
 					<i class="bi bi-wifi float-start"></i>
 				{:else}
@@ -46,7 +46,7 @@
 				{/if}
 				{$roundHasStarted ? i + 1 + '.' : ''}
 				{tPlayer.name}
-				{#if tPlayer.name === $host}
+				{#if tPlayer.uuid === $host.uuid}
 					(Host)
 				{/if}
 				{#if tPlayer.wins > 0}
@@ -70,7 +70,7 @@
 						</button>
 					</li>
 				{/each}
-				{#if $player.name === $host && tPlayer.name !== $host}
+				{#if $player.uuid === $host.uuid && tPlayer.uuid !== $host.uuid}
 					<li>
 						<hr class="dropdown-divider" />
 					</li>

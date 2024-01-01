@@ -44,7 +44,7 @@
 	</div>
 
 	<div class="col-xs-2 col-md-6 col-xl-3">
-		{#if $lobbyConnected && $host === $player.name}
+		{#if $lobbyConnected && $host.uuid === $player.uuid}
 			<button class="btn btn-outline-danger w-100" on:click={() => dispatch('closeLobby')}
 				>{selectedLanguage.closeRoom}</button
 			>
@@ -52,7 +52,7 @@
 			<button
 				class="btn btn-primary w-100"
 				on:click={() => dispatch('createLobby')}
-				disabled={$player.name.length === 0 || ($host !== '' && $host !== $player.name)}
+				disabled={$player.name.length === 0 || ($host.name !== '' && $host.uuid !== $player.uuid)}
 				>{selectedLanguage.createRoom}</button
 			>
 		{/if}

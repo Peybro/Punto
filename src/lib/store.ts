@@ -16,7 +16,7 @@ const invitation = useInvitationStore();
 // normal stores
 const lobbyCode = writable<string>('');
 const lobbyConnected = writable<boolean>(false);
-const host = writable<string>('');
+const host = writable<{ name: string; uuid: string }>({ name: '', uuid: '' });
 const players = writable<Player[]>([]);
 const roundHasStarted = writable<boolean>(false);
 const codeCopied = writable<boolean>(false);
@@ -41,7 +41,7 @@ function resetApp() {
 	player.reset();
 	gameState.reset();
 	lobbyConnected.set(false);
-	host.set('');
+	host.set({ name: '', uuid: '' });
 	players.set([]);
 	roundHasStarted.set(false);
 	infoVisible.set(true);
