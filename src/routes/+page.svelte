@@ -15,6 +15,7 @@
 		player,
 		players,
 		playersOnline,
+		renameInProgress,
 		resetApp,
 		roundHasStarted,
 		winnerWithThrees
@@ -55,6 +56,11 @@
 				) {
 					toast.error(selectedLanguage.toasts.kick);
 					await leaveLobby();
+				}
+
+				if (data.roundHasStarted) {
+					$renameInProgress = false;
+					$player.name = data.players.find((p: Player) => p.uuid === $player.uuid)?.name;
 				}
 
 				// update local state with data from database

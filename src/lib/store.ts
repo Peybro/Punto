@@ -25,6 +25,7 @@ const neutralColor = writable<string>('');
 const playersOnline = writable<string[]>([]);
 const winnerWithThrees = writable<[string, number]>(['', 0]);
 const oldGame = writable(browser ? JSON.parse(localStorage.getItem('PuntoLobby') ?? '{}') : {});
+const renameInProgress = writable<boolean>(false);
 
 lobbyCode.subscribe((code: string) => {
 	if (browser) invitation.update({ url: `${window.location.origin.toString()}/?code=${code}` });
@@ -67,5 +68,6 @@ export {
 	neutralColor,
 	playersOnline,
 	winnerWithThrees,
-	oldGame
+	oldGame,
+	renameInProgress
 };

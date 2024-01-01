@@ -7,7 +7,8 @@
 		player,
 		players,
 		playersOnline,
-		roundHasStarted
+		roundHasStarted,
+		renameInProgress
 	} from '$lib/store';
 	import { getBeautifulColors } from '$lib/utils';
 	import { db } from '$lib/firebase';
@@ -21,6 +22,10 @@
 		await update(ref(db, `${$lobbyCode}/`), {
 			players: $players.filter((p) => p.name !== name)
 		});
+	}
+
+	async function renamePlayer(name: string) {
+		$renameInProgress = true;
 	}
 </script>
 
@@ -70,10 +75,19 @@
 						</button>
 					</li>
 				{/each}
-				{#if $player.uuid === $host.uuid && tPlayer.uuid !== $host.uuid}
+				<li>
+					<hr class="dropdown-divider" />
+				</li>
+				{#if $player.uuid === tPlayer.uuid}
 					<li>
-						<hr class="dropdown-divider" />
+						<button
+							class="dropdown-item"
+							on:click={() => renamePlayer(tPlayer.name)}
+							disabled={$roundHasStarted}><i class="bi bi-pencil-square"></i> Umbenennen</button
+						>
 					</li>
+				{/if}
+				{#if $player.uuid === $host.uuid && tPlayer.uuid !== $host.uuid}
 					<li>
 						<button
 							class="dropdown-item"
