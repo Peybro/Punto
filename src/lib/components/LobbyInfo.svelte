@@ -41,7 +41,16 @@
 			/>
 		{:else}
 			<div class="input-group">
-				<input class="form-control" placeholder="Name" type="text" bind:value={$player.name} />
+				<input
+					class="form-control"
+					id="renamePlayerInput"
+					placeholder="Name"
+					type="text"
+					bind:value={$player.name}
+					on:keydown={(e) => {
+						if (e.key === 'Enter') handleRenamePlayer();
+					}}
+				/>
 				<button
 					class="btn btn-{$player.name.length < 3 ? 'danger' : 'primary'}"
 					on:click={() => handleRenamePlayer()}

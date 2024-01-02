@@ -18,14 +18,30 @@
 
 	$: selectedLanguage = translations[$languageId];
 
+	/**
+	 * Kick a player from the lobby
+	 * @param name The name of the player to kick
+	 */
 	async function kickPlayer(name: string) {
 		await update(ref(db, `${$lobbyCode}/`), {
 			players: $players.filter((p) => p.name !== name)
 		});
 	}
 
-	async function renamePlayer(name: string) {
-		$renameInProgress = true;
+	/**
+	 * Start renaming the current player
+	 */
+	async function renamePlayer() {
+		if ($renameInProgress) {
+			$player.name = $players.find((p) => p.uuid === $player.uuid)?.name || '';
+			$renameInProgress = false;
+		} else {
+			$renameInProgress = true;
+			// TODO: diiiirty
+			setTimeout(() => {
+				document.getElementById('renamePlayerInput')?.focus();
+			}, 100);
+		}
 	}
 </script>
 
@@ -84,9 +100,10 @@
 					<li>
 						<button
 							class="dropdown-item"
-							on:click={() => renamePlayer(tPlayer.name)}
+							on:click={() => renamePlayer()}
 							disabled={$roundHasStarted}
-							><i class="bi bi-pencil-square"></i> {selectedLanguage.rename}</button
+							><i class="bi bi-pencil-square"></i>
+							{!$renameInProgress ? selectedLanguage.rename : 'Cancel'}</button
 						>
 					</li>
 				{/if}
