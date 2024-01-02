@@ -48,6 +48,7 @@ function resetApp() {
 	infoVisible.set(true);
 	neutralColor.set('');
 	winnerWithThrees.set(['', 0]);
+ renameInProgress.set(false);
 	if (browser) localStorage.removeItem('PuntoLobby');
 	goto(window.location.origin, { replaceState: true });
 	lobbyCode.set('');
