@@ -18,7 +18,6 @@
 
 	const dispatch = createEventDispatcher();
 
-	$: $lobbyCode = $page.url.searchParams.get('code') || '';
 	$: selectedLanguage = translations[$languageId];
 
 	async function handleRenamePlayer() {

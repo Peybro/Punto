@@ -53,6 +53,8 @@
 				{tPlayer.name}
 				{#if tPlayer.uuid === $host.uuid}
 					(Host)
+				{:else if tPlayer.uuid === $player.uuid}
+					({selectedLanguage.you})
 				{/if}
 				{#if tPlayer.wins > 0}
 					<span class="ms-2"><i class="bi bi-trophy"></i> {tPlayer.wins}x</span>

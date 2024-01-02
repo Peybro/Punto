@@ -30,10 +30,28 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { fly } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	$: selectedLanguage = translations[$languageId];
 	$: isHost = $host.uuid === $player.uuid;
 	$: currentPlayer = $players[$gameState.currentPlayerIndex];
+
+	onMount(() => {
+		const tempLobbyCode = $page.url.searchParams.get('code') || '';
+
+		if (tempLobbyCode.length === 6) {
+			if ($player.name === '') $player.name = 'Player ' + $player.uuid.substring(0, 4);
+
+			get(ref(db, `${tempLobbyCode}/`)).then((snap) => {
+				if (snap.val() === null) {
+					toast.error(selectedLanguage.toasts.noMatchingRoom);
+				} else {
+					$lobbyCode = tempLobbyCode;
+					joinLobby();
+				}
+			});
+		}
+	});
 
 	/**
 	 * Listens to the lobby with the given code and updates the store accordingly
@@ -63,6 +81,25 @@
 					$player.name = data.players.find((p: Player) => p.uuid === $player.uuid)?.name;
 				}
 
+				// TODO: toasts for renamed players
+				// TODO: fix logic of playerWhoLeft and playerWhoJoined
+				// toast if someone left or joined
+				// if (data.presence !== undefined) {
+				// 	// check if someone left
+				// 	const playerWhoLeft =
+				// 		$players.find((pl) => !Object.keys(data.presence).includes(pl.uuid))?.name || '';
+				// 	if (playerWhoLeft.length > 0) {
+				// 		toast.error(`${playerWhoLeft} ${selectedLanguage.toasts.playerLeft}`);
+				// 	}
+
+				// 	// check if someone joined
+				// 	const playerWhoJoined =
+				// 		$players.find((pl) => Object.keys(data.presence).includes(pl.uuid))?.name || '';
+				// 	if (playerWhoJoined.length > 0 && playerWhoJoined !== $player.name) {
+				// 		toast(`${playerWhoJoined} ${selectedLanguage.toasts.playerJoined.new}`);
+				// 	}
+				// }
+
 				// update local state with data from database
 				$host = data.host;
 				$players = data.players;
@@ -70,23 +107,6 @@
 				$roundHasStarted = data.roundHasStarted;
 				$infoVisible = !data.roundHasStarted;
 				$neutralColor = data.neutralColor;
-
-				if (data.presence !== undefined) {
-					// check if someone left
-					const playerWhoLeft = $playersOnline.filter(
-						(p) => !Object.keys(data.presence).includes(p)
-					);
-					if (playerWhoLeft.length > 0) {
-						toast.error(`${playerWhoLeft[0]} ${selectedLanguage.toasts.playerLeft}`);
-					}
-
-					// check if someone joined
-					const playerWhoJoined =
-						$players.find((pl) => !Object.keys(data.presence).includes(pl.uuid))?.name || '';
-					if (playerWhoJoined.length > 0 && playerWhoJoined[0] !== $player.name) {
-						toast(`${playerWhoJoined[0]} ${selectedLanguage.toasts.playerJoined.new}`);
-					}
-				}
 
 				$playersOnline = [];
 				if (data.presence !== undefined) {

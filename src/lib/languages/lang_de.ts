@@ -1,6 +1,7 @@
 import type { Translation } from '$lib/types';
 
 export const lang_de: Translation = {
+	you: 'Du',
 	colors: {
 		red: 'Rot',
 		blue: 'Blau',

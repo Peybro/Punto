@@ -9,6 +9,7 @@ type GameState = {
 };
 
 type Translation = {
+	you: string;
 	colors: {
 		red: string;
 		blue: string;
