@@ -21,7 +21,7 @@
 		winnerWithThrees
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import type { Player } from '$lib/types';
+	import type { Card, Player } from '$lib/types';
 	import { duplicate, fourInARow, getBeautifulColors, getMostThrees, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
@@ -235,7 +235,7 @@
 						Array(9)
 							.fill(0)
 							.map((_, j) => j + 1)
-					).map((v) => ({ value: v, color: color }))
+					).map((v) => ({ value: v, color: color }) as Card)
 				]);
 			});
 
@@ -248,7 +248,7 @@
 					Array(9)
 						.fill(0)
 						.map((_, i) => i + 1)
-				).map((v) => ({ value: v, color: colorsNotInUse($players)[0] }))
+				).map((v) => ({ value: v, color: colorsNotInUse($players)[0] }) as Card)
 			);
 
 			const tempPlayers = $players.map((player) => {
@@ -328,7 +328,7 @@
 							Array(9)
 								.fill(0)
 								.map((_, i) => i + 1)
-						).map((v) => ({ value: v, color: player.color }))
+						).map((v) => ({ value: v, color: player.color }) as Card)
 					),
 					wins: player.wins
 				};
@@ -384,7 +384,7 @@
 							Array(9)
 								.fill(0)
 								.map((_, i) => i + 1)
-						).map((v) => ({ value: v, color: 'red' }))
+						).map((v) => ({ value: v, color: 'red' }) as Card)
 					),
 					wins: 0
 				}
@@ -480,12 +480,15 @@
 									Array(9)
 										.fill(0)
 										.map((_, i) => i + 1)
-								).map((v) => ({
-									value: v,
-									color: ['red', 'blue', 'green', 'yellow'].filter(
-										(color) => !playersOnline.some((p) => p.color === color)
-									)[0]
-								}))
+								).map(
+									(v) =>
+										({
+											value: v,
+											color: ['red', 'blue', 'green', 'yellow'].filter(
+												(color) => !playersOnline.some((p) => p.color === color)
+											)[0]
+										}) as Card
+								)
 							),
 							wins: 0
 						}

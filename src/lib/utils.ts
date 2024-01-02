@@ -166,7 +166,7 @@ function hasNeighbourCard(board: Card[][], row: number, col: number): boolean {
  * @param arr array to duplicate
  * @returns duplicated array
  */
-function duplicate(arr: any[]): any[] {
+function duplicate<ElementType>(arr: ElementType[]): ElementType[] {
 	return [...arr, ...arr];
 }
 
@@ -175,7 +175,7 @@ function duplicate(arr: any[]): any[] {
  * @param arr array to shuffle
  * @returns shuffled array
  */
-function shuffle(arr: any[]): any[] {
+function shuffle<ElementType>(arr: ElementType[]): ElementType[] {
 	for (let i = arr.length - 1; i > 0; i--) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[arr[i], arr[j]] = [arr[j], arr[i]];
