@@ -50,6 +50,7 @@ function resetApp() {
 	winnerWithThrees.set(['', 0]);
 	if (browser) localStorage.removeItem('PuntoLobby');
 	goto(window.location.origin, { replaceState: true });
+	lobbyCode.set('');
 }
 
 export {

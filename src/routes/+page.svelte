@@ -82,23 +82,32 @@
 				}
 
 				// TODO: toasts for renamed players
-				// TODO: fix logic of playerWhoLeft and playerWhoJoined
 				// toast if someone left or joined
-				// if (data.presence !== undefined) {
-				// 	// check if someone left
-				// 	const playerWhoLeft =
-				// 		$players.find((pl) => !Object.keys(data.presence).includes(pl.uuid))?.name || '';
-				// 	if (playerWhoLeft.length > 0) {
-				// 		toast.error(`${playerWhoLeft} ${selectedLanguage.toasts.playerLeft}`);
-				// 	}
+				if (data.presence !== undefined) {
+					// check if someone left
+					const playerWhoLeft = $players.filter(
+						(player) => !Object.keys(data.presence).includes(player.uuid)
+					)[0];
 
-				// 	// check if someone joined
-				// 	const playerWhoJoined =
-				// 		$players.find((pl) => Object.keys(data.presence).includes(pl.uuid))?.name || '';
-				// 	if (playerWhoJoined.length > 0 && playerWhoJoined !== $player.name) {
-				// 		toast(`${playerWhoJoined} ${selectedLanguage.toasts.playerJoined.new}`);
-				// 	}
-				// }
+					if (playerWhoLeft !== undefined && playerWhoLeft.name !== '') {
+						toast.error(`${playerWhoLeft.name} ${selectedLanguage.toasts.playerLeft}`);
+					}
+					// TODO: fix logic
+					// if (playerWhoLeft !== undefined && playerWhoLeft.uuid === $host.uuid) {
+					// 	const newHost = $players.filter((p) => p.uuid !== $player.uuid)[0];
+					// 	await update(ref(db, `${$lobbyCode}/host`), {
+					// 		name: newHost.name,
+					// 		uuid: newHost.uuid
+					// 	});
+					// }
+
+					// TODO: fix logic
+					// // check if someone joined
+					// const playerWhoJoined = data.presence.filter((uuid:string) => !$players.some(player => player.uuid === uuid))[0];
+					// if (playerWhoJoined !== '' && playerWhoJoined !== $player.name) {
+					// 	toast(`${playerWhoJoined} ${selectedLanguage.toasts.playerJoined.new}`);
+					// }
+				}
 
 				// update local state with data from database
 				$host = data.host;
