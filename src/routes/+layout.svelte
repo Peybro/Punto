@@ -4,7 +4,7 @@
 	import { ref, set } from 'firebase/database';
 	import { db } from '$lib/firebase';
 	import { browser, dev } from '$app/environment';
-	import { lobbyCode, lobbyConnected, player } from '$lib/store';
+	import { lobbyConnected, player } from '$lib/store';
 
 	import './../scss/styles.scss';
 

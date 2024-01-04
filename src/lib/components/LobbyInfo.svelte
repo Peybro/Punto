@@ -11,7 +11,6 @@
 	} from '$lib/store';
 	import { copyTextToClipboard } from '$lib/utils';
 	import { translations } from '$lib/translations';
-	import { page } from '$app/stores';
 	import { createEventDispatcher } from 'svelte';
 	import { ref, update } from 'firebase/database';
 	import { db } from '$lib/firebase';

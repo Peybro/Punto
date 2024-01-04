@@ -89,7 +89,7 @@
 						(player) => !Object.keys(data.presence).includes(player.uuid)
 					)[0];
 
-					if (playerWhoLeft !== undefined && playerWhoLeft.name !== '') {
+					if (playerWhoLeft?.name !== '') {
 						toast.error(`${playerWhoLeft.name} ${selectedLanguage.toasts.playerLeft}`);
 					}
 					// TODO: fix logic
