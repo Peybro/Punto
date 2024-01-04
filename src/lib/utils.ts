@@ -5,7 +5,7 @@ import { codeCopied } from './store';
  * Returns a color object with the color, hex and bootstrap color.
  * @param color
  */
-function getBeautifulColors(color: Color | string): {
+function getBeautifulColors(color: Color): {
 	color: Color;
 	hex: string;
 	bootstrap: string;
