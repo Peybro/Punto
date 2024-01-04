@@ -21,7 +21,7 @@
 		winnerWithThrees
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import type { Card, Player } from '$lib/types';
+	import type { Card, Color, Player } from '$lib/types';
 	import { duplicate, fourInARow, getBeautifulColors, getMostThrees, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
@@ -216,14 +216,14 @@
 		// TODO: implement team play with 4 players: each team 2 decks shuffled,
 		// team turns after each other, win with 5 cards in a row of one color
 
-		function colorsInUse(playerArr: Player[]) {
-			return playerArr.map((p) => p.color?.toString());
+		function colorsInUse(playerArr: Player[]): Color[] {
+			return playerArr.map((p) => p.color);
 		}
 
-		function colorsNotInUse(playerArr: Player[]) {
+		function colorsNotInUse(playerArr: Player[]): Color[] {
 			return ['red', 'blue', 'green', 'yellow'].filter(
-				(color) => !colorsInUse(playerArr).includes(color)
-			);
+				(color) => !colorsInUse(playerArr).includes(color as Color)
+			) as Color[];
 		}
 
 		// two player round
@@ -258,7 +258,7 @@
 					color: player.color,
 					deck: shuffle([...player.deck, ...lastDeck.splice(0, 6)]),
 					wins: player.wins
-				};
+				} as Player;
 			});
 
 			await set(ref(db, `${$lobbyCode}/neutralColor`), colorsNotInUse($players)[0]);
@@ -331,7 +331,7 @@
 						).map((v) => ({ value: v, color: player.color }) as Card)
 					),
 					wins: player.wins
-				};
+				} as Player;
 			})
 		);
 
@@ -388,9 +388,9 @@
 					),
 					wins: 0
 				}
-			],
+			] as Player[],
 			gameState: {
-				board: Array(11).fill(Array(11).fill({ value: 0, color: null })),
+				board: Array(11).fill(Array(11).fill({ value: 0, color: null } as Card)) as Card[][],
 				turn: 0,
 				currentPlayerIndex: 0
 			},
@@ -474,7 +474,7 @@
 							uuid: $player.uuid,
 							color: ['red', 'blue', 'green', 'yellow'].filter(
 								(color) => !playersOnline.some((p) => p.color === color)
-							)[0],
+							)[0] as Color,
 							deck: shuffle(
 								duplicate(
 									Array(9)
@@ -486,7 +486,7 @@
 											value: v,
 											color: ['red', 'blue', 'green', 'yellow'].filter(
 												(color) => !playersOnline.some((p) => p.color === color)
-											)[0]
+											)[0] as Color
 										}) as Card
 								)
 							),
