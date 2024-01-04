@@ -89,24 +89,19 @@
 						(player) => !Object.keys(data.presence).includes(player.uuid)
 					)[0];
 
+					// TODO: runs multiple times when someone leaves
 					if (playerWhoLeft !== undefined && playerWhoLeft.name !== '') {
 						toast.error(`${playerWhoLeft.name} ${selectedLanguage.toasts.playerLeft}`);
 					}
-					// TODO: fix logic
-					// if (playerWhoLeft !== undefined && playerWhoLeft.uuid === $host.uuid) {
-					// 	const newHost = $players.filter((p) => p.uuid !== $player.uuid)[0];
-					// 	await update(ref(db, `${$lobbyCode}/host`), {
-					// 		name: newHost.name,
-					// 		uuid: newHost.uuid
-					// 	});
-					// }
 
-					// TODO: fix logic
-					// // check if someone joined
-					// const playerWhoJoined = data.presence.filter((uuid:string) => !$players.some(player => player.uuid === uuid))[0];
-					// if (playerWhoJoined !== '' && playerWhoJoined !== $player.name) {
-					// 	toast(`${playerWhoJoined} ${selectedLanguage.toasts.playerJoined.new}`);
-					// }
+					// give host to someone else if host left
+					if (playerWhoLeft !== undefined && playerWhoLeft.uuid === $host.uuid) {
+						const newHost = $players.filter((p) => p.uuid !== playerWhoLeft.uuid)[0];
+						await update(ref(db, `${$lobbyCode}/host`), {
+							name: newHost.name,
+							uuid: newHost.uuid
+						});
+					}
 				}
 
 				// update local state with data from database
