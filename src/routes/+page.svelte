@@ -85,11 +85,11 @@
 				// toast if someone left or joined
 				if (data.presence !== undefined) {
 					// check if someone left
-					const playerWhoLeft = $players.filter(
+					const playerWhoLeft: Player | undefined = $players.filter(
 						(player) => !Object.keys(data.presence).includes(player.uuid)
 					)[0];
 
-					if (playerWhoLeft?.name !== '') {
+					if (playerWhoLeft !== undefined && playerWhoLeft.name !== '') {
 						toast.error(`${playerWhoLeft.name} ${selectedLanguage.toasts.playerLeft}`);
 					}
 					// TODO: fix logic
