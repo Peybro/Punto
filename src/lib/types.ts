@@ -8,6 +8,7 @@ type GameState = {
 	currentPlayerIndex: number;
 };
 
+type AvailableLanguageType = "en" | "de" | "fr";
 type Translation = {
 	you: string;
 	colors: {
@@ -82,8 +83,6 @@ type Translation = {
 	rename: string;
 };
 
-type LanguagesType = {
-	[key: string]: Translation;
-};
+type LanguagesType = Record<AvailableLanguageType, Translation>
 
-export type { Color, CardValue, Card, Player, GameState, LanguagesType, Translation };
+export type { AvailableLanguageType, Color, CardValue, Card, Player, GameState, LanguagesType, Translation };
