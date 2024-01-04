@@ -390,7 +390,8 @@
 				}
 			] as Player[],
 			gameState: {
-				board: Array(11).fill(Array(11).fill({ value: 0, color: null } as Card)) as Card[][],
+				// use red as default color here (card is seen as default by 0 anyways)
+				board: Array(11).fill(Array(11).fill({ value: 0, color: "red" } as Card)) as Card[][],
 				turn: 0,
 				currentPlayerIndex: 0
 			},
