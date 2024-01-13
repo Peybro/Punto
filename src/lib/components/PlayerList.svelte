@@ -15,6 +15,7 @@
 	import { ref, update } from 'firebase/database';
 	import { translations } from '$lib/translations';
 	import { browser } from '$app/environment';
+	import { colors } from '$lib/types';
 
 	$: selectedLanguage = translations[$languageId];
 
@@ -77,7 +78,7 @@
 				{/if}
 			</button>
 			<ul class="dropdown-menu">
-				{#each ['red', 'blue', 'green', 'yellow'] as color}
+				{#each colors as color}
 					<li>
 						<button
 							class={`dropdown-item text-${getBeautifulColors(color)?.bootstrap} fw-bold`}
@@ -87,9 +88,7 @@
 								})}
 							disabled={$players.some((p) => p.color === color) || $roundHasStarted}
 						>
-							{Object.values(selectedLanguage.colors)[
-								['red', 'blue', 'green', 'yellow'].indexOf(color)
-							]}
+							{Object.values(selectedLanguage.colors)[colors.indexOf(color)]}
 						</button>
 					</li>
 				{/each}

@@ -1,4 +1,5 @@
-type Color = 'red' | 'blue' | 'green' | 'yellow' | null;
+const colors = ['red', 'blue', 'green', 'yellow'] as const;
+type Color = (typeof colors)[number] | null;
 type CardValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 type Card = { value: CardValue; color: Color };
 type Player = { name: string; uuid: string; color: Color; deck: Card[]; wins: number };
@@ -82,8 +83,18 @@ type Translation = {
 	rename: string;
 };
 
-type LanguagesType = {
-	[key: string]: Translation;
-};
+const availableLanguages = ['en', 'fr', 'de'] as const;
+type AvailableLanguages = (typeof availableLanguages)[number];
+type LanguagesType = Record<AvailableLanguages, Translation>;
 
-export type { Color, CardValue, Card, Player, GameState, LanguagesType, Translation };
+export { colors };
+export type {
+	AvailableLanguages,
+	Color,
+	CardValue,
+	Card,
+	Player,
+	GameState,
+	LanguagesType,
+	Translation
+};

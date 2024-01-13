@@ -21,7 +21,7 @@
 		winnerWithThrees
 	} from '$lib/store';
 	import Face from '$lib/components/dice/Face.svelte';
-	import type { Card, Color, Player } from '$lib/types';
+	import { colors, type Card, type Color, type Player } from '$lib/types';
 	import { duplicate, fourInARow, getBeautifulColors, getMostThrees, shuffle } from '$lib/utils';
 	import PlayerList from '$lib/components/PlayerList.svelte';
 	import LobbyInfo from '$lib/components/LobbyInfo.svelte';
@@ -216,9 +216,7 @@
 		}
 
 		function colorsNotInUse(playerArr: Player[]): Color[] {
-			return ['red', 'blue', 'green', 'yellow'].filter(
-				(color) => !colorsInUse(playerArr).includes(color as Color)
-			) as Color[];
+			return colors.filter((color) => !colorsInUse(playerArr).includes(color as Color)) as Color[];
 		}
 
 		// two player round
@@ -467,7 +465,7 @@
 						{
 							name: $player.name,
 							uuid: $player.uuid,
-							color: ['red', 'blue', 'green', 'yellow'].filter(
+							color: colors.filter(
 								(color) => !playersOnline.some((p) => p.color === color)
 							)[0] as Color,
 							deck: shuffle(
@@ -479,7 +477,7 @@
 									(v) =>
 										({
 											value: v,
-											color: ['red', 'blue', 'green', 'yellow'].filter(
+											color: colors.filter(
 												(color) => !playersOnline.some((p) => p.color === color)
 											)[0] as Color
 										}) as Card
