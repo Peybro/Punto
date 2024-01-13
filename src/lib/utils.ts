@@ -5,7 +5,7 @@ import { codeCopied } from './store';
  * Returns a color object with the color, hex and bootstrap color.
  * @param color
  */
-function getBeautifulColors(color: Color | string): {
+function getBeautifulColors(color: Color): {
 	color: Color;
 	hex: string;
 	bootstrap: string;
@@ -326,12 +326,7 @@ function fiveInARow(board: Card[][]): boolean {
  * Counts the number of rows of three cards of the same color for each color separately.
  * @param board The board to check.
  */
-function getMostThrees(board: Card[][]): {
-	red: number;
-	blue: number;
-	green: number;
-	yellow: number;
-} {
+function getMostThrees(board: Card[][]): Record<Color, number> {
 	const counts = { red: 0, blue: 0, green: 0, yellow: 0 };
 	const height = board.length;
 	const width = board[0].length;

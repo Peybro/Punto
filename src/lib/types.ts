@@ -9,6 +9,7 @@ type GameState = {
 	currentPlayerIndex: number;
 };
 
+type AvailableLanguageType = "en" | "de" | "fr";
 type Translation = {
 	you: string;
 	colors: {
