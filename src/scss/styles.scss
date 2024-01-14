@@ -4,6 +4,11 @@ $success: #78b728;
 $warning: #f1b300;
 $dark: #161616;
 
+html,
+body {
+	overscroll-behavior-y: contain;
+}
+
 .punto {
 	font-family: century-gothic, sans-serif;
 	font-weight: bold;
