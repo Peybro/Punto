@@ -1,4 +1,4 @@
-import type { Card, Color, GameState } from '$lib/types';
+import type { Card, Color, GameState, colors } from '$lib/types';
 import { codeCopied } from './store';
 
 /**
@@ -188,7 +188,7 @@ function shuffle<ElementType>(arr: ElementType[]): ElementType[] {
  * @param board
  * @param neutralColor
  */
-function fourInARow(board: Card[][], neutralColor: string): boolean {
+function fourInARow(board: Card[][], neutralColor: Color): boolean {
 	const width = board[0].length;
 	const height = board.length;
 
@@ -326,7 +326,7 @@ function fiveInARow(board: Card[][]): boolean {
  * Counts the number of rows of three cards of the same color for each color separately.
  * @param board The board to check.
  */
-function getMostThrees(board: Card[][]): Record<Color, number> {
+function getMostThrees(board: Card[][]): Record<(typeof colors)[number], number> {
 	const counts = { red: 0, blue: 0, green: 0, yellow: 0 };
 	const height = board.length;
 	const width = board[0].length;

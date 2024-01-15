@@ -8,6 +8,6 @@ const translations: LanguagesType = {
 	en: lang_en,
 	de: lang_de,
 	fr: lang_fr
-};
+} as const;
 
 export { translations };

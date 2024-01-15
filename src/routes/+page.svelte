@@ -225,10 +225,8 @@
 				$players[i].deck = shuffle([
 					...$players[i].deck,
 					...duplicate(
-						Array(9)
-							.fill(0)
-							.map((_, j) => j + 1)
-					).map((v) => ({ value: v, color: color }) as Card)
+						Array.from({ length: 9 }, (_, j) => ({ value: j + 1, color: color }) as Card)
+					)
 				]);
 			});
 
@@ -238,24 +236,24 @@
 		} else if ($players.length === 3) {
 			const lastDeck = shuffle(
 				duplicate(
-					Array(9)
-						.fill(0)
-						.map((_, i) => i + 1)
-				).map((v) => ({ value: v, color: colorsNotInUse($players)[0] }) as Card)
+					Array.from(
+						{ length: 9 },
+						(_, i) => ({ value: i + 1, color: colorsNotInUse($players)[0] }) as Card
+					)
+				)
 			);
 
-			const tempPlayers = $players.map((player) => {
-				return {
-					name: player.name,
-					uuid: player.uuid,
-					color: player.color,
-					deck: shuffle([...player.deck, ...lastDeck.splice(0, 6)]),
-					wins: player.wins
-				} as Player;
-			});
-
+			// set neutral color and add split remaining cards to players
 			await set(ref(db, `${$lobbyCode}/neutralColor`), colorsNotInUse($players)[0]);
-			await set(ref(db, `${$lobbyCode}/players/`), tempPlayers);
+			await set(
+				ref(db, `${$lobbyCode}/players/`),
+				$players.map((player) => {
+					return {
+						...player,
+						deck: shuffle([...player.deck, ...lastDeck.splice(0, 6)])
+					} as Player;
+				})
+			);
 		}
 
 		// one and four player rounds
@@ -313,17 +311,12 @@
 			ref(db, `${$lobbyCode}/players/`),
 			$players.map((player) => {
 				return {
-					name: player.name,
-					uuid: player.uuid,
-					color: player.color,
+					...player,
 					deck: shuffle(
 						duplicate(
-							Array(9)
-								.fill(0)
-								.map((_, i) => i + 1)
-						).map((v) => ({ value: v, color: player.color }) as Card)
-					),
-					wins: player.wins
+							Array.from({ length: 9 }, (_, i) => ({ value: i + 1, color: player.color }) as Card)
+						)
+					)
 				} as Player;
 			})
 		);
@@ -373,11 +366,7 @@
 					uuid: $player.uuid,
 					color: 'red',
 					deck: shuffle(
-						duplicate(
-							Array(9)
-								.fill(0)
-								.map((_, i) => i + 1)
-						).map((v) => ({ value: v, color: 'red' }) as Card)
+						duplicate(Array.from({ length: 9 }, (_, i) => ({ value: i + 1, color: 'red' }) as Card))
 					),
 					wins: 0
 				}
@@ -471,17 +460,16 @@
 							)[0] as Color,
 							deck: shuffle(
 								duplicate(
-									Array(9)
-										.fill(0)
-										.map((_, i) => i + 1)
-								).map(
-									(v) =>
-										({
-											value: v,
-											color: colors.filter(
-												(color) => !playersOnline.some((p) => p.color === color)
-											)[0] as Color
-										}) as Card
+									Array.from(
+										{ length: 9 },
+										(_, i) =>
+											({
+												value: i + 1,
+												color: colors.filter(
+													(color) => !playersOnline.some((p) => p.color === color)
+												)[0] as Color
+											}) as Card
+									)
 								)
 							),
 							wins: 0

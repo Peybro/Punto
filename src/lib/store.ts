@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-import type { Player } from './types';
+import type { Color, Player } from './types';
 import { goto } from '$app/navigation';
 import { usePlayerStore } from '$lib/stores/player-store';
 import { useGameStateStore } from '$lib/stores/gamestate-store';
@@ -21,7 +21,7 @@ const players = writable<Player[]>([]);
 const roundHasStarted = writable<boolean>(false);
 const codeCopied = writable<boolean>(false);
 const infoVisible = writable<boolean>(true);
-const neutralColor = writable<string>('');
+const neutralColor = writable<Color>(null);
 const playersOnline = writable<string[]>([]);
 const winnerWithThrees = writable<[string, number]>(['', 0]);
 const oldGame = writable(browser ? JSON.parse(localStorage.getItem('PuntoLobby') ?? '{}') : {});
@@ -46,7 +46,7 @@ function resetApp() {
 	players.set([]);
 	roundHasStarted.set(false);
 	infoVisible.set(true);
-	neutralColor.set('');
+	neutralColor.set(null);
 	winnerWithThrees.set(['', 0]);
 	renameInProgress.set(false);
 	if (browser) localStorage.removeItem('PuntoLobby');
