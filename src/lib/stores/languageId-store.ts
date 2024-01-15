@@ -7,7 +7,7 @@ import type { AvailableLanguages } from '$lib/types';
 const invitation = useInvitationStore();
 
 export function useLanguageIdStore() {
-	const { subscribe, set, update } = writable<AvailableLanguages>(
+	const { subscribe, set } = writable<AvailableLanguages>(
 		browser ? (navigator.language.split('-')[0] as AvailableLanguages) || 'en' : 'en'
 	);
 
