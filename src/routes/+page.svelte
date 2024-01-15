@@ -357,6 +357,8 @@
 			$lobbyCode = newLobbyCode;
 		}
 
+		const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
 		await set(ref(db, `${newLobbyCode}/`), {
 			lobbyCode: newLobbyCode,
 			host: { name: $player.name, uuid: $player.uuid },
@@ -364,16 +366,17 @@
 				{
 					name: $player.name,
 					uuid: $player.uuid,
-					color: 'red',
+					color: randomColor,
 					deck: shuffle(
-						duplicate(Array.from({ length: 9 }, (_, i) => ({ value: i + 1, color: 'red' }) as Card))
+						duplicate(
+							Array.from({ length: 9 }, (_, i) => ({ value: i + 1, color: randomColor }) as Card)
+						)
 					),
 					wins: 0
 				}
 			] as Player[],
 			gameState: {
-				// use red as default color here (card is seen as default by 0 anyways)
-				board: Array(11).fill(Array(11).fill({ value: 0, color: 'red' } as Card)) as Card[][],
+				board: Array(11).fill(Array(11).fill({ value: 0, color: null } as Card)) as Card[][],
 				turn: 0,
 				currentPlayerIndex: 0
 			},
